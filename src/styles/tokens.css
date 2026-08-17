@@ -1,0 +1,63 @@
+/*
+  來源：docs/tokens.md（實測 noahportfolio.figma.site 的 computed styles）。
+  只有 light 主題有實測依據；dark 主題尚未設計，故意不填值，見檔案底部說明。
+*/
+
+:root {
+  /* 色彩 — light（唯一目前有實測依據的主題） */
+  --color-bg: #f2f2f2;
+  --color-surface: #ffffff; /* [需確認] 沒有實測到獨立卡片背景色 */
+  --color-ink: #333333;
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-muted: rgba(0, 0, 0, 0.55);
+  /* [需確認] 沒有實測到明確的 hairline border 色，暫用 ink 的低透明度技術性替代，等設計師提供正式數值 */
+  --color-border: rgba(51, 51, 51, 0.12);
+
+  /* 字體 */
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* [需確認] 是否需要中文 fallback（Noto Sans TC）— 目前內容全英文，尚未確認 */
+
+  /* 字重 */
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  /* 字級階層 */
+  --font-size-hero: 100px; /* [需確認] 只出現一次，未定位到確切元素 */
+  --font-size-h1: 48px;
+  --font-size-h2: 36px;
+  --font-size-h3: 24px;
+  --font-size-body-lg: 20px;
+  --font-size-body: 18px;
+  --font-size-label: 16px;
+  --font-size-meta: 12px;
+
+  /* 間距階梯（8px 基準，實測值） */
+  --sp-1: 8px;
+  --sp-2: 16px;
+  --sp-3: 24px;
+  --sp-4: 32px;
+  --sp-5: 40px;
+  --sp-6: 64px;
+  --sp-7: 80px;
+  --sp-8: 120px;
+  --sp-9: 240px;
+
+  /* 圓角 */
+  --radius: 16px;
+  --radius-pill: 999px; /* [需確認] 目前站上沒有藥丸形元件，先保留備用 */
+
+  /* 斷點（僅供 JS 或註解參考，CSS 仍用 @media 明寫數值） */
+  --breakpoint-sm: 375px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1200px;
+}
+
+/*
+  Dark theme：目前沒有任何實測依據（live 站沒有主題切換機制），
+  刻意不在這裡填入 [data-theme="dark"] 的色彩數值，避免自己猜一組填進去。
+  等設計師確認 dark 配色後，再補上對應的 :root[data-theme="dark"] { ... } 覆寫區塊。
+*/

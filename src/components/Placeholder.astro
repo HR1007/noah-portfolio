@@ -1,0 +1,38 @@
+---
+interface Props {
+  ratio: string;
+  label: string;
+}
+
+const { ratio, label } = Astro.props;
+const showLabel = import.meta.env.SHOW_PLACEHOLDER_LABEL !== 'false';
+---
+
+<div class="placeholder" style={`aspect-ratio: ${ratio}`}>
+  {showLabel && <span class="placeholder__label">{label}</span>}
+</div>
+
+<style>
+  .placeholder {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--sp-2);
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--color-bg) 0 12px,
+      var(--color-surface) 12px 24px
+    );
+  }
+
+  .placeholder__label {
+    font-size: var(--font-size-meta);
+    color: var(--color-muted);
+    background: var(--color-surface);
+    padding: var(--sp-1) var(--sp-2);
+    border-radius: calc(var(--radius) / 2);
+    border: 1px solid var(--color-border);
+  }
+</style>

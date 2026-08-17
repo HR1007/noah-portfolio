@@ -1,0 +1,45 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionIntro from '../components/SectionIntro.astro';
+import PortfolioCard from '../components/PortfolioCard.astro';
+import { getProjectImages } from '../lib/media';
+
+const site = await getEntry('site', 'main');
+const { eyebrow, headline, intro } = site!.data.portfolio;
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title={`${headline} — Noah Wen`} description={intro}>
+  <section class="portfolio">
+    <SectionIntro eyebrow={eyebrow} headline={headline} body={intro} />
+    <div class="portfolio__list">
+      {
+        projects.map((project, index) => (
+          <PortfolioCard
+            title={project.data.title}
+            summary={project.data.summary}
+            ctaLabel={project.data.ctaLabel}
+            href={`/projects/${project.id}`}
+            image={getProjectImages(project.id)[0]}
+            reverse={index % 2 === 1}
+          />
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .portfolio {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: var(--sp-7) var(--sp-3);
+  }
+
+  .portfolio__list {
+    display: flex;
+    flex-direction: column;
+  }
+</style>

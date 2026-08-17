@@ -1,0 +1,60 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Media from '../../components/Media.astro';
+import { getProjectImages } from '../../lib/media';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const images = getProjectImages(project.id);
+---
+
+<BaseLayout title={`${project.data.title} — Noah Wen`} description={project.data.summary}>
+  <section class="project-hero">
+    <h1 class="project-hero__title">{project.data.title}</h1>
+    <p class="project-hero__summary">{project.data.summary}</p>
+  </section>
+
+  <section class="project-showcase">
+    <Media image={images[0]} ratio="4/3" alt={`${project.data.title} showcase`} />
+  </section>
+
+  <section class="project-body">
+    <Content />
+  </section>
+</BaseLayout>
+
+<style>
+  .project-hero,
+  .project-showcase,
+  .project-body {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--sp-6) var(--sp-3);
+  }
+
+  .project-hero__title {
+    font-size: var(--font-size-h1);
+    margin-bottom: var(--sp-2);
+  }
+
+  .project-hero__summary {
+    font-size: var(--font-size-body-lg);
+    color: var(--color-muted);
+    max-width: 65ch;
+  }
+
+  .project-body {
+    font-size: var(--font-size-body);
+    color: var(--color-muted);
+    line-height: 1.7;
+  }
+</style>

@@ -1,0 +1,71 @@
+---
+import { getEntry } from 'astro:content';
+
+const site = await getEntry('site', 'main');
+const items = site!.data.marquee.items;
+// 循環 4 輪讓跑馬燈在寬螢幕下也填滿並無縫銜接
+const loop = [...items, ...items, ...items, ...items];
+---
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track">
+    {
+      loop.map((item) => (
+        <span class="marquee__item">
+          <span class="marquee__text">{item}</span>
+          <span class="marquee__dot">✦</span>
+        </span>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    background: var(--color-ink);
+    padding: var(--sp-1) 0;
+  }
+
+  .marquee__track {
+    display: flex;
+    width: max-content;
+    animation: marquee 26s linear infinite;
+  }
+
+  .marquee__item {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: 0 var(--sp-3);
+    white-space: nowrap;
+  }
+
+  .marquee__text {
+    font-size: var(--font-size-meta);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-white);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .marquee__dot {
+    color: var(--color-white);
+    font-size: var(--font-size-meta);
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-25%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+    }
+  }
+</style>

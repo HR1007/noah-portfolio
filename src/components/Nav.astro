@@ -1,0 +1,84 @@
+---
+import { getEntry } from 'astro:content';
+
+const site = await getEntry('site', 'main');
+const { logo, links } = site!.data.nav;
+const currentPath = Astro.url.pathname;
+---
+
+<nav class="nav">
+  <a href="/" class="nav__logo">{logo}</a>
+  <ul class="nav__links">
+    {
+      links.map((link) => {
+        const isActive = currentPath === link.href;
+        return (
+          <li>
+            <a href={link.href} aria-current={isActive ? 'page' : undefined} class="nav__link">
+              {link.label}
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .nav__logo {
+    font-weight: var(--font-weight-black);
+    font-size: var(--font-size-h3);
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+  }
+
+  .nav__links {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .nav__link {
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-ink);
+  }
+
+  .nav__link[aria-current='page'] {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  @media (max-width: 767px) {
+    .nav {
+      flex-wrap: wrap;
+    }
+
+    .nav__logo {
+      font-size: var(--font-size-body);
+    }
+
+    .nav__links {
+      gap: var(--sp-2);
+      flex-wrap: wrap;
+    }
+
+    .nav__link {
+      font-size: var(--font-size-meta);
+    }
+  }
+</style>

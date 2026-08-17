@@ -1,0 +1,63 @@
+{
+  "nav": {
+    "logo": "NOAH WEN",
+    "links": [
+      { "label": "About Me", "href": "/" },
+      { "label": "Portfolio", "href": "/portfolio" },
+      { "label": "Gallery", "href": "/gallery" }
+    ]
+  },
+  "marquee": {
+    "items": ["UI/UX DESIGNER", "HUMAN FACTORS", "INFO MANAGEMENT"]
+  },
+  "footer": {
+    "copyright": "© 2026 Chung Wen Hung. All content, including pixel art and photography, are personal works."
+  },
+  "home": {
+    "heroName": "Chung Wen Hung",
+    "heroTagline": "Just a coffee guy",
+    "heroRoles": ["UI/UX Designer", "Human Factors Engineering", "Information Management"],
+    "heroQuote": "My life is an 8px grid, and I'm just trying not to let my anxiety overflow-y",
+    "aboutEyebrow": "About me",
+    "aboutHeadline": "Shaping Intuitive Solutions",
+    "aboutIntro": "Hi there! I'm an Information Management graduate student at NKUST with a heart for UI/UX and Human Factors. My journey has taken me from analyzing data at e-Excellence Inc. to exploring new perspectives during an exchange at THWS in Germany, all of which fuels my focus on creating accessible and beautifully structured interfaces. These days, I'm pouring my energy into optimizing OSCE medical system backends through User-Centered Design (UCD) — striving to turn complex technical logic into an intuitive experience that truly serves its users.",
+    "beyondGridHeading": "Beyond the Grid",
+    "beyondGridParagraphs": [
+      "When I'm not refining pixels or analyzing datasets, I immerse myself in illustration and digital art. My love for visual storytelling often translates into my web projects, where I enjoy integrating unique character designs.",
+      "Having served as a Student Ambassador and International Volunteer in Würzburg, I have a deep appreciation for cross-cultural exchange and travel photography. I believe that observing the world from different perspectives fuels my creativity and empathy as a designer."
+    ],
+    "experience": [
+      {
+        "title": "Human Factors Researcher",
+        "period": "2025 - Present",
+        "description": "Showcased medical UI/UX optimizations using UCD at international conferences (JSES & CIIE)."
+      },
+      {
+        "title": "Teaching Assistant",
+        "period": "2024 - 2025",
+        "description": "Assisted in Statistics at NKUST and Intelligent Manufacturing at NTHU."
+      },
+      {
+        "title": "Data Analysis Intern",
+        "period": "2023 - 2024",
+        "description": "e-Excellence Inc., Applied Information Architecture (IA) and Visual Hierarchy to transform complex datasets into intuitive, user-friendly visual stories for management."
+      }
+    ],
+    "connectHeading": "Connect with me",
+    "connectIntro": ["Want to work on something together?", "Or just want to chat?", "Hit me up."],
+    "connectChannels": [
+      { "label": "Email", "value": "hungnoah730@gmail.com", "href": "mailto:hungnoah730@gmail.com" },
+      { "label": "Instagram", "value": "lens.memo", "href": "https://www.instagram.com/lens.memo/" }
+    ]
+  },
+  "portfolio": {
+    "eyebrow": "Bridging the gap between technical logic and human-centered intuition.",
+    "headline": "Portfolio",
+    "intro": "I'm a designer who's honestly just obsessed with how people actually function. To me, design isn't just about 'looking good'—it's about Human Factors and hard evidence. I rely on eye-tracking, emotional responses, and user interviews to prove that a layout actually works. Whether I'm cleaning up a chaotic technical interface or geeking out over dark mode aesthetics, I love thinking outside the box to turn complex digital friction into a smooth, 'it just works' experience."
+  },
+  "gallery": {
+    "eyebrow": "Life, Framed",
+    "headline": "Gallery",
+    "intro": "I believe every great photo starts with a good story. My photography journey is a constant switch between the timeless charm of a Film project and the fast-paced creativity of my Digital Cam. Welcome to my visual archive. Feel free to explore my ongoing Projects, dive into the sceneries of my Travels, or simply browse through the raw, unscripted moments of my Day Life :)"
+  }
+}

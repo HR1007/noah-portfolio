@@ -1,0 +1,25 @@
+---
+import { getEntry } from 'astro:content';
+import Marquee from './Marquee.astro';
+
+const site = await getEntry('site', 'main');
+const { copyright } = site!.data.footer;
+---
+
+<footer class="footer">
+  <p class="footer__copyright">{copyright}</p>
+</footer>
+<Marquee />
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-border);
+    padding: var(--sp-3);
+    text-align: center;
+  }
+
+  .footer__copyright {
+    font-size: var(--font-size-meta);
+    color: var(--color-muted);
+  }
+</style>
