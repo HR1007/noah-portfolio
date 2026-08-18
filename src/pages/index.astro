@@ -5,14 +5,16 @@ import Media from '../components/Media.astro';
 import PullQuote from '../components/PullQuote.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
 import ConnectChannel from '../components/ConnectChannel.astro';
-import { getHomeImage } from '../lib/media';
+import { getHomeImage, getHomeImageSet } from '../lib/media';
 
 const site = await getEntry('site', 'main');
 const { home } = site!.data;
 
 const heroImage = getHomeImage('hero');
+const avatarImage = getHomeImage('avatar');
 const aboutImage = getHomeImage('about');
 const beyondGridPhoto = getHomeImage('beyond-grid');
+const hobbyPhotos = getHomeImageSet('hobby');
 ---
 
 <BaseLayout
@@ -21,35 +23,54 @@ const beyondGridPhoto = getHomeImage('beyond-grid');
 >
   <section class="hero">
     <div class="hero__media">
-      <Media image={heroImage} ratio="4/5" alt={`${home.heroName} pixel-art portrait`} />
+      <Media image={heroImage} ratio="3/7" alt={`${home.heroName} pixel-art portrait`} />
     </div>
-    <div class="hero__content">
-      <h1 class="hero__name">{home.heroName}</h1>
-      <p class="hero__tagline">{home.heroTagline}</p>
-      <ul class="hero__roles">
-        {home.heroRoles.map((role) => <li>{role}</li>)}
-      </ul>
-      <PullQuote quote={home.heroQuote} />
+    <ul class="hero__roles">
+      {home.heroRoles.map((role) => <li>{role}</li>)}
+    </ul>
+  </section>
+
+  <section class="quote">
+    <PullQuote quote={home.heroQuote} />
+    <div class="quote__byline">
+      <div class="quote__avatar">
+        <Media image={avatarImage} ratio="1/1" alt={home.heroName} />
+      </div>
+      <div>
+        <p class="quote__name">{home.heroName}</p>
+        <p class="quote__tagline">{home.heroTagline}</p>
+      </div>
     </div>
   </section>
 
   <section class="about">
-    <p class="about__eyebrow">{home.aboutEyebrow}</p>
-    <h2 class="about__headline">{home.aboutHeadline}</h2>
+    <h2 class="about__heading">{home.aboutHeading}</h2>
     <div class="about__grid">
-      <Media image={aboutImage} ratio="3/4" alt={home.heroName} />
-      <p class="about__intro">{home.aboutIntro}</p>
+      <Media image={aboutImage} ratio="4/5" alt={home.heroName} />
+      <div>
+        <h3 class="about__subheading">{home.aboutSubheading}</h3>
+        <p class="about__intro">{home.aboutIntro}</p>
+      </div>
     </div>
   </section>
 
   <section class="beyond-grid">
-    <h2>{home.beyondGridHeading}</h2>
     <div class="beyond-grid__grid">
       <div class="beyond-grid__text">
+        <h2>{home.beyondGridHeading}</h2>
         {home.beyondGridParagraphs.map((paragraph) => <p>{paragraph}</p>)}
       </div>
-      <Media image={beyondGridPhoto} ratio="16/9" alt={home.beyondGridHeading} />
+      <Media image={beyondGridPhoto} ratio="1/1" alt={home.beyondGridHeading} />
     </div>
+    {
+      hobbyPhotos.length > 0 && (
+        <div class="beyond-grid__hobbies">
+          {hobbyPhotos.map((photo, index) => (
+            <Media image={photo} ratio="1/1" alt={`travel photo ${index + 1}`} />
+          ))}
+        </div>
+      )
+    }
   </section>
 
   <section class="experience">
@@ -84,44 +105,65 @@ const beyondGridPhoto = getHomeImage('beyond-grid');
   }
 
   .hero {
-    display: grid;
-    grid-template-columns: 0.95fr 1.05fr;
-    gap: var(--sp-6);
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    text-align: center;
+    padding-bottom: var(--sp-3);
   }
 
-  .hero__name {
-    font-size: var(--font-size-h1);
-  }
-
-  .hero__tagline {
-    color: var(--color-muted);
-    font-size: var(--font-size-body);
-    margin-top: var(--sp-1);
+  .hero__media {
+    width: min(100%, 260px);
+    margin-bottom: var(--sp-3);
   }
 
   .hero__roles {
     display: flex;
     flex-direction: column;
     gap: var(--sp-1);
-    margin: var(--sp-3) 0;
     font-weight: var(--font-weight-semibold);
     font-size: var(--font-size-body-lg);
   }
 
-  .hero__roles li {
-    list-style: disc;
-    margin-left: 1.2em;
+  .quote {
+    padding-top: var(--sp-3);
+    padding-bottom: var(--sp-7);
   }
 
-  .about__eyebrow {
-    font-size: var(--font-size-label);
+  .quote__byline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    margin-top: var(--sp-4);
+  }
+
+  .quote__avatar {
+    width: 56px;
+    flex: none;
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+  }
+
+  .quote__name {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+    text-align: left;
+  }
+
+  .quote__tagline {
+    font-size: var(--font-size-body);
     color: var(--color-muted);
-    margin-bottom: var(--sp-1);
+    text-align: left;
   }
 
-  .about__headline {
-    font-size: var(--font-size-h1);
+  .about {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .about__heading {
+    font-size: var(--font-size-hero);
+    line-height: 0.95;
     margin-bottom: var(--sp-4);
   }
 
@@ -132,18 +174,19 @@ const beyondGridPhoto = getHomeImage('beyond-grid');
     align-items: start;
   }
 
+  .about__subheading {
+    font-size: var(--font-size-h2);
+    margin-bottom: var(--sp-2);
+  }
+
   .about__intro {
     font-size: var(--font-size-body);
     line-height: 1.7;
-    color: var(--color-ink);
+    color: var(--color-muted);
   }
 
   .beyond-grid {
     border-top: 1px solid var(--color-border);
-  }
-
-  .beyond-grid h2 {
-    margin-bottom: var(--sp-3);
   }
 
   .beyond-grid__grid {
@@ -151,6 +194,7 @@ const beyondGridPhoto = getHomeImage('beyond-grid');
     grid-template-columns: 1fr 1fr;
     gap: var(--sp-5);
     align-items: center;
+    margin-bottom: var(--sp-5);
   }
 
   .beyond-grid__text {
@@ -160,6 +204,16 @@ const beyondGridPhoto = getHomeImage('beyond-grid');
     color: var(--color-muted);
     font-size: var(--font-size-body);
     line-height: 1.7;
+  }
+
+  .beyond-grid__text h2 {
+    color: var(--color-ink);
+  }
+
+  .beyond-grid__hobbies {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--sp-2);
   }
 
   .connect {
@@ -185,11 +239,18 @@ const beyondGridPhoto = getHomeImage('beyond-grid');
   }
 
   @media (max-width: 767px) {
-    .hero,
     .about__grid,
     .beyond-grid__grid,
     .connect__channels {
       grid-template-columns: 1fr;
+    }
+
+    .beyond-grid__hobbies {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .about__heading {
+      font-size: var(--font-size-h1);
     }
   }
 </style>

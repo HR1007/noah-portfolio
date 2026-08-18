@@ -18,8 +18,8 @@
     "heroTagline": "Just a coffee guy",
     "heroRoles": ["UI/UX Designer", "Human Factors Engineering", "Information Management"],
     "heroQuote": "My life is an 8px grid, and I'm just trying not to let my anxiety overflow-y",
-    "aboutEyebrow": "About me",
-    "aboutHeadline": "Shaping Intuitive Solutions",
+    "aboutHeading": "About me",
+    "aboutSubheading": "Shaping Intuitive Solutions",
     "aboutIntro": "Hi there! I'm an Information Management graduate student at NKUST with a heart for UI/UX and Human Factors. My journey has taken me from analyzing data at e-Excellence Inc. to exploring new perspectives during an exchange at THWS in Germany, all of which fuels my focus on creating accessible and beautifully structured interfaces. These days, I'm pouring my energy into optimizing OSCE medical system backends through User-Centered Design (UCD) — striving to turn complex technical logic into an intuitive experience that truly serves its users.",
     "beyondGridHeading": "Beyond the Grid",
     "beyondGridParagraphs": [
