@@ -1,0 +1,37 @@
+---
+import type { ImageMetadata } from 'astro';
+import Media from '../Media.astro';
+
+interface Row {
+  ratio: string;
+  alt: string;
+}
+
+interface Props {
+  rows: Row[];
+  images: (ImageMetadata | undefined)[];
+}
+
+const { rows, images } = Astro.props;
+---
+
+<section class="image-row" style={`--columns: ${rows.length}`}>
+  {rows.map((row, index) => <Media image={images[index]} ratio={row.ratio} alt={row.alt} />)}
+</section>
+
+<style>
+  .image-row {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 var(--sp-3) var(--sp-6);
+    display: grid;
+    grid-template-columns: repeat(var(--columns), 1fr);
+    gap: var(--sp-3);
+  }
+
+  @media (max-width: 767px) {
+    .image-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

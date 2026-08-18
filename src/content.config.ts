@@ -50,12 +50,18 @@ const featureGridBlock = z.object({
   ),
 });
 
+const imageRowBlock = z.object({
+  type: z.literal('imageRow'),
+  images: z.array(z.object({ ratio: z.string(), alt: z.string() })).min(1).max(2),
+});
+
 const projectSection = z.discriminatedUnion('type', [
   textSectionBlock,
   deviceShowcaseBlock,
   experienceDemoBlock,
   featureSplitBlock,
   featureGridBlock,
+  imageRowBlock,
 ]);
 
 const projects = defineCollection({

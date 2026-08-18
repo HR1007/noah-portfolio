@@ -8,6 +8,7 @@ import DeviceShowcase from '../../components/project/DeviceShowcase.astro';
 import ExperienceDemo from '../../components/project/ExperienceDemo.astro';
 import FeatureSplit from '../../components/project/FeatureSplit.astro';
 import FeatureGrid from '../../components/project/FeatureGrid.astro';
+import ImageRow from '../../components/project/ImageRow.astro';
 import ProjectQuote from '../../components/project/ProjectQuote.astro';
 import { getProjectImages } from '../../lib/media';
 
@@ -90,6 +91,10 @@ const { Content } = await render(project);
                   columns={section.columns}
                   images={section.columns.map(() => nextImage())}
                 />
+              );
+            case 'imageRow':
+              return (
+                <ImageRow rows={section.images} images={section.images.map(() => nextImage())} />
               );
             default:
               return null;
