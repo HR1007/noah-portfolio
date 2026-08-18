@@ -1,6 +1,63 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+// 案例頁區塊：每個專案依自己的 wireframe 排列不同組合與順序的區塊。
+// 區塊一律不帶圖片路徑／檔名，頁面依 sections 出現順序，依序從該專案的圖片資料夾取下一張圖（沒有圖就顯示佔位框）。
+const textSectionBlock = z.object({
+  type: z.literal('textSection'),
+  eyebrow: z.string().optional(),
+  heading: z.string(),
+  paragraphs: z.array(z.string()),
+});
+
+const deviceShowcaseBlock = z.object({
+  type: z.literal('deviceShowcase'),
+  ratio: z.string(),
+  alt: z.string(),
+});
+
+const experienceDemoBlock = z.object({
+  type: z.literal('experienceDemo'),
+  eyebrow: z.string().optional(),
+  heading: z.string(),
+  body: z.string(),
+  ratio: z.string(),
+  alt: z.string(),
+});
+
+const featureSplitBlock = z.object({
+  type: z.literal('featureSplit'),
+  heading: z.string(),
+  body: z.string(),
+  imagePosition: z.enum(['left', 'right']),
+  ratio: z.string(),
+  alt: z.string(),
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
+});
+
+const featureGridBlock = z.object({
+  type: z.literal('featureGrid'),
+  eyebrow: z.string().optional(),
+  heading: z.string(),
+  columns: z.array(
+    z.object({
+      heading: z.string(),
+      body: z.string(),
+      ratio: z.string(),
+      alt: z.string(),
+    })
+  ),
+});
+
+const projectSection = z.discriminatedUnion('type', [
+  textSectionBlock,
+  deviceShowcaseBlock,
+  experienceDemoBlock,
+  featureSplitBlock,
+  featureGridBlock,
+]);
+
 const projects = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/projects' }),
   schema: z.object({
@@ -10,6 +67,15 @@ const projects = defineCollection({
     summary: z.string(),
     tags: z.array(z.string()).default([]), // [需確認] live 站卡片未展示 tag，待設計師提供
     ctaLabel: z.string().default('More Details'), // Portfolio 卡片上的按鈕文字
+    // hero／sections 為新版區塊式案例頁用；尚未依 wireframe 重新拆解的專案先留空，
+    // [slug].astro 會 fallback 回舊版簡易版型（標題＋摘要＋單張圖＋Markdown 內文），不讓 build 失敗。
+    hero: z
+      .object({
+        ctaLabel: z.string(),
+        ctaHref: z.string().default('#'), // [需確認] 待設計師提供實際 demo／prototype 連結
+      })
+      .optional(),
+    sections: z.array(projectSection).default([]),
   }),
 });
 
@@ -49,6 +115,11 @@ const site = defineCollection({
       eyebrow: z.string(),
       headline: z.string(),
       intro: z.string(),
+    }),
+    projectQuote: z.object({
+      quote: z.string(),
+      name: z.string(),
+      tagline: z.string(),
     }),
     gallery: z.object({
       eyebrow: z.string(),

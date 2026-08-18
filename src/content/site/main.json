@@ -55,6 +55,11 @@
     "headline": "Portfolio",
     "intro": "I'm a designer who's honestly just obsessed with how people actually function. To me, design isn't just about 'looking good'—it's about Human Factors and hard evidence. I rely on eye-tracking, emotional responses, and user interviews to prove that a layout actually works. Whether I'm cleaning up a chaotic technical interface or geeking out over dark mode aesthetics, I love thinking outside the box to turn complex digital friction into a smooth, 'it just works' experience."
   },
+  "projectQuote": {
+    "quote": "A great interface is like an 8px grid: invisible to the eye, but felt in every seamless interaction.",
+    "name": "Chung Wen Hung",
+    "tagline": "Just a coffee guy"
+  },
   "gallery": {
     "eyebrow": "Life, Framed",
     "headline": "Gallery",
