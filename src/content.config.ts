@@ -23,6 +23,8 @@ const experienceDemoBlock = z.object({
   body: z.string(),
   ratio: z.string(),
   alt: z.string(),
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
 });
 
 const featureSplitBlock = z.object({
@@ -39,7 +41,7 @@ const featureSplitBlock = z.object({
 const featureGridBlock = z.object({
   type: z.literal('featureGrid'),
   eyebrow: z.string().optional(),
-  heading: z.string(),
+  heading: z.string().optional(),
   columns: z.array(
     z.object({
       heading: z.string(),
@@ -52,7 +54,17 @@ const featureGridBlock = z.object({
 
 const imageRowBlock = z.object({
   type: z.literal('imageRow'),
-  images: z.array(z.object({ ratio: z.string(), alt: z.string() })).min(1).max(2),
+  images: z.array(z.object({ ratio: z.string(), alt: z.string() })).min(1).max(3),
+});
+
+// 圖片數量可調：設計師之後增減插畫素材時，把這裡的 count 改成資料夾裡實際的插畫張數即可。
+const illustrationGridBlock = z.object({
+  type: z.literal('illustrationGrid'),
+  eyebrow: z.string().optional(),
+  heading: z.string(),
+  body: z.string().optional(),
+  count: z.number(),
+  alt: z.string(),
 });
 
 const projectSection = z.discriminatedUnion('type', [
@@ -62,6 +74,7 @@ const projectSection = z.discriminatedUnion('type', [
   featureSplitBlock,
   featureGridBlock,
   imageRowBlock,
+  illustrationGridBlock,
 ]);
 
 const projects = defineCollection({

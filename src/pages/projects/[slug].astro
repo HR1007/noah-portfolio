@@ -9,6 +9,7 @@ import ExperienceDemo from '../../components/project/ExperienceDemo.astro';
 import FeatureSplit from '../../components/project/FeatureSplit.astro';
 import FeatureGrid from '../../components/project/FeatureGrid.astro';
 import ImageRow from '../../components/project/ImageRow.astro';
+import IllustrationGrid from '../../components/project/IllustrationGrid.astro';
 import ProjectQuote from '../../components/project/ProjectQuote.astro';
 import { getProjectImages } from '../../lib/media';
 
@@ -68,6 +69,8 @@ const { Content } = await render(project);
                   image={nextImage()}
                   ratio={section.ratio}
                   alt={section.alt}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
                 />
               );
             case 'featureSplit':
@@ -95,6 +98,16 @@ const { Content } = await render(project);
             case 'imageRow':
               return (
                 <ImageRow rows={section.images} images={section.images.map(() => nextImage())} />
+              );
+            case 'illustrationGrid':
+              return (
+                <IllustrationGrid
+                  eyebrow={section.eyebrow}
+                  heading={section.heading}
+                  body={section.body}
+                  alt={section.alt}
+                  images={Array.from({ length: section.count }, () => nextImage())}
+                />
               );
             default:
               return null;
