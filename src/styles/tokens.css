@@ -1,15 +1,14 @@
 /*
   來源：docs/tokens.md（實測 noahportfolio.figma.site 的 computed styles）。
-  只有 light 主題有實測依據；dark 主題尚未設計，故意不填值，見檔案底部說明。
+  light 主題的色彩數值全部有實測依據。dark 主題 live 網站上不存在（沒有主題切換機制），
+  是應使用者要求另外設計的，色彩用 light 主題的語意值做等價反轉，不是逆向工程結果。
 */
 
 :root {
-  /* 色彩 — light（唯一目前有實測依據的主題） */
+  /* 色彩 — light（實測值） */
   --color-bg: #f2f2f2;
   --color-surface: #ffffff; /* [需確認] 沒有實測到獨立卡片背景色 */
   --color-ink: #333333;
-  --color-black: #000000;
-  --color-white: #ffffff;
   --color-muted: rgba(0, 0, 0, 0.55);
   /* [需確認] 沒有實測到明確的 hairline border 色，暫用 ink 的低透明度技術性替代，等設計師提供正式數值 */
   --color-border: rgba(51, 51, 51, 0.12);
@@ -26,7 +25,7 @@
   --font-weight-black: 900;
 
   /* 字級階層 */
-  --font-size-hero: 100px; /* [需確認] 只出現一次，未定位到確切元素 */
+  --font-size-hero: 100px; /* 實測：Nav 字標「NOAH WEN」與首頁「About me」大標題共用此字級 */
   --font-size-h1: 48px;
   --font-size-h2: 36px;
   --font-size-h3: 24px;
@@ -57,7 +56,23 @@
 }
 
 /*
-  Dark theme：目前沒有任何實測依據（live 站沒有主題切換機制），
-  刻意不在這裡填入 [data-theme="dark"] 的色彩數值，避免自己猜一組填進去。
-  等設計師確認 dark 配色後，再補上對應的 :root[data-theme="dark"] { ... } 覆寫區塊。
+  Dark theme：非實測值。用 light 主題的語意對應關係等價反轉
+  （--color-bg ↔ --color-ink 互換基準），讓所有元件不需要改一行程式碼就能換色。
 */
+:root[data-theme='dark'] {
+  --color-bg: #18181a;
+  --color-surface: #222225;
+  --color-ink: #f2f2f2;
+  --color-muted: rgba(242, 242, 242, 0.6);
+  --color-border: rgba(242, 242, 242, 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #18181a;
+    --color-surface: #222225;
+    --color-ink: #f2f2f2;
+    --color-muted: rgba(242, 242, 242, 0.6);
+    --color-border: rgba(242, 242, 242, 0.14);
+  }
+}
