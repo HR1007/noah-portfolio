@@ -44,3 +44,13 @@ export function getHomeImage(name: string): ImageMetadata | undefined {
   });
   return match?.[1];
 }
+
+/** 依檔名前綴取一組首頁圖片（例如 getHomeImageSet('hobby') 對應 hobby-01.png, hobby-02.png...），依檔名排序；找不到時回傳空陣列。 */
+export function getHomeImageSet(prefix: string): ImageMetadata[] {
+  return sortedByFilename(homeImageModules)
+    .filter(([path]) => {
+      const filename = path.split('/').pop() ?? '';
+      return filename.startsWith(`${prefix}-`);
+    })
+    .map(([, image]) => image);
+}

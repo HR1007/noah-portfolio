@@ -31,8 +31,8 @@ const site = defineCollection({
       heroTagline: z.string(),
       heroRoles: z.array(z.string()),
       heroQuote: z.string(),
-      aboutEyebrow: z.string(),
-      aboutHeadline: z.string(),
+      aboutHeading: z.string(), // 巨大標題，例如 "About me"
+      aboutSubheading: z.string(), // 次標題，例如 "Shaping Intuitive Solutions"
       aboutIntro: z.string(),
       beyondGridHeading: z.string(),
       beyondGridParagraphs: z.array(z.string()),
