@@ -1,0 +1,38 @@
+---
+import PullQuote from '../PullQuote.astro';
+
+interface Props {
+  quote: string;
+  name: string;
+  tagline: string;
+}
+
+const { quote, name, tagline } = Astro.props;
+---
+
+<section class="project-quote">
+  <PullQuote quote={quote} />
+  <p class="project-quote__byline">
+    <span class="project-quote__name">{name}</span>, {tagline}
+  </p>
+</section>
+
+<style>
+  .project-quote {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--sp-7) var(--sp-3);
+    text-align: center;
+  }
+
+  .project-quote__byline {
+    margin-top: var(--sp-3);
+    font-size: var(--font-size-body);
+    color: var(--color-muted);
+  }
+
+  .project-quote__name {
+    color: var(--color-ink);
+    font-weight: var(--font-weight-semibold);
+  }
+</style>

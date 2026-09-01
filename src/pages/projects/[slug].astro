@@ -1,7 +1,16 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection, getEntry, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Media from '../../components/Media.astro';
+import ProjectHero from '../../components/project/ProjectHero.astro';
+import TextSection from '../../components/project/TextSection.astro';
+import DeviceShowcase from '../../components/project/DeviceShowcase.astro';
+import ExperienceDemo from '../../components/project/ExperienceDemo.astro';
+import FeatureSplit from '../../components/project/FeatureSplit.astro';
+import FeatureGrid from '../../components/project/FeatureGrid.astro';
+import ImageRow from '../../components/project/ImageRow.astro';
+import IllustrationGrid from '../../components/project/IllustrationGrid.astro';
+import ProjectQuote from '../../components/project/ProjectQuote.astro';
 import { getProjectImages } from '../../lib/media';
 
 export async function getStaticPaths() {
@@ -13,23 +22,117 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
-const { Content } = await render(project);
+const { hero, sections } = project.data;
+const isMigrated = hero !== undefined && sections.length > 0;
+
+const site = await getEntry('site', 'main');
+const { projectQuote } = site!.data;
+
+// 圖片不寫路徑/檔名在內容裡：依區塊在頁面上出現的順序，依序從該專案資料夾取下一張圖。
+// 資料夾裡沒圖時 getProjectImages 回傳空陣列，取值自然是 undefined，Media 元件會自動顯示佔位框。
 const images = getProjectImages(project.id);
+let cursor = 0;
+const nextImage = () => images[cursor++];
+
+const { Content } = await render(project);
 ---
 
 <BaseLayout title={`${project.data.title} — Noah Wen`} description={project.data.summary}>
-  <section class="project-hero">
-    <h1 class="project-hero__title">{project.data.title}</h1>
-    <p class="project-hero__summary">{project.data.summary}</p>
-  </section>
+  {
+    isMigrated ? (
+      <Fragment>
+        <ProjectHero
+          title={project.data.title}
+          ctaLabel={hero!.ctaLabel}
+          ctaHref={hero!.ctaHref}
+          image={nextImage()}
+        />
 
-  <section class="project-showcase">
-    <Media image={images[0]} ratio="4/3" alt={`${project.data.title} showcase`} />
-  </section>
+        {sections.map((section) => {
+          switch (section.type) {
+            case 'textSection':
+              return (
+                <TextSection
+                  eyebrow={section.eyebrow}
+                  heading={section.heading}
+                  paragraphs={section.paragraphs}
+                />
+              );
+            case 'deviceShowcase':
+              return <DeviceShowcase image={nextImage()} ratio={section.ratio} alt={section.alt} />;
+            case 'experienceDemo':
+              return (
+                <ExperienceDemo
+                  eyebrow={section.eyebrow}
+                  heading={section.heading}
+                  body={section.body}
+                  image={nextImage()}
+                  ratio={section.ratio}
+                  alt={section.alt}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
+                />
+              );
+            case 'featureSplit':
+              return (
+                <FeatureSplit
+                  heading={section.heading}
+                  body={section.body}
+                  imagePosition={section.imagePosition}
+                  image={nextImage()}
+                  ratio={section.ratio}
+                  alt={section.alt}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
+                />
+              );
+            case 'featureGrid':
+              return (
+                <FeatureGrid
+                  eyebrow={section.eyebrow}
+                  heading={section.heading}
+                  columns={section.columns}
+                  images={section.columns.map(() => nextImage())}
+                />
+              );
+            case 'imageRow':
+              return (
+                <ImageRow rows={section.images} images={section.images.map(() => nextImage())} />
+              );
+            case 'illustrationGrid':
+              return (
+                <IllustrationGrid
+                  eyebrow={section.eyebrow}
+                  heading={section.heading}
+                  body={section.body}
+                  alt={section.alt}
+                  images={Array.from({ length: section.count }, () => nextImage())}
+                />
+              );
+            default:
+              return null;
+          }
+        })}
 
-  <section class="project-body">
-    <Content />
-  </section>
+        <ProjectQuote quote={projectQuote.quote} name={projectQuote.name} tagline={projectQuote.tagline} />
+      </Fragment>
+    ) : (
+      <Fragment>
+        <section class="project-hero">
+          <h1 class="project-hero__title">{project.data.title}</h1>
+          <p class="project-hero__summary">{project.data.summary}</p>
+        </section>
+
+        <section class="project-showcase">
+          <Media image={images[0]} ratio="4/3" alt={`${project.data.title} showcase`} />
+        </section>
+
+        <section class="project-body">
+          <Content />
+        </section>
+      </Fragment>
+    )
+  }
 </BaseLayout>
 
 <style>
