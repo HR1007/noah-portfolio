@@ -10,13 +10,13 @@
 |---|---|---|
 | `--color-bg` | `#F2F2F2` | 頁面背景 |
 | `--color-surface` | `#FFFFFF` | 卡片/面板背景 [需確認] — 實測時沒有明確捕捉到獨立卡片背景色，Portfolio/專案卡看起來直接坐在頁面背景上，是否需要獨立 surface 色要看實際重建時的視覺判斷 |
-| `--color-ink` | `#333333` | 主要文字、marquee 跑馬燈底色、字標 |
-| `--color-black` | `#000000` | 純黑，`More Details` 按鈕背景 |
-| `--color-white` | `#FFFFFF` | marquee 文字、深色按鈕上的文字 |
+| `--color-ink` | `#333333` | 主要文字、marquee 跑馬燈底色、字標、primary 按鈕底色 |
 | `--color-muted` | `rgba(0, 0, 0, 0.55)` | 次要文字（例如 Connect 頁的說明文字） |
 | `--color-border` | [需確認] | 沒有實測到明確的 hairline border 色，本站目前視覺上分隔線很少（Experience 每個項目間有一條極細淺色線），需要在瀏覽器 zoom 後取色或請設計師提供 |
 
-沒有偵測到 dark mode（無 `prefers-color-scheme` 切換、無 `[data-theme]`）。CLAUDE.md 要求 tokens.css 要有 light 預設 + dark 可覆寫的架構，但 dark 的實際數值目前全部 **[需確認]** — 建議先用 `--color-ink` 反相當 dark bg 的暫定值，正式數值等設計師提供。
+不再需要獨立的 `--color-black`/`--color-white`：marquee 底色與 primary 按鈕改用 `--color-ink`/`--color-bg` 這組語意相反色，dark 主題只要覆寫 `--color-ink`/`--color-bg`，這些元件就會自動換色。
+
+沒有偵測到 dark mode（無 `prefers-color-scheme` 切換、無 `[data-theme]`）。應使用者要求，dark 主題數值已經補上（見 `tokens.css` 的 `:root[data-theme="dark"]` 區塊），但這組數值是**設計出來的，不是逆向工程結果**：把 `--color-bg` 與 `--color-ink` 的語意角色互換（bg 變深、ink 變淺），border/muted 用同樣邏輯的透明度反轉。等設計師有正式 dark 稿再替換。
 
 ## 字體
 
@@ -30,7 +30,7 @@ CLAUDE.md 原先預設 Saira / Noto Sans TC / Source Sans 3 三字體分流中�
 
 | 語意變數 | px | 對應用途（依畫面觀察） |
 |---|---|---|
-| `--font-size-hero` | `100px` [需確認] — 只在一次審計中出現，未能定位到確切元素，需要重新在瀏覽器 inspector 核對是不是「NOAH WEN」字標或其他大型裝飾文字 |
+| `--font-size-hero` | `100px` | 確認用途：Nav 的「NOAH WEN」字標（weight 900）與首頁「About me」大標題（weight 700）共用此字級 |
 | `--font-size-h1` | `48px` | 各頁大標（例如「Portfolio」「Shaping Intuitive Solutions」等頁面主標） |
 | `--font-size-h2` | `36px` | 專案頁次標題（例如「Talk German」「A design language for the Star Overlay editor」） |
 | `--font-size-h3` | `24px` | Section 小標（例如 Experience 裡的職稱「Human Factors Researcher」） |
@@ -73,7 +73,6 @@ CLAUDE.md 原先預設 Saira / Noto Sans TC / Source Sans 3 三字體分流中�
 ## [需確認] 彙總
 
 1. `--color-surface`（卡片背景）與 `--color-border`（分隔線）的確切色值
-2. dark theme 全部數值
+2. dark theme 數值是設計出來的，不是實測值，等設計師提供正式稿
 3. 中文內容 / Noto Sans TC fallback 是否需要
-4. `100px` 字級對應的確切元素
-5. 各字級的 line-height 與 letter-spacing
+4. 各字級的 line-height 與 letter-spacing

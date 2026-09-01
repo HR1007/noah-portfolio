@@ -1,5 +1,6 @@
 ---
 import { getEntry } from 'astro:content';
+import ThemeToggle from './ThemeToggle.astro';
 
 const site = await getEntry('site', 'main');
 const { logo, links } = site!.data.nav;
@@ -8,20 +9,23 @@ const currentPath = Astro.url.pathname;
 
 <nav class="nav">
   <a href="/" class="nav__logo">{logo}</a>
-  <ul class="nav__links">
-    {
-      links.map((link) => {
-        const isActive = currentPath === link.href;
-        return (
-          <li>
-            <a href={link.href} aria-current={isActive ? 'page' : undefined} class="nav__link">
-              {link.label}
-            </a>
-          </li>
-        );
-      })
-    }
-  </ul>
+  <div class="nav__right">
+    <ul class="nav__links">
+      {
+        links.map((link) => {
+          const isActive = currentPath === link.href;
+          return (
+            <li>
+              <a href={link.href} aria-current={isActive ? 'page' : undefined} class="nav__link">
+                {link.label}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+    <ThemeToggle />
+  </div>
 </nav>
 
 <style>
@@ -40,9 +44,16 @@ const currentPath = Astro.url.pathname;
 
   .nav__logo {
     font-weight: var(--font-weight-black);
-    font-size: var(--font-size-h3);
+    font-size: var(--font-size-hero);
+    line-height: 1;
     letter-spacing: -0.02em;
     color: var(--color-ink);
+  }
+
+  .nav__right {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
   }
 
   .nav__links {
@@ -63,13 +74,15 @@ const currentPath = Astro.url.pathname;
     font-weight: var(--font-weight-semibold);
   }
 
+  @media (max-width: 1199px) {
+    .nav__logo {
+      font-size: var(--font-size-h1);
+    }
+  }
+
   @media (max-width: 767px) {
     .nav {
       flex-wrap: wrap;
-    }
-
-    .nav__logo {
-      font-size: var(--font-size-body);
     }
 
     .nav__links {
