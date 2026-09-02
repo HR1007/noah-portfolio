@@ -1,80 +1,115 @@
 // 本機專用的小型後台伺服器 —— 只給 /admin 這個自訂管理介面用，正式網站不會載入這支程式。
-// 只處理 Gallery 三個相簿的圖片：列表（含尺寸/檔案大小）、上傳、刪除、拖拉排序。
+// 管三種素材：
+//   /api/collections/gallery/:slug   Gallery 三個相簿（編號序列）
+//   /api/collections/projects/:slug  Portfolio 五個 case study（編號序列，對應 content.config.ts 的 sections）
+//   /api/home                        Home 頁面的固定命名圖片（hero / avatar / about / beyond-grid）
 import express from 'express';
 import cors from 'cors';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { imageSize } from 'image-size';
+import matter from 'gray-matter';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const GALLERY_DIR = path.join(ROOT, 'src/assets/gallery');
+const PROJECTS_ASSET_DIR = path.join(ROOT, 'src/assets/projects');
+const PROJECTS_CONTENT_DIR = path.join(ROOT, 'src/content/projects');
+const HOME_DIR = path.join(ROOT, 'src/assets/home');
 const SITE_EN = path.join(ROOT, 'src/content/site/main-en.json');
 
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif']);
+const HOME_SLOTS = ['hero', 'avatar', 'about', 'beyond-grid'];
+
+const COLLECTIONS = {
+  gallery: { dir: GALLERY_DIR, urlBase: '/gallery-src' },
+  projects: { dir: PROJECTS_ASSET_DIR, urlBase: '/projects-src' },
+};
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-function albumDir(slug) {
-  const resolved = path.join(GALLERY_DIR, slug);
-  if (!resolved.startsWith(GALLERY_DIR)) throw new Error('invalid slug');
+function collectionOf(type) {
+  const c = COLLECTIONS[type];
+  if (!c) throw new Error(`unknown collection type: ${type}`);
+  return c;
+}
+
+function slugDir(type, slug) {
+  const { dir } = collectionOf(type);
+  const resolved = path.join(dir, slug);
+  if (!resolved.startsWith(dir)) throw new Error('invalid slug');
   return resolved;
 }
 
-async function listAlbumSlugs() {
-  const site = JSON.parse(await fs.readFile(SITE_EN, 'utf-8'));
-  const { albums, germany } = site.gallery;
-  return [...albums.map((a) => ({ slug: a.slug, title: a.title })), { slug: germany.slug, title: germany.title }];
+async function describeFile(full, urlPath) {
+  const [stat, buf] = await Promise.all([fs.stat(full), fs.readFile(full)]);
+  let dims = { width: null, height: null };
+  try {
+    const s = imageSize(buf);
+    dims = { width: s.width, height: s.height };
+  } catch {
+    // 讀不出尺寸就留 null，前端顯示「—」
+  }
+  return {
+    filename: path.basename(full),
+    url: urlPath,
+    sizeBytes: stat.size,
+    width: dims.width,
+    height: dims.height,
+    // rename（拖拉排序／互換位置）不會動到 birthtime/mtime，比較適合當「上傳日期」判斷依據。
+    uploadedAt: stat.birthtime.toISOString(),
+    modifiedAt: stat.mtime.toISOString(),
+  };
 }
 
-app.get('/api/albums', async (req, res) => {
+async function listSlugImages(type, slug) {
+  const { urlBase } = collectionOf(type);
+  const dir = slugDir(type, slug);
+  const entries = (await fs.readdir(dir)).filter((f) => IMAGE_EXT.has(path.extname(f).toLowerCase())).sort();
+  return Promise.all(entries.map((filename) => describeFile(path.join(dir, filename), `${urlBase}/${slug}/${filename}`)));
+}
+
+app.get('/api/collections/gallery', async (req, res) => {
   try {
-    res.json(await listAlbumSlugs());
+    const site = JSON.parse(await fs.readFile(SITE_EN, 'utf-8'));
+    const { albums, germany } = site.gallery;
+    res.json([...albums.map((a) => ({ slug: a.slug, title: a.title })), { slug: germany.slug, title: germany.title }]);
   } catch (err) {
     res.status(500).json({ error: String(err) });
   }
 });
 
-app.get('/api/albums/:slug/images', async (req, res) => {
+app.get('/api/collections/projects', async (req, res) => {
   try {
-    const dir = albumDir(req.params.slug);
-    const entries = (await fs.readdir(dir)).filter((f) => IMAGE_EXT.has(path.extname(f).toLowerCase())).sort();
-    const images = await Promise.all(
-      entries.map(async (filename) => {
-        const full = path.join(dir, filename);
-        const [stat, buf] = await Promise.all([fs.stat(full), fs.readFile(full)]);
-        let dims = { width: null, height: null };
-        try {
-          const s = imageSize(buf);
-          dims = { width: s.width, height: s.height };
-        } catch {
-          // 讀不出尺寸就留 null，前端顯示「—」
-        }
-        return {
-          filename,
-          url: `/gallery-src/${req.params.slug}/${filename}`,
-          sizeBytes: stat.size,
-          width: dims.width,
-          height: dims.height,
-          // birthtime 在 rename（拖拉排序／互換位置）時不會變，比較貼近「上傳日期」；
-          // mtime 才是實際寫入內容的時間，兩個都給前端，各自標清楚。
-          uploadedAt: stat.birthtime.toISOString(),
-          modifiedAt: stat.mtime.toISOString(),
-        };
+    const files = (await fs.readdir(PROJECTS_CONTENT_DIR)).filter((f) => f.endsWith('.md'));
+    const projects = await Promise.all(
+      files.map(async (file) => {
+        const raw = await fs.readFile(path.join(PROJECTS_CONTENT_DIR, file), 'utf-8');
+        const { data } = matter(raw);
+        return { slug: file.replace(/\.md$/, ''), title: data.title, order: data.order ?? 999 };
       })
     );
-    res.json(images);
+    projects.sort((a, b) => a.order - b.order);
+    res.json(projects.map(({ slug, title }) => ({ slug, title })));
   } catch (err) {
     res.status(500).json({ error: String(err) });
   }
 });
 
-app.post('/api/albums/:slug/images', express.raw({ type: '*/*', limit: '25mb' }), async (req, res) => {
+app.get('/api/collections/:type/:slug/images', async (req, res) => {
   try {
-    const dir = albumDir(req.params.slug);
+    res.json(await listSlugImages(req.params.type, req.params.slug));
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+app.post('/api/collections/:type/:slug/images', express.raw({ type: '*/*', limit: '25mb' }), async (req, res) => {
+  try {
+    const dir = slugDir(req.params.type, req.params.slug);
     const ext = path.extname(String(req.query.filename || '')).toLowerCase();
     if (!IMAGE_EXT.has(ext)) return res.status(400).json({ error: 'unsupported extension' });
 
@@ -92,9 +127,9 @@ app.post('/api/albums/:slug/images', express.raw({ type: '*/*', limit: '25mb' })
   }
 });
 
-app.delete('/api/albums/:slug/images/:filename', async (req, res) => {
+app.delete('/api/collections/:type/:slug/images/:filename', async (req, res) => {
   try {
-    const dir = albumDir(req.params.slug);
+    const dir = slugDir(req.params.type, req.params.slug);
     const target = path.join(dir, req.params.filename);
     if (!target.startsWith(dir)) throw new Error('invalid filename');
     await fs.unlink(target);
@@ -106,9 +141,9 @@ app.delete('/api/albums/:slug/images/:filename', async (req, res) => {
 
 // body: { order: ["03.webp", "00.webp", ...] } —— 依新順序把檔案改名成 00, 01, 02...
 // 先全部改成不會撞名的暫存檔名，再改成最終編號，避免排列過程中互相覆蓋。
-app.put('/api/albums/:slug/order', async (req, res) => {
+app.put('/api/collections/:type/:slug/order', async (req, res) => {
   try {
-    const dir = albumDir(req.params.slug);
+    const dir = slugDir(req.params.type, req.params.slug);
     const order = req.body.order;
     if (!Array.isArray(order) || order.length === 0) return res.status(400).json({ error: 'order required' });
 
@@ -129,7 +164,62 @@ app.put('/api/albums/:slug/order', async (req, res) => {
   }
 });
 
+// ---------- Home：固定命名圖片（不是編號序列，不用排序） ----------
+
+app.get('/api/home', async (req, res) => {
+  try {
+    const files = await fs.readdir(HOME_DIR);
+    const slots = await Promise.all(
+      HOME_SLOTS.map(async (name) => {
+        const match = files.find((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()) && path.basename(f, path.extname(f)) === name);
+        if (!match) return { name, filename: null };
+        const info = await describeFile(path.join(HOME_DIR, match), `/home-src/${match}`);
+        return { name, ...info };
+      })
+    );
+    res.json(slots);
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+app.post('/api/home/:name', express.raw({ type: '*/*', limit: '25mb' }), async (req, res) => {
+  try {
+    const { name } = req.params;
+    if (!HOME_SLOTS.includes(name)) return res.status(400).json({ error: 'unknown home slot' });
+    const ext = path.extname(String(req.query.filename || '')).toLowerCase();
+    if (!IMAGE_EXT.has(ext)) return res.status(400).json({ error: 'unsupported extension' });
+
+    const files = await fs.readdir(HOME_DIR);
+    await Promise.all(
+      files
+        .filter((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()) && path.basename(f, path.extname(f)) === name)
+        .map((f) => fs.unlink(path.join(HOME_DIR, f)))
+    );
+    const filename = `${name}${ext}`;
+    await fs.writeFile(path.join(HOME_DIR, filename), req.body);
+    res.json({ filename });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+app.delete('/api/home/:name', async (req, res) => {
+  try {
+    const { name } = req.params;
+    if (!HOME_SLOTS.includes(name)) return res.status(400).json({ error: 'unknown home slot' });
+    const files = await fs.readdir(HOME_DIR);
+    const match = files.find((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()) && path.basename(f, path.extname(f)) === name);
+    if (match) await fs.unlink(path.join(HOME_DIR, match));
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
 app.use('/gallery-src', express.static(GALLERY_DIR));
+app.use('/projects-src', express.static(PROJECTS_ASSET_DIR));
+app.use('/home-src', express.static(HOME_DIR));
 
 const PORT = 5174;
 app.listen(PORT, () => {

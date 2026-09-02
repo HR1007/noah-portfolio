@@ -3,20 +3,26 @@
 // 不會影響正式站台的任何一行程式碼或打包內容。
 const API = 'http://localhost:5174';
 
-const albumTabsEl = document.getElementById('albumTabs');
-const albumMetaEl = document.getElementById('albumMeta');
-const gridEl = document.getElementById('grid');
+const sidebarItems = [...document.querySelectorAll('.sidebar__item[data-page]')];
+const pageTitleEl = document.getElementById('pageTitle');
+const pageMetaEl = document.getElementById('pageMeta');
+const pageTabsEl = document.getElementById('pageTabs');
+const contentEl = document.getElementById('content');
 const fileInputEl = document.getElementById('fileInput');
 const lightboxEl = document.getElementById('lightbox');
 const lightboxImageEl = document.getElementById('lightboxImage');
 const lightboxInfoEl = document.getElementById('lightboxInfo');
 const lightboxCloseEl = document.getElementById('lightboxClose');
 
-let albums = [];
+let currentPage = 'gallery'; // 'gallery' | 'portfolio' | 'home'
+let currentType = 'gallery'; // 'gallery' | 'projects' —— 對應後端 /api/collections/:type
 let currentSlug = null;
 let currentImages = [];
 let dragFromIndex = null;
 let selectedIndex = null;
+let pendingUpload = null; // { type:'collection', type/slug } 或 { type:'home', name } —— fileInput 觸發時要知道存去哪
+
+// ---------- 共用小工具 ----------
 
 function showToast(message, isError = false) {
   let toast = document.querySelector('.toast');
@@ -45,12 +51,18 @@ function formatDate(iso) {
   return d.toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 
-function openLightbox(img, index) {
-  lightboxImageEl.src = `${API}${img.url}`;
+// rename（拖拉排序／互換位置）不會動到檔案的 mtime，只有內容真的變了 mtime 才會變，
+// 拿它當 cache-busting 參數：同一個檔名位置換了不同內容的檔案時，瀏覽器才不會拿舊快取圖顯示。
+function imgUrl(img) {
+  return `${API}${img.url}?t=${encodeURIComponent(img.modifiedAt || '')}`;
+}
+
+function openLightbox(img, label) {
+  lightboxImageEl.src = imgUrl(img);
   lightboxImageEl.alt = img.filename;
   lightboxInfoEl.innerHTML = `
     <div><dt>檔名</dt><dd>${img.filename}</dd></div>
-    <div><dt>順序位置</dt><dd>第 ${index + 1} 張${index === 0 ? '（Cover）' : ''}</dd></div>
+    <div><dt>位置</dt><dd>${label}</dd></div>
     <div><dt>尺寸</dt><dd>${img.width && img.height ? `${img.width} × ${img.height} px` : '—'}</dd></div>
     <div><dt>檔案大小</dt><dd>${formatBytes(img.sizeBytes)}</dd></div>
     <div><dt>上傳日期</dt><dd>${formatDate(img.uploadedAt)}</dd></div>
@@ -70,39 +82,69 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !lightboxEl.hidden) closeLightbox();
 });
 
-async function loadAlbums() {
-  albums = await fetch(`${API}/api/albums`).then((r) => r.json());
-  albumTabsEl.innerHTML = '';
-  albums.forEach((album) => {
-    const btn = document.createElement('button');
-    btn.className = 'tab' + (album.slug === currentSlug ? ' tab--active' : '');
-    btn.textContent = album.title;
-    btn.addEventListener('click', () => selectAlbum(album.slug));
-    albumTabsEl.appendChild(btn);
+// ---------- 側欄切換 ----------
+
+sidebarItems.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const page = btn.dataset.page;
+    if (page === currentPage) return;
+    sidebarItems.forEach((b) => b.classList.toggle('sidebar__item--active', b === btn));
+    currentPage = page;
+    selectedIndex = null;
+    if (page === 'gallery') {
+      currentType = 'gallery';
+      loadCollectionList();
+    } else if (page === 'portfolio') {
+      currentType = 'projects';
+      loadCollectionList();
+    } else if (page === 'home') {
+      loadHome();
+    }
   });
-  if (!currentSlug && albums.length > 0) {
-    await selectAlbum(albums[0].slug);
+});
+
+// ---------- Gallery / Portfolio（編號序列相簿，共用同一套邏輯） ----------
+
+async function loadCollectionList() {
+  pageTitleEl.textContent = currentType === 'gallery' ? 'Gallery 相簿' : 'Portfolio 案例圖片';
+  pageMetaEl.textContent = '載入中…';
+  pageTabsEl.innerHTML = '';
+  contentEl.innerHTML = '<div class="grid" id="grid"></div>';
+
+  const list = await fetch(`${API}/api/collections/${currentType}`).then((r) => r.json());
+  pageTabsEl.innerHTML = '';
+  list.forEach((item, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (i === 0 ? ' tab--active' : '');
+    btn.textContent = item.title;
+    btn.addEventListener('click', () => selectSlug(item.slug, btn));
+    pageTabsEl.appendChild(btn);
+  });
+  if (list.length > 0) {
+    currentSlug = list[0].slug;
+    await loadImages();
   }
 }
 
-async function selectAlbum(slug) {
+async function selectSlug(slug, btn) {
   currentSlug = slug;
-  [...albumTabsEl.children].forEach((btn, i) => {
-    btn.classList.toggle('tab--active', albums[i].slug === slug);
-  });
+  selectedIndex = null;
+  [...pageTabsEl.children].forEach((b) => b.classList.toggle('tab--active', b === btn));
   await loadImages();
 }
 
 async function loadImages() {
-  albumMetaEl.textContent = '載入中…';
-  selectedIndex = null;
-  currentImages = await fetch(`${API}/api/albums/${currentSlug}/images`).then((r) => r.json());
-  albumMetaEl.textContent = `${currentImages.length} 張照片 · 拖拉調順序，或點兩張快速互換位置`;
-  renderGrid();
+  pageMetaEl.textContent = '載入中…';
+  currentImages = await fetch(`${API}/api/collections/${currentType}/${currentSlug}/images`).then((r) => r.json());
+  pageMetaEl.textContent = `${currentImages.length} 張圖片 · 拖拉調順序，或點兩張快速互換位置`;
+  renderCollectionGrid();
 }
 
-function renderGrid() {
+function renderCollectionGrid() {
+  const gridEl = document.getElementById('grid');
+  if (!gridEl) return;
   gridEl.innerHTML = '';
+
   currentImages.forEach((img, index) => {
     const tile = document.createElement('div');
     tile.className = 'tile' + (index === selectedIndex ? ' tile--selected' : '');
@@ -112,7 +154,7 @@ function renderGrid() {
     tile.innerHTML = `
       <div class="tile__image-wrap">
         ${index === 0 ? '<span class="tile__badge">Cover</span>' : ''}
-        <img src="${API}${img.url}" alt="${img.filename}" loading="lazy" />
+        <img src="${imgUrl(img)}" alt="${img.filename}" loading="lazy" />
         <button class="tile__expand" title="放大查看">
           <svg viewBox="0 0 24 24"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg>
         </button>
@@ -133,17 +175,17 @@ function renderGrid() {
 
     tile.querySelector('.tile__expand').addEventListener('click', (e) => {
       e.stopPropagation();
-      openLightbox(img, index);
+      openLightbox(img, `第 ${index + 1} 張${index === 0 ? '（Cover）' : ''}`);
     });
 
     // 點兩張圖快速互換位置：不用拖著整張圖跨越整個 grid，適合離很遠的兩張圖交換。
     tile.addEventListener('click', () => {
       if (selectedIndex === null) {
         selectedIndex = index;
-        renderGrid();
+        renderCollectionGrid();
       } else if (selectedIndex === index) {
         selectedIndex = null;
-        renderGrid();
+        renderCollectionGrid();
       } else {
         const a = selectedIndex;
         selectedIndex = null;
@@ -179,14 +221,17 @@ function renderGrid() {
   addTile.className = 'tile tile--add';
   addTile.innerHTML = '<span class="plus">+</span>';
   addTile.draggable = false;
-  addTile.addEventListener('click', () => fileInputEl.click());
+  addTile.addEventListener('click', () => {
+    pendingUpload = { kind: 'collection' };
+    fileInputEl.click();
+  });
   gridEl.appendChild(addTile);
 }
 
 async function handleDelete(filename) {
   if (!confirm(`確定要刪除 ${filename}？`)) return;
   try {
-    const res = await fetch(`${API}/api/albums/${currentSlug}/images/${filename}`, { method: 'DELETE' });
+    const res = await fetch(`${API}/api/collections/${currentType}/${currentSlug}/images/${filename}`, { method: 'DELETE' });
     if (!res.ok) throw new Error(await res.text());
     showToast(`已刪除 ${filename}`);
     await loadImages();
@@ -196,7 +241,7 @@ async function handleDelete(filename) {
 }
 
 async function submitOrder(order) {
-  const res = await fetch(`${API}/api/albums/${currentSlug}/order`, {
+  const res = await fetch(`${API}/api/collections/${currentType}/${currentSlug}/order`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ order }),
@@ -229,23 +274,117 @@ async function handleSwap(indexA, indexB) {
   }
 }
 
+// ---------- Home（固定命名圖片：hero / avatar / about / beyond-grid） ----------
+
+const HOME_LABELS = {
+  hero: 'Hero（首頁最上方全身照）',
+  avatar: 'Avatar（引言旁的圓形頭像）',
+  about: 'About（About me 區塊照片）',
+  'beyond-grid': 'Beyond the Grid（生活照）',
+};
+
+let currentHomeSlots = [];
+
+async function loadHome() {
+  pageTitleEl.textContent = 'Home 首頁圖片';
+  pageMetaEl.textContent = '每個位置固定用途，點圖上傳／更換即可，不需要排序';
+  pageTabsEl.innerHTML = '';
+  contentEl.innerHTML = '<div class="home-grid" id="homeGrid"></div>';
+
+  currentHomeSlots = await fetch(`${API}/api/home`).then((r) => r.json());
+  renderHomeGrid();
+}
+
+function renderHomeGrid() {
+  const homeGridEl = document.getElementById('homeGrid');
+  if (!homeGridEl) return;
+  homeGridEl.innerHTML = '';
+
+  currentHomeSlots.forEach((slot) => {
+    const card = document.createElement('div');
+    card.className = 'home-card';
+
+    const hasImage = !!slot.filename;
+    card.innerHTML = `
+      <div class="tile__image-wrap home-card__image-wrap">
+        ${
+          hasImage
+            ? `<img src="${imgUrl(slot)}" alt="${slot.filename}" loading="lazy" />
+               <button class="tile__expand" title="放大查看"><svg viewBox="0 0 24 24"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg></button>
+               <button class="tile__delete" title="刪除，改回佔位框"><svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg></button>`
+            : `<span class="home-card__empty">尚未上傳，點擊上傳</span>`
+        }
+      </div>
+      <div class="tile__meta home-card__meta">
+        <strong>${HOME_LABELS[slot.name] ?? slot.name}</strong>
+        <span>${hasImage ? `${slot.width && slot.height ? `${slot.width}×${slot.height}` : '—'} · ${formatBytes(slot.sizeBytes)}` : '—'}</span>
+      </div>
+    `;
+
+    if (hasImage) {
+      card.querySelector('.tile__expand').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openLightbox(slot, HOME_LABELS[slot.name] ?? slot.name);
+      });
+      card.querySelector('.tile__delete').addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleHomeDelete(slot.name);
+      });
+    }
+
+    card.querySelector('.home-card__image-wrap').addEventListener('click', () => {
+      pendingUpload = { kind: 'home', name: slot.name };
+      fileInputEl.click();
+    });
+
+    homeGridEl.appendChild(card);
+  });
+}
+
+async function handleHomeDelete(name) {
+  if (!confirm(`確定要刪除 ${HOME_LABELS[name] ?? name} 的圖片嗎？（會改回佔位框）`)) return;
+  try {
+    const res = await fetch(`${API}/api/home/${name}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(await res.text());
+    showToast('已刪除');
+    await loadHome();
+  } catch (err) {
+    showToast(`刪除失敗：${err.message}`, true);
+  }
+}
+
+// ---------- 上傳（Gallery/Portfolio 與 Home 共用同一個 file input） ----------
+
 fileInputEl.addEventListener('change', async () => {
   const file = fileInputEl.files[0];
+  const pending = pendingUpload;
   fileInputEl.value = '';
-  if (!file) return;
+  pendingUpload = null;
+  if (!file || !pending) return;
+
   try {
-    const res = await fetch(`${API}/api/albums/${currentSlug}/images?filename=${encodeURIComponent(file.name)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': file.type || 'application/octet-stream' },
-      body: file,
-    });
-    if (!res.ok) throw new Error(await res.text());
-    const { filename } = await res.json();
-    showToast(`已上傳為 ${filename}`);
-    await loadImages();
+    if (pending.kind === 'collection') {
+      const res = await fetch(
+        `${API}/api/collections/${currentType}/${currentSlug}/images?filename=${encodeURIComponent(file.name)}`,
+        { method: 'POST', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file }
+      );
+      if (!res.ok) throw new Error(await res.text());
+      const { filename } = await res.json();
+      showToast(`已上傳為 ${filename}`);
+      await loadImages();
+    } else if (pending.kind === 'home') {
+      const res = await fetch(`${API}/api/home/${pending.name}?filename=${encodeURIComponent(file.name)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        body: file,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      showToast('已更新');
+      await loadHome();
+    }
   } catch (err) {
     showToast(`上傳失敗：${err.message}`, true);
   }
 });
 
-loadAlbums().catch((err) => showToast(`載入失敗：${err.message}`, true));
+loadCollectionList().catch((err) => showToast(`載入失敗：${err.message}`, true));
