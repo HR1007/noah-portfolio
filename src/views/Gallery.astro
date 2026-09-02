@@ -3,7 +3,11 @@ import { getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionIntro from '../components/SectionIntro.astro';
 import Media from '../components/Media.astro';
-import { getGalleryImages } from '../lib/media';
+import AlbumCoverCard from '../components/gallery/AlbumCoverCard.astro';
+import AlbumHeading from '../components/gallery/AlbumHeading.astro';
+import PhotoGrid from '../components/gallery/PhotoGrid.astro';
+import GalleryCta from '../components/gallery/GalleryCta.astro';
+import { getGalleryImage, getGalleryAlbumImages } from '../lib/media';
 
 interface Props {
   locale: 'en' | 'zh';
@@ -11,25 +15,45 @@ interface Props {
 
 const { locale } = Astro.props;
 const site = await getEntry('site', `main-${locale}`);
-const { eyebrow, headline, intro } = site!.data.gallery;
+const { eyebrow, headline, intro, albums, germany, cta } = site!.data.gallery;
 
-const images = getGalleryImages();
-const placeholderCount = 9;
-const items = images.length > 0 ? images : Array.from({ length: placeholderCount }, () => undefined);
+const heroImage = getGalleryImage('hero');
+const ctaAvatar = getGalleryImage('cta-avatar');
+const germanyImages = getGalleryAlbumImages('germany');
 ---
 
 <BaseLayout title={`${headline} — Noah Wen`} description={intro}>
   <section class="gallery">
-    <SectionIntro eyebrow={eyebrow} headline={headline} body={intro} />
-    <div class="gallery__grid">
+    <div class="gallery__hero">
+      <div class="gallery__hero-illustration">
+        <Media image={heroImage} ratio="159/436" alt={`${headline} illustration`} loading="eager" />
+      </div>
+      <SectionIntro eyebrow={eyebrow} headline={headline} body={intro} />
+    </div>
+
+    <div class="gallery__albums">
       {
-        items.map((image, index) => (
-          <div class="gallery__item">
-            <Media image={image} ratio="3/4" alt={`photo ${String(index + 1).padStart(2, '0')}`} />
-          </div>
+        albums.map((album) => (
+          <AlbumCoverCard
+            title={album.title}
+            dateLabel={album.dateLabel}
+            href={`/${locale}/gallery/${album.slug}`}
+            images={getGalleryAlbumImages(album.slug)}
+          />
         ))
       }
     </div>
+
+    <div class="gallery__germany">
+      <PhotoGrid images={germanyImages} labelPrefix={germany.title} />
+      <AlbumHeading
+        title={germany.title}
+        dateLabel={germany.dateLabel}
+        href={`/${locale}/gallery/${germany.slug}`}
+      />
+    </div>
+
+    <GalleryCta heading={cta.heading} body={cta.body} ctaLabel={cta.ctaLabel} ctaHref={cta.ctaHref} avatar={ctaAvatar} />
   </section>
 </BaseLayout>
 
@@ -38,27 +62,46 @@ const items = images.length > 0 ? images : Array.from({ length: placeholderCount
     max-width: 1120px;
     margin: 0 auto;
     padding: var(--sp-7) var(--sp-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-7);
   }
 
-  .gallery__grid {
-    columns: 3;
-    column-gap: var(--sp-2);
+  .gallery__hero {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-5);
   }
 
-  .gallery__item {
-    break-inside: avoid;
-    margin-bottom: var(--sp-2);
+  .gallery__hero :global(.section-intro) {
+    margin-bottom: 0;
+  }
+
+  .gallery__hero-illustration {
+    flex: none;
+    width: 160px;
+    height: auto;
+  }
+
+  .gallery__albums {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-4);
+  }
+
+  .gallery__germany {
+    display: flex;
+    flex-direction: column;
   }
 
   @media (max-width: 767px) {
-    .gallery__grid {
-      columns: 1;
+    .gallery__hero {
+      flex-direction: column;
+      align-items: flex-start;
     }
-  }
 
-  @media (min-width: 768px) and (max-width: 1199px) {
-    .gallery__grid {
-      columns: 2;
+    .gallery__albums {
+      grid-template-columns: 1fr;
     }
   }
 </style>

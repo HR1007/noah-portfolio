@@ -1,0 +1,66 @@
+---
+import type { ImageMetadata } from 'astro';
+import Media from '../Media.astro';
+
+interface Props {
+  title: string;
+  dateLabel: string;
+  href: string;
+  images: (ImageMetadata | undefined)[];
+}
+
+const { title, dateLabel, href, images } = Astro.props;
+const tiles = images.length > 0 ? images.slice(0, 6) : Array.from({ length: 6 }, () => undefined);
+---
+
+<a class="album-cover" href={href}>
+  <div class="album-cover__grid">
+    {
+      tiles.map((image, index) => (
+        <Media image={image} ratio="1/1" alt={`${title} ${String(index + 1).padStart(2, '0')}`} />
+      ))
+    }
+  </div>
+  <div class="album-cover__meta">
+    <span class="album-cover__title">{title}</span>
+    <span class="album-cover__date">{dateLabel}</span>
+  </div>
+</a>
+
+<style>
+  .album-cover {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    color: var(--color-ink);
+  }
+
+  .album-cover__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .album-cover__grid :global(.media) {
+    border-radius: 0;
+  }
+
+  .album-cover__meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-2);
+  }
+
+  .album-cover__title {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .album-cover__date {
+    font-size: var(--font-size-body);
+    color: var(--color-muted);
+  }
+</style>

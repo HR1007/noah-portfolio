@@ -2,13 +2,26 @@
   "nav": {
     "logo": "NOAH WEN",
     "links": [
-      { "label": "About Me", "href": "/en/" },
-      { "label": "Portfolio", "href": "/en/portfolio" },
-      { "label": "Gallery", "href": "/en/gallery" }
+      {
+        "label": "About Me",
+        "href": "/en/"
+      },
+      {
+        "label": "Portfolio",
+        "href": "/en/portfolio"
+      },
+      {
+        "label": "Gallery",
+        "href": "/en/gallery"
+      }
     ]
   },
   "marquee": {
-    "items": ["UI/UX DESIGNER", "HUMAN FACTORS", "INFO MANAGEMENT"]
+    "items": [
+      "UI/UX DESIGNER",
+      "HUMAN FACTORS",
+      "INFO MANAGEMENT"
+    ]
   },
   "footer": {
     "copyright": "© 2026 Chung Wen Hung. All content, including pixel art and photography, are personal works."
@@ -16,7 +29,11 @@
   "home": {
     "heroName": "Chung Wen Hung",
     "heroTagline": "Just a coffee guy",
-    "heroRoles": ["UI/UX Designer", "Human Factors Engineering", "Information Management"],
+    "heroRoles": [
+      "UI/UX Designer",
+      "Human Factors Engineering",
+      "Information Management"
+    ],
     "heroQuote": "My life is an 8px grid, and I'm just trying not to let my anxiety overflow-y",
     "aboutHeading": "About me",
     "aboutSubheading": "Shaping Intuitive Solutions",
@@ -44,10 +61,24 @@
       }
     ],
     "connectHeading": "Connect with me",
-    "connectIntro": ["Want to work on something together?", "Or just want to chat?", "Hit me up."],
+    "connectIntro": [
+      "Want to work on something together?",
+      "Or just want to chat?",
+      "Hit me up."
+    ],
     "connectChannels": [
-      { "icon": "email", "label": "Email", "value": "hungnoah730@gmail.com", "href": "mailto:hungnoah730@gmail.com" },
-      { "icon": "instagram", "label": "Instagram", "value": "lens.memo", "href": "https://www.instagram.com/lens.memo/" }
+      {
+        "icon": "email",
+        "label": "Email",
+        "value": "hungnoah730@gmail.com",
+        "href": "mailto:hungnoah730@gmail.com"
+      },
+      {
+        "icon": "instagram",
+        "label": "Instagram",
+        "value": "lens.memo",
+        "href": "https://www.instagram.com/lens.memo/"
+      }
     ]
   },
   "portfolio": {
@@ -63,6 +94,29 @@
   "gallery": {
     "eyebrow": "Life, Framed",
     "headline": "Gallery",
-    "intro": "I believe every great photo starts with a good story. My photography journey is a constant switch between the timeless charm of a Film project and the fast-paced creativity of my Digital Cam. Welcome to my visual archive. Feel free to explore my ongoing Projects, dive into the sceneries of my Travels, or simply browse through the raw, unscripted moments of my Day Life :)"
+    "intro": "I believe every great photo starts with a good story. My photography journey is a constant switch between the timeless charm of a Film project and the fast-paced creativity of my Digital Cam. Welcome to my visual archive. Feel free to explore my ongoing Projects, dive into the sceneries of my Travels, or simply browse through the raw, unscripted moments of my Day Life :)",
+    "albums": [
+      {
+        "slug": "film-project",
+        "title": "Film project",
+        "dateLabel": "2024-Now"
+      },
+      {
+        "slug": "digital-cam-project",
+        "title": "Digital Cam project",
+        "dateLabel": "2025-Now"
+      }
+    ],
+    "germany": {
+      "title": "Germany",
+      "dateLabel": "2024",
+      "slug": "germany"
+    },
+    "cta": {
+      "heading": "This outstanding object",
+      "body": "A description explains a little bit more.",
+      "ctaLabel": "Call to action",
+      "ctaHref": "#"
+    }
   }
 }

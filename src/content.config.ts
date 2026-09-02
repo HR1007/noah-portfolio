@@ -149,6 +149,29 @@ const site = defineCollection({
       eyebrow: z.string(),
       headline: z.string(),
       intro: z.string(),
+      albums: z.array(
+        z.object({
+          slug: z.string(),
+          title: z.string(),
+          dateLabel: z.string(),
+        })
+      ),
+      // Germany 在主頁是直接內嵌整組相片（非封面卡+連結），但同時也有自己的獨立相簿頁，
+      // 所以一樣帶 slug，跟 albums 一起餵給 [slug].astro 的 getStaticPaths。
+      germany: z.object({
+        slug: z.string(),
+        title: z.string(),
+        dateLabel: z.string(),
+      }),
+      // [需確認] heading/body/ctaLabel/ctaHref 四項在參考稿裡是範本沒填的佔位文案（"This outstanding
+      // object" / "A description explains a little bit more." / "Call to action"），先照抄英文原文
+      // 並附上中文暫譯，待設計師提供正式內容與連結後更新。
+      cta: z.object({
+        heading: z.string(),
+        body: z.string(),
+        ctaLabel: z.string(),
+        ctaHref: z.string().default('#'),
+      }),
     }),
   }),
 });

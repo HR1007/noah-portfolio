@@ -12,6 +12,11 @@ const galleryImageModules = import.meta.glob<ImageModule>(
   { eager: true }
 );
 
+const galleryAlbumImageModules = import.meta.glob<ImageModule>(
+  '/src/assets/gallery/*/*.{png,jpg,jpeg,webp,avif}',
+  { eager: true }
+);
+
 const homeImageModules = import.meta.glob<ImageModule>(
   '/src/assets/home/*.{png,jpg,jpeg,webp,avif}',
   { eager: true }
@@ -31,9 +36,21 @@ export function getProjectImages(slug: string): ImageMetadata[] {
     .map(([, image]) => image);
 }
 
-/** 依檔名序號回傳 Gallery 資料夾內所有圖片；無圖時回傳空陣列。 */
-export function getGalleryImages(): ImageMetadata[] {
-  return sortedByFilename(galleryImageModules).map(([, image]) => image);
+/** 依語意檔名（不含副檔名）取單張 Gallery 頁面圖片，例如 getGalleryImage('hero')；找不到時回傳 undefined。 */
+export function getGalleryImage(name: string): ImageMetadata | undefined {
+  const match = sortedByFilename(galleryImageModules).find(([path]) => {
+    const filename = path.split('/').pop() ?? '';
+    return filename.replace(/\.[^.]+$/, '') === name;
+  });
+  return match?.[1];
+}
+
+/** 依檔名序號（00, 01, 02...）回傳指定相簿資料夾內所有照片；資料夾不存在或無圖時回傳空陣列。 */
+export function getGalleryAlbumImages(slug: string): ImageMetadata[] {
+  const prefix = `/src/assets/gallery/${slug}/`;
+  return sortedByFilename(galleryAlbumImageModules)
+    .filter(([path]) => path.startsWith(prefix))
+    .map(([, image]) => image);
 }
 
 /** 依語意檔名（不含副檔名）取單張首頁圖片，例如 getHomeImage('hero')；找不到時回傳 undefined。 */

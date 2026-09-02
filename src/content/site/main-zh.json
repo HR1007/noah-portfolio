@@ -2,13 +2,26 @@
   "nav": {
     "logo": "NOAH WEN",
     "links": [
-      { "label": "關於我", "href": "/zh/" },
-      { "label": "作品集", "href": "/zh/portfolio" },
-      { "label": "藝廊", "href": "/zh/gallery" }
+      {
+        "label": "關於我",
+        "href": "/zh/"
+      },
+      {
+        "label": "作品集",
+        "href": "/zh/portfolio"
+      },
+      {
+        "label": "藝廊",
+        "href": "/zh/gallery"
+      }
     ]
   },
   "marquee": {
-    "items": ["UI/UX 設計師", "人因工程", "資訊管理"]
+    "items": [
+      "UI/UX 設計師",
+      "人因工程",
+      "資訊管理"
+    ]
   },
   "footer": {
     "copyright": "© 2026 Chung Wen Hung。網站內所有像素圖與攝影作品皆為個人創作。"
@@ -16,7 +29,11 @@
   "home": {
     "heroName": "Chung Wen Hung",
     "heroTagline": "一個愛喝咖啡的人而已",
-    "heroRoles": ["UI/UX 設計師", "人因工程", "資訊管理"],
+    "heroRoles": [
+      "UI/UX 設計師",
+      "人因工程",
+      "資訊管理"
+    ],
     "heroQuote": "[需確認 — 草稿翻譯，原文是雙關語（CSS overflow 屬性），中文很難完全保留這個梗，麻煩校對] 我的人生是一張 8px 網格，而我只是努力不讓焦慮 overflow 出界",
     "aboutHeading": "關於我",
     "aboutSubheading": "打造直覺的解決方案",
@@ -44,10 +61,24 @@
       }
     ],
     "connectHeading": "與我聯繫",
-    "connectIntro": ["想一起合作點什麼嗎？", "還是只是想聊聊？", "都歡迎找我。"],
+    "connectIntro": [
+      "想一起合作點什麼嗎？",
+      "還是只是想聊聊？",
+      "都歡迎找我。"
+    ],
     "connectChannels": [
-      { "icon": "email", "label": "電子郵件", "value": "hungnoah730@gmail.com", "href": "mailto:hungnoah730@gmail.com" },
-      { "icon": "instagram", "label": "Instagram", "value": "lens.memo", "href": "https://www.instagram.com/lens.memo/" }
+      {
+        "icon": "email",
+        "label": "電子郵件",
+        "value": "hungnoah730@gmail.com",
+        "href": "mailto:hungnoah730@gmail.com"
+      },
+      {
+        "icon": "instagram",
+        "label": "Instagram",
+        "value": "lens.memo",
+        "href": "https://www.instagram.com/lens.memo/"
+      }
     ]
   },
   "portfolio": {
@@ -63,6 +94,29 @@
   "gallery": {
     "eyebrow": "被定格的生活",
     "headline": "藝廊",
-    "intro": "我相信每一張好照片，都從一個好故事開始。我的攝影旅程，一直在底片（Film）雋永的質感，與數位相機（Digital Cam）快速的創作節奏之間切換。歡迎來到我的視覺檔案庫。歡迎自由瀏覽我持續進行的專案、探索旅途中的風景，或單純看看我日常生活裡未經修飾的真實片刻 :)"
+    "intro": "我相信每一張好照片，都從一個好故事開始。我的攝影旅程，一直在底片（Film）雋永的質感，與數位相機（Digital Cam）快速的創作節奏之間切換。歡迎來到我的視覺檔案庫。歡迎自由瀏覽我持續進行的專案、探索旅途中的風景，或單純看看我日常生活裡未經修飾的真實片刻 :)",
+    "albums": [
+      {
+        "slug": "film-project",
+        "title": "Film project",
+        "dateLabel": "2024 – 至今"
+      },
+      {
+        "slug": "digital-cam-project",
+        "title": "Digital Cam project",
+        "dateLabel": "2025 – 至今"
+      }
+    ],
+    "germany": {
+      "title": "德國",
+      "dateLabel": "2024",
+      "slug": "germany"
+    },
+    "cta": {
+      "heading": "這是個很棒的作品",
+      "body": "這裡放一段簡短說明。",
+      "ctaLabel": "前往看看",
+      "ctaHref": "#"
+    }
   }
 }

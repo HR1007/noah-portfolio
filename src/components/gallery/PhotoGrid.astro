@@ -1,0 +1,65 @@
+---
+// 相片牆用每張照片原始比例排版（масonry），不強制裁切成統一比例，
+// 讓橫幅／直幅照片都能自然呈現，比較貼近真實攝影作品集的排版方式。
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Placeholder from '../Placeholder.astro';
+
+interface Props {
+  images: (ImageMetadata | undefined)[];
+  labelPrefix: string;
+  placeholderCount?: number;
+}
+
+const { images, labelPrefix, placeholderCount = 9 } = Astro.props;
+const items = images.length > 0 ? images : Array.from({ length: placeholderCount }, () => undefined);
+---
+
+<div class="photo-grid">
+  {
+    items.map((image, index) => {
+      const alt = `${labelPrefix} ${String(index + 1).padStart(2, '0')}`;
+      return (
+        <div class="photo-grid__item">
+          {image ? (
+            <Image src={image} alt={alt} loading="lazy" />
+          ) : (
+            <Placeholder ratio="3/4" label={alt} />
+          )}
+        </div>
+      );
+    })
+  }
+</div>
+
+<style>
+  .photo-grid {
+    columns: 3;
+    column-gap: var(--sp-2);
+  }
+
+  .photo-grid__item {
+    break-inside: avoid;
+    margin-bottom: var(--sp-2);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .photo-grid__item :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (max-width: 767px) {
+    .photo-grid {
+      columns: 1;
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .photo-grid {
+      columns: 2;
+    }
+  }
+</style>

@@ -1,0 +1,17 @@
+---
+import { getEntry } from 'astro:content';
+import GalleryAlbum from '../../../views/GalleryAlbum.astro';
+
+export async function getStaticPaths() {
+  const site = await getEntry('site', 'main-en');
+  const { albums, germany } = site!.data.gallery;
+  return [...albums, germany].map((album) => ({
+    params: { slug: album.slug },
+    props: { slug: album.slug, title: album.title },
+  }));
+}
+
+const { slug, title } = Astro.props;
+---
+
+<GalleryAlbum locale="en" slug={slug} title={title} />

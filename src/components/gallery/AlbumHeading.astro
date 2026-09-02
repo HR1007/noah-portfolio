@@ -1,0 +1,38 @@
+---
+interface Props {
+  title: string;
+  dateLabel: string;
+  href?: string;
+}
+
+const { title, dateLabel, href } = Astro.props;
+---
+
+<div class="album-heading">
+  <h2 class="album-heading__title">{href ? <a href={href}>{title}</a> : title}</h2>
+  <span class="album-heading__date">{dateLabel}</span>
+</div>
+
+<style>
+  .album-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-3);
+  }
+
+  .album-heading__title {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .album-heading__title :global(a) {
+    color: inherit;
+  }
+
+  .album-heading__date {
+    font-size: var(--font-size-body);
+    color: var(--color-muted);
+  }
+</style>
