@@ -1,0 +1,28 @@
+---
+import { otherLocale as getOtherLocale, swapLocalePath, type Locale } from '../lib/i18n';
+
+const currentLocale = (Astro.currentLocale ?? 'en') as Locale;
+const otherLocale = getOtherLocale(currentLocale);
+const otherPath = swapLocalePath(Astro.url.pathname, otherLocale);
+const label = currentLocale === 'en' ? '中文' : 'EN';
+---
+
+<a href={otherPath} class="lang-toggle" hreflang={otherLocale} aria-label="Switch language">
+  {label}
+</a>
+
+<style>
+  .lang-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 var(--sp-2);
+    flex: none;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-border);
+    color: var(--color-ink);
+    font-size: var(--font-size-meta);
+    font-weight: var(--font-weight-semibold);
+  }
+</style>

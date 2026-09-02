@@ -1,0 +1,68 @@
+{
+  "nav": {
+    "logo": "NOAH WEN",
+    "links": [
+      { "label": "關於我", "href": "/zh/" },
+      { "label": "作品集", "href": "/zh/portfolio" },
+      { "label": "藝廊", "href": "/zh/gallery" }
+    ]
+  },
+  "marquee": {
+    "items": ["UI/UX 設計師", "人因工程", "資訊管理"]
+  },
+  "footer": {
+    "copyright": "© 2026 Chung Wen Hung。網站內所有像素圖與攝影作品皆為個人創作。"
+  },
+  "home": {
+    "heroName": "Chung Wen Hung",
+    "heroTagline": "一個愛喝咖啡的人而已",
+    "heroRoles": ["UI/UX 設計師", "人因工程", "資訊管理"],
+    "heroQuote": "[需確認 — 草稿翻譯，原文是雙關語（CSS overflow 屬性），中文很難完全保留這個梗，麻煩校對] 我的人生是一張 8px 網格，而我只是努力不讓焦慮 overflow 出界",
+    "aboutHeading": "關於我",
+    "aboutSubheading": "打造直覺的解決方案",
+    "aboutIntro": "嗨，我是高科大資訊管理研究所的學生，對 UI/UX 與人因工程有著滿滿的熱忱。從在 e-Excellence Inc. 分析資料，到在德國 THWS 交換期間打開新的視野，這些經歷都持續推動我專注於打造無障礙且結構優美的介面。目前我正投入心力，透過使用者中心設計（UCD）優化 OSCE 醫學系統後台——努力把複雜的技術邏輯，轉化成真正服務使用者的直覺體驗。",
+    "beyondGridHeading": "格線之外",
+    "beyondGridParagraphs": [
+      "當我不是在琢磨像素或分析資料集的時候，我會沉浸在插畫與數位藝術的世界裡。這份對視覺敘事的喜愛，也常常延伸進我的網頁作品，讓我樂於在其中融入獨特的角色設計。",
+      "曾擔任學生大使與國際志工，在符茲堡（Würzburg）的經歷讓我深深體會跨文化交流與旅行攝影的魅力。我相信，用不同的視角觀察世界，能不斷滋養我身為設計師的創造力與同理心。"
+    ],
+    "experience": [
+      {
+        "title": "人因研究員",
+        "period": "2025 - 至今",
+        "description": "在國際研討會（JSES 與 CIIE）上發表運用 UCD 優化醫療 UI/UX 的成果。"
+      },
+      {
+        "title": "教學助理",
+        "period": "2024 - 2025",
+        "description": "協助高科大統計學課程，以及清大智慧製造課程的教學工作。"
+      },
+      {
+        "title": "資料分析實習生",
+        "period": "2023 - 2024",
+        "description": "任職於 e-Excellence Inc.，運用資訊架構（IA）與視覺層級，將複雜的資料集轉化為直覺易懂、對使用者友善的視覺化敘事，協助管理階層決策。"
+      }
+    ],
+    "connectHeading": "與我聯繫",
+    "connectIntro": ["想一起合作點什麼嗎？", "還是只是想聊聊？", "都歡迎找我。"],
+    "connectChannels": [
+      { "icon": "email", "label": "電子郵件", "value": "hungnoah730@gmail.com", "href": "mailto:hungnoah730@gmail.com" },
+      { "icon": "instagram", "label": "Instagram", "value": "lens.memo", "href": "https://www.instagram.com/lens.memo/" }
+    ]
+  },
+  "portfolio": {
+    "eyebrow": "在技術邏輯與人本直覺之間，搭起一座橋。",
+    "headline": "作品集",
+    "intro": "老實說，我是個對「人到底是怎麼運作的」很著迷的設計師。對我來說，設計不只是「好看」而已——而是人因工程與扎實的證據。我依靠眼動追蹤、情緒反應與使用者訪談，來證明一個版面真的有效。不管是在整理一團亂的技術介面，還是沉迷於深色模式的美學細節，我都樂於跳脫框架思考，把複雜的數位摩擦感，轉化成順暢、「就是這麼直覺」的體驗。"
+  },
+  "projectQuote": {
+    "quote": "好的介面就像一張 8px 網格：肉眼看不見，卻能在每一次順暢的互動中被感受到。",
+    "name": "Chung Wen Hung",
+    "tagline": "一個愛喝咖啡的人而已"
+  },
+  "gallery": {
+    "eyebrow": "被定格的生活",
+    "headline": "藝廊",
+    "intro": "我相信每一張好照片，都從一個好故事開始。我的攝影旅程，一直在底片（Film）雋永的質感，與數位相機（Digital Cam）快速的創作節奏之間切換。歡迎來到我的視覺檔案庫。歡迎自由瀏覽我持續進行的專案、探索旅途中的風景，或單純看看我日常生活裡未經修飾的真實片刻 :)"
+  }
+}

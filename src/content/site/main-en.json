@@ -2,9 +2,9 @@
   "nav": {
     "logo": "NOAH WEN",
     "links": [
-      { "label": "About Me", "href": "/" },
-      { "label": "Portfolio", "href": "/portfolio" },
-      { "label": "Gallery", "href": "/gallery" }
+      { "label": "About Me", "href": "/en/" },
+      { "label": "Portfolio", "href": "/en/portfolio" },
+      { "label": "Gallery", "href": "/en/gallery" }
     ]
   },
   "marquee": {
@@ -46,8 +46,8 @@
     "connectHeading": "Connect with me",
     "connectIntro": ["Want to work on something together?", "Or just want to chat?", "Hit me up."],
     "connectChannels": [
-      { "label": "Email", "value": "hungnoah730@gmail.com", "href": "mailto:hungnoah730@gmail.com" },
-      { "label": "Instagram", "value": "lens.memo", "href": "https://www.instagram.com/lens.memo/" }
+      { "icon": "email", "label": "Email", "value": "hungnoah730@gmail.com", "href": "mailto:hungnoah730@gmail.com" },
+      { "icon": "instagram", "label": "Instagram", "value": "lens.memo", "href": "https://www.instagram.com/lens.memo/" }
     ]
   },
   "portfolio": {

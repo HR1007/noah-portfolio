@@ -5,7 +5,12 @@ import SectionIntro from '../components/SectionIntro.astro';
 import PortfolioCard from '../components/PortfolioCard.astro';
 import { getProjectImages } from '../lib/media';
 
-const site = await getEntry('site', 'main');
+interface Props {
+  locale: 'en' | 'zh';
+}
+
+const { locale } = Astro.props;
+const site = await getEntry('site', `main-${locale}`);
 const { eyebrow, headline, intro } = site!.data.portfolio;
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -21,7 +26,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             title={project.data.title}
             summary={project.data.summary}
             ctaLabel={project.data.ctaLabel}
-            href={`/projects/${project.id}`}
+            href={`/${locale}/projects/${project.id}`}
             image={getProjectImages(project.id)[0]}
             reverse={index % 2 === 1}
           />

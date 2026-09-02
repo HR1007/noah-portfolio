@@ -5,7 +5,12 @@ import SectionIntro from '../components/SectionIntro.astro';
 import Media from '../components/Media.astro';
 import { getGalleryImages } from '../lib/media';
 
-const site = await getEntry('site', 'main');
+interface Props {
+  locale: 'en' | 'zh';
+}
+
+const { locale } = Astro.props;
+const site = await getEntry('site', `main-${locale}`);
 const { eyebrow, headline, intro } = site!.data.gallery;
 
 const images = getGalleryImages();
