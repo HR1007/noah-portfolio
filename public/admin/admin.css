@@ -1,0 +1,439 @@
+/*
+  這份 CSS 只給 /admin 這個本機後台用，不是正式站台的一部分，
+  所以不受 CLAUDE.md「顏色必須引用 tokens.css」的硬規則限制。
+  但為了視覺一致，色彩／間距／字級／圓角數值仍手動對齊
+  src/styles/tokens.css 目前的值 —— 若之後 tokens.css 改了，這裡要跟著手動同步。
+*/
+:root {
+  --bg: #f2f2f2;
+  --surface: #ffffff;
+  --ink: #333333;
+  --muted: rgba(0, 0, 0, 0.55);
+  --border: rgba(51, 51, 51, 0.12);
+
+  --accent: #2f6fed;
+  --accent-ink: #ffffff;
+  --danger: #d64545;
+
+  --font-sans:
+    'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --sp-1: 8px;
+  --sp-2: 16px;
+  --sp-3: 24px;
+  --sp-4: 32px;
+  --sp-5: 40px;
+
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: var(--bg);
+}
+
+svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  width: 72px;
+  flex: none;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--sp-2) 0;
+  gap: var(--sp-3);
+}
+
+.sidebar__logo {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--ink);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.sidebar__spacer {
+  flex: 1;
+}
+
+.sidebar__item {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.sidebar__item:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.sidebar__item--active {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* ---------- Main ---------- */
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-4) var(--sp-3);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.topbar__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.topbar__meta {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.topbar__tabs {
+  display: flex;
+  gap: var(--sp-1);
+}
+
+.tab {
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tab--active {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+.content {
+  flex: 1;
+  padding: var(--sp-4);
+  overflow: auto;
+}
+
+/* ---------- Grid ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--sp-2);
+}
+
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+}
+
+.tile.dragging {
+  opacity: 0.4;
+}
+
+.tile.drop-target {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.tile--selected {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  box-shadow: 0 0 0 4px rgba(47, 111, 237, 0.15);
+}
+
+.tile__image-wrap {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: repeating-linear-gradient(45deg, #eee 0 10px, #f7f7f7 10px 20px);
+  overflow: hidden;
+}
+
+/*
+  img 用 position:absolute 完全脫離文件流，而不是靠 width/height:100% 撐滿——
+  否則直向（長寬比窄）的照片會讓瀏覽器在計算 aspect-ratio 容器高度時
+  參考到圖片本身的原始比例，撐爆這個本來該固定 4:3 的裁切框。
+  這是 admin 管理縮圖 grid 專用的裁切邏輯，跟正式網站的 PhotoGrid（保留照片原始比例、不裁切）無關。
+*/
+.tile__image-wrap img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tile__badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.tile__delete,
+.tile__expand {
+  position: absolute;
+  top: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.tile__delete {
+  right: 8px;
+  color: var(--danger);
+}
+
+.tile__expand {
+  right: 40px;
+  color: var(--ink);
+}
+
+.tile:hover .tile__delete,
+.tile:hover .tile__expand {
+  opacity: 1;
+}
+
+.tile__delete svg,
+.tile__expand svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tile__meta {
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.tile__meta strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.tile--add {
+  border: 2px dashed var(--border);
+  background: transparent;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.tile--add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tile--add .plus {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.toast {
+  position: fixed;
+  bottom: var(--sp-3);
+  right: var(--sp-3);
+  background: var(--ink);
+  color: var(--bg);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.15s;
+  pointer-events: none;
+}
+
+.toast--show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast--error {
+  background: var(--danger);
+}
+
+/* ---------- Lightbox ---------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-4);
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 20, 22, 0.72);
+}
+
+.lightbox__panel {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  max-width: min(1000px, 100%);
+  max-height: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.lightbox__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.lightbox__image-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: repeating-linear-gradient(45deg, #eee 0 10px, #f7f7f7 10px 20px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox__image-wrap img {
+  max-width: 100%;
+  max-height: 80vh;
+  display: block;
+  object-fit: contain;
+}
+
+.lightbox__info {
+  flex: none;
+  width: 260px;
+  margin: 0;
+  padding: var(--sp-3);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  overflow-y: auto;
+}
+
+.lightbox__info dt {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lightbox__info dd {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+@media (max-width: 767px) {
+  .lightbox__panel {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .lightbox__info {
+    width: auto;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+}

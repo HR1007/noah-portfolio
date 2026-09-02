@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Noah Portfolio 後台（本機）</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="sidebar__logo">N</div>
+        <nav class="sidebar__nav">
+          <button class="sidebar__item" data-page="home" disabled title="Home（尚未開放）">
+            <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5" /><path d="M5 10v9h14v-9" /></svg>
+          </button>
+          <button class="sidebar__item sidebar__item--active" data-page="gallery" title="Gallery">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" /><circle cx="8.5" cy="9" r="1.6" /><path d="m21 15-5-5-11 11" /></svg>
+          </button>
+          <button class="sidebar__item" data-page="portfolio" disabled title="Portfolio（尚未開放）">
+            <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+          </button>
+        </nav>
+        <div class="sidebar__spacer"></div>
+        <button class="sidebar__item" data-page="settings" disabled title="設定（尚未開放）">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1Z" /></svg>
+        </button>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h1 class="topbar__title">Gallery 相簿</h1>
+            <p class="topbar__meta" id="albumMeta">載入中…</p>
+          </div>
+          <div class="topbar__tabs" id="albumTabs"></div>
+        </header>
+
+        <section class="content">
+          <div class="grid" id="grid"></div>
+        </section>
+      </main>
+    </div>
+
+    <input type="file" id="fileInput" accept="image/*" hidden />
+
+    <div class="lightbox" id="lightbox" hidden>
+      <div class="lightbox__backdrop"></div>
+      <div class="lightbox__panel">
+        <button class="lightbox__close" id="lightboxClose" title="關閉">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+        <div class="lightbox__image-wrap">
+          <img id="lightboxImage" alt="" />
+        </div>
+        <dl class="lightbox__info" id="lightboxInfo"></dl>
+      </div>
+    </div>
+
+    <script src="/admin/admin.js"></script>
+  </body>
+</html>
