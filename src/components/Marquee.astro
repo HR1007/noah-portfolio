@@ -1,7 +1,8 @@
 ---
 import { getEntry } from 'astro:content';
 
-const site = await getEntry('site', 'main');
+const locale = Astro.currentLocale ?? 'en';
+const site = await getEntry('site', `main-${locale}`);
 const items = site!.data.marquee.items;
 // 循環 4 輪讓跑馬燈在寬螢幕下也填滿並無縫銜接
 const loop = [...items, ...items, ...items, ...items];

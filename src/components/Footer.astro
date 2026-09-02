@@ -2,7 +2,8 @@
 import { getEntry } from 'astro:content';
 import Marquee from './Marquee.astro';
 
-const site = await getEntry('site', 'main');
+const locale = Astro.currentLocale ?? 'en';
+const site = await getEntry('site', `main-${locale}`);
 const { copyright } = site!.data.footer;
 ---
 

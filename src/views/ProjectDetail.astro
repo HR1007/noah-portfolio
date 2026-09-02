@@ -1,31 +1,29 @@
 ---
-import { getCollection, getEntry, render } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Media from '../../components/Media.astro';
-import ProjectHero from '../../components/project/ProjectHero.astro';
-import TextSection from '../../components/project/TextSection.astro';
-import DeviceShowcase from '../../components/project/DeviceShowcase.astro';
-import ExperienceDemo from '../../components/project/ExperienceDemo.astro';
-import FeatureSplit from '../../components/project/FeatureSplit.astro';
-import FeatureGrid from '../../components/project/FeatureGrid.astro';
-import ImageRow from '../../components/project/ImageRow.astro';
-import IllustrationGrid from '../../components/project/IllustrationGrid.astro';
-import ProjectQuote from '../../components/project/ProjectQuote.astro';
-import { getProjectImages } from '../../lib/media';
+import { getEntry, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Media from '../components/Media.astro';
+import ProjectHero from '../components/project/ProjectHero.astro';
+import TextSection from '../components/project/TextSection.astro';
+import DeviceShowcase from '../components/project/DeviceShowcase.astro';
+import ExperienceDemo from '../components/project/ExperienceDemo.astro';
+import FeatureSplit from '../components/project/FeatureSplit.astro';
+import FeatureGrid from '../components/project/FeatureGrid.astro';
+import ImageRow from '../components/project/ImageRow.astro';
+import IllustrationGrid from '../components/project/IllustrationGrid.astro';
+import ProjectQuote from '../components/project/ProjectQuote.astro';
+import { getProjectImages } from '../lib/media';
 
-export async function getStaticPaths() {
-  const projects = await getCollection('projects');
-  return projects.map((project) => ({
-    params: { slug: project.id },
-    props: { project },
-  }));
+interface Props {
+  project: CollectionEntry<'projects'>;
+  locale: 'en' | 'zh';
 }
 
-const { project } = Astro.props;
+const { project, locale } = Astro.props;
 const { hero, sections } = project.data;
 const isMigrated = hero !== undefined && sections.length > 0;
 
-const site = await getEntry('site', 'main');
+const site = await getEntry('site', `main-${locale}`);
 const { projectQuote } = site!.data;
 
 // 圖片不寫路徑/檔名在內容裡：依區塊在頁面上出現的順序，依序從該專案資料夾取下一張圖。

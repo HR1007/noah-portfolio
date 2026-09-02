@@ -1,14 +1,16 @@
 ---
 import { getEntry } from 'astro:content';
 import ThemeToggle from './ThemeToggle.astro';
+import LangToggle from './LangToggle.astro';
 
-const site = await getEntry('site', 'main');
+const locale = Astro.currentLocale ?? 'en';
+const site = await getEntry('site', `main-${locale}`);
 const { logo, links } = site!.data.nav;
 const currentPath = Astro.url.pathname;
 ---
 
 <nav class="nav">
-  <a href="/" class="nav__logo">{logo}</a>
+  <a href={`/${locale}/`} class="nav__logo">{logo}</a>
   <div class="nav__right">
     <ul class="nav__links">
       {
@@ -24,6 +26,7 @@ const currentPath = Astro.url.pathname;
         })
       }
     </ul>
+    <LangToggle />
     <ThemeToggle />
   </div>
 </nav>

@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Marquee from '../components/Marquee.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import { otherLocale as getOtherLocale, swapLocalePath, type Locale } from '../lib/i18n';
 
 interface Props {
   title: string;
@@ -12,10 +13,14 @@ interface Props {
 
 const { title, description, ogImage } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+const locale = (Astro.currentLocale ?? 'en') as Locale;
+const otherLocale = getOtherLocale(locale);
+const alternateURL = new URL(swapLocalePath(Astro.url.pathname, otherLocale), Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -27,6 +32,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" hreflang={locale} href={canonicalURL} />
+    <link rel="alternate" hreflang={otherLocale} href={alternateURL} />
     <title>{title}</title>
     <meta name="description" content={description} />
 
