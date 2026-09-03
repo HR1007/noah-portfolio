@@ -18,7 +18,7 @@ const { title, ctaLabel, ctaHref, image } = Astro.props;
   <div class="project-hero__media">
     <Media image={image} ratio="21/9" alt={`${title} hero`} loading="eager" fetchpriority="high" />
   </div>
-  <div class="project-hero__overlay">
+  <div class="project-hero__overlay" class:list={{ 'project-hero__overlay--placeholder': !image }}>
     <h1 class="project-hero__title">{title}</h1>
     <Button label={ctaLabel} href={ctaHref} variant="secondary" />
   </div>
@@ -44,6 +44,21 @@ const { title, ctaLabel, ctaHref, image } = Astro.props;
   .project-hero__title {
     font-size: var(--font-size-h1);
     color: var(--color-bg);
+  }
+
+  /*
+    沒有真實 hero 圖時，底下是 Placeholder 的條紋背景（跟 --color-bg 同一色系），
+    白色/背景色文字會直接被吃掉、幾乎看不見。這種情況改用一般內文色，
+    並把內容靠上排版，避開 Placeholder 自己在框底部顯示的檔名標籤，
+    圖片上傳之後 Placeholder 消失，恢復成疊在照片上的正常樣式。
+  */
+  .project-hero__overlay--placeholder {
+    justify-content: flex-start;
+    padding-top: var(--sp-4);
+  }
+
+  .project-hero__overlay--placeholder .project-hero__title {
+    color: var(--color-ink);
   }
 
   @media (max-width: 767px) {

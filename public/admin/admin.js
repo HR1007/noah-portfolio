@@ -415,14 +415,17 @@ function renderHomeGrid() {
     card.className = 'home-card';
 
     const hasImage = !!slot.filename;
+    // 空位跟 Gallery/Portfolio 的「待上傳」格子共用同一套樣式（虛線框＋pending 徽章＋說明文字），
+    // 三個頁面的「這裡還沒有圖」視覺要一致，不要各刻一套。
     card.innerHTML = `
-      <div class="tile__image-wrap home-card__image-wrap">
+      <div class="tile__image-wrap home-card__image-wrap${hasImage ? '' : ' tile--empty-slot'}">
         ${
           hasImage
             ? `<img src="${imgUrl(slot)}" alt="${slot.filename}" loading="lazy" />
                <button class="tile__expand" title="放大查看"><svg viewBox="0 0 24 24"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg></button>
                <button class="tile__delete" title="刪除，改回佔位框"><svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg></button>`
-            : `<span class="home-card__empty">尚未上傳，點擊上傳</span>`
+            : `<span class="tile__badge tile__badge--pending">待上傳</span>
+               <span class="tile__empty-label">尚未上傳，點擊上傳</span>`
         }
       </div>
       <div class="tile__meta home-card__meta">

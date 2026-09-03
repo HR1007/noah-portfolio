@@ -295,7 +295,13 @@ svg {
   cursor: pointer;
 }
 
-.tile--empty-slot .tile__image-wrap {
+/*
+  兩種用法都要吃到同一套虛線框樣式：
+  - Gallery/Portfolio：.tile--empty-slot 是外層 tile，.tile__image-wrap 是裡面的子元素
+  - Home：.tile--empty-slot 直接跟 .tile__image-wrap 同一個元素
+*/
+.tile--empty-slot .tile__image-wrap,
+.tile__image-wrap.tile--empty-slot {
   border: 2px dashed var(--border);
   background: transparent;
   display: flex;
@@ -303,7 +309,8 @@ svg {
   padding: 8px;
 }
 
-.tile--empty-slot:hover .tile__image-wrap {
+.tile--empty-slot:hover .tile__image-wrap,
+.tile__image-wrap.tile--empty-slot:hover {
   border-color: var(--accent);
 }
 
@@ -358,17 +365,6 @@ svg {
 
 .home-card__image-wrap {
   cursor: pointer;
-}
-
-.home-card__empty {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  text-align: left;
-  padding: var(--sp-2);
-  font-size: 13px;
-  color: var(--muted);
 }
 
 .home-card__meta strong {
