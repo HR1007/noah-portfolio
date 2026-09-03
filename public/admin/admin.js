@@ -93,6 +93,7 @@ let previewLocale = 'en';
 let previewPath = '/';
 let galleryAlbumList = [];
 let previewOptionsLoaded = false;
+let contentPreviewTouched = false; // 在 Content 分頁手動選過別的 preview 頁面後，就不要再被自動蓋回 Home
 
 async function ensurePreviewOptionsLoaded() {
   if (previewOptionsLoaded) return;
@@ -134,7 +135,11 @@ async function syncPreview() {
   if (currentPage === 'home') previewPath = '/';
   else if (currentPage === 'gallery' && currentSlug) previewPath = `/gallery/${currentSlug}`;
   else if (currentPage === 'portfolio' && currentSlug) previewPath = `/projects/${currentSlug}`;
-  else if (currentPage === 'content') previewPath = previewPath || '/';
+  // Content 頁涵蓋很多頁面，沒有單一對應頁面可以自動猜；每次「切換到」這個分頁
+  // 都固定回到 Home，不要沿用切換前殘留的 gallery/portfolio 路徑（不然會看起來
+  // 像是「儲存文案卻跳回 Gallery」，其實只是切分頁那瞬間就已經沒同步）。
+  // 下拉選單仍可以手動換到別頁，之後儲存/重新整理不會再把它改回去。
+  else if (currentPage === 'content' && !contentPreviewTouched) previewPath = '/';
   if ([...previewSelectEl.options].some((o) => o.value === previewPath)) {
     previewSelectEl.value = previewPath;
   }
@@ -143,6 +148,7 @@ async function syncPreview() {
 
 previewSelectEl.addEventListener('change', () => {
   previewPath = previewSelectEl.value;
+  if (currentPage === 'content') contentPreviewTouched = true;
   reloadPreview();
 });
 previewLocaleBtn.addEventListener('click', () => {
@@ -162,6 +168,7 @@ sidebarItems.forEach((btn) => {
     sidebarItems.forEach((b) => b.classList.toggle('sidebar__item--active', b === btn));
     currentPage = page;
     selectedIndex = null;
+    if (page !== 'content') contentPreviewTouched = false;
     document.querySelector('.content-savebar')?.remove();
     if (page === 'gallery') {
       currentType = 'gallery';
