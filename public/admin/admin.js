@@ -13,6 +13,10 @@ const lightboxEl = document.getElementById('lightbox');
 const lightboxImageEl = document.getElementById('lightboxImage');
 const lightboxInfoEl = document.getElementById('lightboxInfo');
 const lightboxCloseEl = document.getElementById('lightboxClose');
+const previewPanelEl = document.getElementById('previewPanel');
+const previewFrameEl = document.getElementById('previewFrame');
+const previewSelectEl = document.getElementById('previewPageSelect');
+const previewLocaleBtn = document.getElementById('previewLocaleToggle');
 
 let currentPage = 'gallery'; // 'gallery' | 'portfolio' | 'home'
 let currentType = 'gallery'; // 'gallery' | 'projects' —— 對應後端 /api/collections/:type
@@ -82,6 +86,73 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !lightboxEl.hidden) closeLightbox();
 });
 
+// ---------- 右側即時 Preview（iframe 嵌實際跑在 astro dev 上的正式頁面） ----------
+
+const PREVIEW_BASE = 'http://localhost:4321';
+let previewLocale = 'en';
+let previewPath = '/';
+let galleryAlbumList = [];
+let previewOptionsLoaded = false;
+
+async function ensurePreviewOptionsLoaded() {
+  if (previewOptionsLoaded) return;
+  const [gallery, projects] = await Promise.all([
+    fetch(`${API}/api/collections/gallery`).then((r) => r.json()),
+    fetch(`${API}/api/collections/projects`).then((r) => r.json()),
+  ]);
+  galleryAlbumList = gallery;
+  if (projectSlugs.length === 0) projectSlugs = projects;
+  previewOptionsLoaded = true;
+  populatePreviewSelect();
+}
+
+function populatePreviewSelect() {
+  const opts = [
+    { path: '/', label: 'Home' },
+    { path: '/portfolio', label: 'Portfolio（列表頁）' },
+    { path: '/gallery', label: 'Gallery（主頁）' },
+  ];
+  projectSlugs.forEach(({ slug, title }) => opts.push({ path: `/projects/${slug}`, label: `案例頁 → ${title}` }));
+  galleryAlbumList.forEach(({ slug, title }) => opts.push({ path: `/gallery/${slug}`, label: `相簿 → ${title}` }));
+  previewSelectEl.innerHTML = '';
+  opts.forEach((o) => {
+    const el = document.createElement('option');
+    el.value = o.path;
+    el.textContent = o.label;
+    previewSelectEl.appendChild(el);
+  });
+  previewSelectEl.value = previewPath;
+}
+
+function reloadPreview() {
+  previewFrameEl.src = `${PREVIEW_BASE}/${previewLocale}${previewPath}?t=${Date.now()}`;
+}
+
+// 依目前後台在編輯哪一頁，自動把 Preview 切到對應的正式頁面；下拉選單仍可手動覆蓋。
+async function syncPreview() {
+  await ensurePreviewOptionsLoaded();
+  if (currentPage === 'home') previewPath = '/';
+  else if (currentPage === 'gallery' && currentSlug) previewPath = `/gallery/${currentSlug}`;
+  else if (currentPage === 'portfolio' && currentSlug) previewPath = `/projects/${currentSlug}`;
+  else if (currentPage === 'content') previewPath = previewPath || '/';
+  if ([...previewSelectEl.options].some((o) => o.value === previewPath)) {
+    previewSelectEl.value = previewPath;
+  }
+  reloadPreview();
+}
+
+previewSelectEl.addEventListener('change', () => {
+  previewPath = previewSelectEl.value;
+  reloadPreview();
+});
+previewLocaleBtn.addEventListener('click', () => {
+  previewLocale = previewLocale === 'en' ? 'zh' : 'en';
+  previewLocaleBtn.textContent = previewLocale.toUpperCase();
+  reloadPreview();
+});
+document.getElementById('previewRefresh').addEventListener('click', reloadPreview);
+document.getElementById('previewCollapse').addEventListener('click', () => previewPanelEl.classList.toggle('collapsed'));
+
 // ---------- 側欄切換 ----------
 
 sidebarItems.forEach((btn) => {
@@ -136,17 +207,30 @@ async function selectSlug(slug, btn) {
   await loadImages();
 }
 
+let currentRequiredSlots = null;
+let currentSlotLabels = [];
+
 async function loadImages() {
   pageMetaEl.textContent = '載入中…';
-  currentImages = await fetch(`${API}/api/collections/${currentType}/${currentSlug}/images`).then((r) => r.json());
-  pageMetaEl.textContent = `${currentImages.length} 張圖片 · 拖拉調順序，或點兩張快速互換位置`;
+  const { images, requiredSlots, slotLabels } = await fetch(
+    `${API}/api/collections/${currentType}/${currentSlug}/images`
+  ).then((r) => r.json());
+  currentImages = images;
+  currentRequiredSlots = requiredSlots;
+  currentSlotLabels = slotLabels || [];
+  pageMetaEl.textContent =
+    requiredSlots != null
+      ? `已上傳 ${currentImages.length} / 需要 ${requiredSlots} 張圖片 · 拖拉調順序，或點兩張快速互換位置`
+      : `${currentImages.length} 張圖片 · 拖拉調順序，或點兩張快速互換位置`;
   renderCollectionGrid();
+  syncPreview();
 }
 
 function renderCollectionGrid() {
   const gridEl = document.getElementById('grid');
   if (!gridEl) return;
   gridEl.innerHTML = '';
+  const showSlotLabels = currentType === 'projects';
 
   currentImages.forEach((img, index) => {
     const tile = document.createElement('div');
@@ -154,9 +238,11 @@ function renderCollectionGrid() {
     tile.draggable = true;
     tile.dataset.index = String(index);
 
+    const badge = showSlotLabels ? img.slotLabel : index === 0 ? 'Cover' : null;
+
     tile.innerHTML = `
       <div class="tile__image-wrap">
-        ${index === 0 ? '<span class="tile__badge">Cover</span>' : ''}
+        ${badge ? `<span class="tile__badge">${badge}</span>` : ''}
         <img src="${imgUrl(img)}" alt="${img.filename}" loading="lazy" />
         <button class="tile__expand" title="放大查看">
           <svg viewBox="0 0 24 24"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg>
@@ -178,7 +264,7 @@ function renderCollectionGrid() {
 
     tile.querySelector('.tile__expand').addEventListener('click', (e) => {
       e.stopPropagation();
-      openLightbox(img, `第 ${index + 1} 張${index === 0 ? '（Cover）' : ''}`);
+      openLightbox(img, badge || `第 ${index + 1} 張`);
     });
 
     // 點兩張圖快速互換位置：不用拖著整張圖跨越整個 grid，適合離很遠的兩張圖交換。
@@ -219,6 +305,26 @@ function renderCollectionGrid() {
 
     gridEl.appendChild(tile);
   });
+
+  // 案例頁：把還沒上傳、但頁面 sections 需要用到的空位也列出來，
+  // 讓你一眼看出「這格對應哪個區塊」，點了直接上傳到那一格（永遠是下一個編號，順序不會亂）。
+  if (showSlotLabels && currentRequiredSlots != null) {
+    for (let i = currentImages.length; i < currentRequiredSlots; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'tile tile--empty-slot';
+      empty.innerHTML = `
+        <div class="tile__image-wrap">
+          <span class="tile__badge tile__badge--pending">待上傳</span>
+          <span class="tile__empty-label">${currentSlotLabels[i] ?? `#${i + 1}`}</span>
+        </div>
+      `;
+      empty.addEventListener('click', () => {
+        pendingUpload = { kind: 'collection' };
+        fileInputEl.click();
+      });
+      gridEl.appendChild(empty);
+    }
+  }
 
   const addTile = document.createElement('div');
   addTile.className = 'tile tile--add';
@@ -296,6 +402,7 @@ async function loadHome() {
 
   currentHomeSlots = await fetch(`${API}/api/home`).then((r) => r.json());
   renderHomeGrid();
+  syncPreview();
 }
 
 function renderHomeGrid() {
@@ -655,6 +762,7 @@ async function loadContentPage() {
 
   pageMetaEl.textContent = '中英文對照（網站文案）+ 案例頁單語欄位，改完按右下角「儲存」直接寫回檔案';
   renderContentForm();
+  syncPreview();
 }
 
 async function handleSaveContent() {
@@ -674,6 +782,7 @@ async function handleSaveContent() {
     const failed = results.find((r) => !r.ok);
     if (failed) throw new Error(await failed.text());
     showToast('文案已儲存');
+    reloadPreview();
   } catch (err) {
     showToast(`儲存失敗：${err.message}`, true);
   }

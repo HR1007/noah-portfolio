@@ -71,7 +71,68 @@ async function listSlugImages(type, slug) {
   const { urlBase } = collectionOf(type);
   const dir = slugDir(type, slug);
   const entries = (await fs.readdir(dir)).filter((f) => IMAGE_EXT.has(path.extname(f).toLowerCase())).sort();
-  return Promise.all(entries.map((filename) => describeFile(path.join(dir, filename), `${urlBase}/${slug}/${filename}`)));
+  const images = await Promise.all(
+    entries.map((filename) => describeFile(path.join(dir, filename), `${urlBase}/${slug}/${filename}`))
+  );
+
+  if (type === 'projects') {
+    const labels = await computeProjectSlotLabels(slug).catch(() => []);
+    images.forEach((img, i) => {
+      img.slotLabel = labels[i] ?? null;
+    });
+    return { images, requiredSlots: labels.length, slotLabels: labels };
+  }
+  return { images, requiredSlots: null, slotLabels: null };
+}
+
+// 依 ProjectDetail.astro 裡 nextImage() 消耗圖片的順序，重算「第幾張圖對應哪個區塊」。
+// 這裡的順序邏輯要跟 src/views/ProjectDetail.astro 保持一致，那邊改了這裡也要跟著改。
+async function computeProjectSlotLabels(slug) {
+  const raw = await fs.readFile(projectFilePath(slug), 'utf-8');
+  const { data } = matter(raw);
+  const labels = [];
+  const isMigrated = data.hero !== undefined && Array.isArray(data.sections) && data.sections.length > 0;
+
+  if (!isMigrated) {
+    labels.push('Showcase（舊版單圖版型，未拆解成 sections）');
+    return labels;
+  }
+
+  labels.push('Hero');
+  data.sections.forEach((section, si) => {
+    const n = si + 1;
+    switch (section.type) {
+      case 'textSection':
+        break;
+      case 'deviceShowcase':
+        labels.push(`#${n} Device Showcase`);
+        break;
+      case 'experienceDemo':
+        labels.push(`#${n} Experience Demo${section.heading ? ' — ' + section.heading : ''}`);
+        break;
+      case 'featureSplit':
+        labels.push(`#${n} Feature Split${section.heading ? ' — ' + section.heading : ''}`);
+        break;
+      case 'featureGrid':
+        (section.columns || []).forEach((col, ci) => {
+          labels.push(`#${n} Feature Grid — Column ${ci + 1}${col.heading ? ` (${col.heading})` : ''}`);
+        });
+        break;
+      case 'imageRow':
+        (section.images || []).forEach((_, ii) => {
+          labels.push(`#${n} Image Row — Image ${ii + 1}`);
+        });
+        break;
+      case 'illustrationGrid':
+        for (let i = 0; i < (section.count || 0); i++) {
+          labels.push(`#${n} Illustration Grid — #${i + 1}`);
+        }
+        break;
+      default:
+        break;
+    }
+  });
+  return labels;
 }
 
 app.get('/api/collections/gallery', async (req, res) => {
@@ -132,6 +193,8 @@ app.put('/api/projects/:slug/content', async (req, res) => {
   }
 });
 
+// 回傳 { images, requiredSlots }：requiredSlots 只有 projects 類型會算（該案例頁
+// 依 sections 需要幾張圖），gallery 類型固定是 null（相片牆沒有「需要幾張」的概念）。
 app.get('/api/collections/:type/:slug/images', async (req, res) => {
   try {
     res.json(await listSlugImages(req.params.type, req.params.slug));

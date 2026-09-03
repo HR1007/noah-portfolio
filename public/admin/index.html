@@ -41,6 +41,22 @@
 
         <section class="content" id="content"></section>
       </main>
+
+      <aside class="preview" id="previewPanel">
+        <div class="preview__header">
+          <select id="previewPageSelect" class="preview__select"></select>
+          <div class="preview__controls">
+            <button id="previewLocaleToggle" class="preview__btn" title="切換語言">EN</button>
+            <button id="previewRefresh" class="preview__btn" title="重新整理">
+              <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36" /><path d="M21 4v6h-6" /></svg>
+            </button>
+            <button id="previewCollapse" class="preview__btn" title="收合／展開預覽">
+              <svg viewBox="0 0 24 24"><path d="m14 6-6 6 6 6" /></svg>
+            </button>
+          </div>
+        </div>
+        <iframe id="previewFrame" class="preview__frame" title="頁面即時預覽"></iframe>
+      </aside>
     </div>
 
     <input type="file" id="fileInput" accept="image/*" hidden />

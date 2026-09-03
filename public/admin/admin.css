@@ -228,12 +228,14 @@ svg {
   position: absolute;
   top: 8px;
   left: 8px;
+  right: 8px;
   background: rgba(255, 255, 255, 0.92);
   color: var(--ink);
   font-size: 11px;
   font-weight: 600;
   padding: 3px 8px;
-  border-radius: 999px;
+  border-radius: 8px;
+  line-height: 1.3;
 }
 
 .tile__delete,
@@ -287,6 +289,36 @@ svg {
 .tile__meta strong {
   color: var(--ink);
   font-weight: 600;
+}
+
+.tile--empty-slot {
+  cursor: pointer;
+}
+
+.tile--empty-slot .tile__image-wrap {
+  border: 2px dashed var(--border);
+  background: transparent;
+  display: flex;
+  align-items: flex-end;
+  padding: 8px;
+}
+
+.tile--empty-slot:hover .tile__image-wrap {
+  border-color: var(--accent);
+}
+
+.tile__badge--pending {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(47, 111, 237, 0.12);
+  color: var(--accent);
+}
+
+.tile__empty-label {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
 }
 
 .tile--add {
@@ -474,6 +506,84 @@ svg {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* ---------- Preview panel ---------- */
+.preview {
+  flex: none;
+  width: 420px;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.15s;
+}
+
+.preview.collapsed {
+  width: 44px;
+}
+
+.preview.collapsed .preview__select,
+.preview.collapsed .preview__frame,
+.preview.collapsed #previewLocaleToggle,
+.preview.collapsed #previewRefresh {
+  display: none;
+}
+
+.preview.collapsed #previewCollapse svg {
+  transform: rotate(180deg);
+}
+
+.preview__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.preview__select {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  padding: 5px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.preview__controls {
+  display: flex;
+  gap: 4px;
+  flex: none;
+}
+
+.preview__btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.preview__btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.preview__frame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #fff;
 }
 
 .toast {
