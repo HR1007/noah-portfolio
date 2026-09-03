@@ -118,6 +118,11 @@ const hobbyPhotos = getHomeImageSet('hobby');
     margin-bottom: var(--sp-3);
   }
 
+  /* 透明去背的插畫沒有矩形底，圓角只會裁掉碰到邊角的圖案（鞋子、頭髮） */
+  .hero__media :global(.media) {
+    border-radius: 0;
+  }
+
   .hero__roles {
     display: flex;
     flex-direction: column;
