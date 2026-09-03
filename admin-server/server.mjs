@@ -17,7 +17,9 @@ const GALLERY_DIR = path.join(ROOT, 'src/assets/gallery');
 const PROJECTS_ASSET_DIR = path.join(ROOT, 'src/assets/projects');
 const PROJECTS_CONTENT_DIR = path.join(ROOT, 'src/content/projects');
 const HOME_DIR = path.join(ROOT, 'src/assets/home');
-const SITE_EN = path.join(ROOT, 'src/content/site/main-en.json');
+const SITE_CONTENT_DIR = path.join(ROOT, 'src/content/site');
+const SITE_EN = path.join(SITE_CONTENT_DIR, 'main-en.json');
+const SITE_ZH = path.join(SITE_CONTENT_DIR, 'main-zh.json');
 
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif']);
 const HOME_SLOTS = ['hero', 'avatar', 'about', 'beyond-grid'];
@@ -211,6 +213,35 @@ app.delete('/api/home/:name', async (req, res) => {
     const files = await fs.readdir(HOME_DIR);
     const match = files.find((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()) && path.basename(f, path.extname(f)) === name);
     if (match) await fs.unlink(path.join(HOME_DIR, match));
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+// ---------- 網站文案（Home/Portfolio/Gallery 等中英文字，src/content/site/*.json） ----------
+
+app.get('/api/site', async (req, res) => {
+  try {
+    const [en, zh] = await Promise.all([
+      fs.readFile(SITE_EN, 'utf-8').then(JSON.parse),
+      fs.readFile(SITE_ZH, 'utf-8').then(JSON.parse),
+    ]);
+    res.json({ en, zh });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+// body 是整份 JSON 物件，直接覆寫對應語言的檔案。
+// 前端只送「型別結構跟原檔一致、只有字串值可能被改過」的物件，
+// 這裡不重新驗證 schema —— 內容壞掉的話下次 astro build 會直接報錯，容易發現。
+app.put('/api/site/:locale', async (req, res) => {
+  try {
+    const { locale } = req.params;
+    if (locale !== 'en' && locale !== 'zh') return res.status(400).json({ error: 'invalid locale' });
+    const target = locale === 'en' ? SITE_EN : SITE_ZH;
+    await fs.writeFile(target, JSON.stringify(req.body, null, 2) + '\n', 'utf-8');
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: String(err) });

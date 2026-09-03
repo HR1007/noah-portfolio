@@ -344,6 +344,139 @@ svg {
   font-size: 13px;
 }
 
+/* ---------- Content（文案編輯） ---------- */
+.content-form {
+  max-width: 1100px;
+  padding-bottom: 80px;
+}
+
+.content-section {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  margin-bottom: var(--sp-2);
+  overflow: hidden;
+}
+
+.content-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-3);
+  cursor: pointer;
+  font-weight: 600;
+  user-select: none;
+}
+
+.content-section__header .chev {
+  transition: transform 0.12s;
+  color: var(--muted);
+}
+
+.content-section.collapsed .chev {
+  transform: rotate(-90deg);
+}
+
+.content-section.collapsed .content-section__body {
+  display: none;
+}
+
+.content-section__body {
+  padding: 0 var(--sp-3) var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.content-group {
+  border-left: 2px solid var(--border);
+  padding-left: var(--sp-2);
+  margin-top: var(--sp-1);
+}
+
+.content-group__label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: var(--sp-2) 0 4px;
+}
+
+.content-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 1fr;
+  gap: var(--sp-2);
+  align-items: start;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.content-row:last-child {
+  border-bottom: none;
+}
+
+.content-row__label {
+  font-size: 13px;
+  color: var(--muted);
+  padding-top: 8px;
+  word-break: break-word;
+}
+
+.content-row input[type='text'],
+.content-row textarea,
+.content-row select {
+  width: 100%;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--ink);
+  resize: vertical;
+}
+
+.content-row textarea {
+  min-height: 60px;
+}
+
+.content-row__lang {
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+@media (max-width: 900px) {
+  .content-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.content-savebar {
+  position: fixed;
+  left: 72px;
+  right: 0;
+  bottom: 0;
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+}
+
+.content-savebar button {
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .toast {
   position: fixed;
   bottom: var(--sp-3);

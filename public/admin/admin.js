@@ -91,6 +91,7 @@ sidebarItems.forEach((btn) => {
     sidebarItems.forEach((b) => b.classList.toggle('sidebar__item--active', b === btn));
     currentPage = page;
     selectedIndex = null;
+    document.querySelector('.content-savebar')?.remove();
     if (page === 'gallery') {
       currentType = 'gallery';
       loadCollectionList();
@@ -99,6 +100,8 @@ sidebarItems.forEach((btn) => {
       loadCollectionList();
     } else if (page === 'home') {
       loadHome();
+    } else if (page === 'content') {
+      loadContentPage();
     }
   });
 });
@@ -350,6 +353,179 @@ async function handleHomeDelete(name) {
     await loadHome();
   } catch (err) {
     showToast(`刪除失敗：${err.message}`, true);
+  }
+}
+
+// ---------- Content（src/content/site/main-en.json ／ main-zh.json 中英文案，逐欄位對照編輯） ----------
+
+let siteEn = null;
+let siteZh = null;
+const CONTENT_EXPANDED_BY_DEFAULT = new Set(['home', 'portfolio', 'gallery']);
+
+function humanize(key) {
+  return String(key).replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
+}
+
+function getPath(obj, keyPath) {
+  return keyPath.reduce((o, k) => (o == null ? undefined : o[k]), obj);
+}
+
+function setPath(obj, keyPath, value) {
+  let node = obj;
+  for (let i = 0; i < keyPath.length - 1; i++) node = node[keyPath[i]];
+  node[keyPath[keyPath.length - 1]] = value;
+}
+
+function makeFieldInput(value, onChange) {
+  const el = value.length > 60 ? document.createElement('textarea') : document.createElement('input');
+  if (el.tagName === 'INPUT') el.type = 'text';
+  el.value = value;
+  el.addEventListener('input', () => onChange(el.value));
+  return el;
+}
+
+function renderContentRow(label, keyPath) {
+  const row = document.createElement('div');
+  row.className = 'content-row';
+
+  const labelEl = document.createElement('div');
+  labelEl.className = 'content-row__label';
+  labelEl.textContent = label;
+  row.appendChild(labelEl);
+
+  const enValue = getPath(siteEn, keyPath) ?? '';
+  const zhValue = getPath(siteZh, keyPath) ?? '';
+
+  if (keyPath[keyPath.length - 1] === 'icon') {
+    [
+      ['EN', siteEn, enValue],
+      ['ZH', siteZh, zhValue],
+    ].forEach(([langLabel, target, value]) => {
+      const wrap = document.createElement('div');
+      const langEl = document.createElement('div');
+      langEl.className = 'content-row__lang';
+      langEl.textContent = langLabel;
+      const select = document.createElement('select');
+      ['email', 'instagram'].forEach((opt) => {
+        const o = document.createElement('option');
+        o.value = opt;
+        o.textContent = opt;
+        if (opt === value) o.selected = true;
+        select.appendChild(o);
+      });
+      select.addEventListener('change', () => setPath(target, keyPath, select.value));
+      wrap.appendChild(langEl);
+      wrap.appendChild(select);
+      row.appendChild(wrap);
+    });
+    return row;
+  }
+
+  [
+    ['EN', siteEn, enValue],
+    ['ZH', siteZh, zhValue],
+  ].forEach(([langLabel, target, value]) => {
+    const wrap = document.createElement('div');
+    const langEl = document.createElement('div');
+    langEl.className = 'content-row__lang';
+    langEl.textContent = langLabel;
+    const input = makeFieldInput(String(value), (v) => setPath(target, keyPath, v));
+    wrap.appendChild(langEl);
+    wrap.appendChild(input);
+    row.appendChild(wrap);
+  });
+
+  return row;
+}
+
+function renderContentNode(enVal, keyPath, container) {
+  if (typeof enVal === 'string') {
+    container.appendChild(renderContentRow(humanize(keyPath[keyPath.length - 1]), keyPath));
+    return;
+  }
+
+  if (Array.isArray(enVal)) {
+    if (enVal.length === 0) return;
+    if (typeof enVal[0] === 'string') {
+      enVal.forEach((_, i) => {
+        container.appendChild(renderContentRow(`${humanize(keyPath[keyPath.length - 1])} #${i + 1}`, [...keyPath, i]));
+      });
+    } else {
+      enVal.forEach((item, i) => {
+        const group = document.createElement('div');
+        group.className = 'content-group';
+        const label = document.createElement('div');
+        label.className = 'content-group__label';
+        label.textContent = `${humanize(keyPath[keyPath.length - 1])} #${i + 1}`;
+        group.appendChild(label);
+        Object.keys(item).forEach((k) => renderContentNode(item[k], [...keyPath, i, k], group));
+        container.appendChild(group);
+      });
+    }
+    return;
+  }
+
+  if (enVal && typeof enVal === 'object') {
+    const group = document.createElement('div');
+    group.className = 'content-group';
+    Object.keys(enVal).forEach((k) => renderContentNode(enVal[k], [...keyPath, k], group));
+    container.appendChild(group);
+    return;
+  }
+}
+
+function renderContentForm() {
+  contentEl.innerHTML = '<div class="content-form" id="contentForm"></div>';
+  const form = document.getElementById('contentForm');
+
+  Object.keys(siteEn).forEach((sectionKey) => {
+    const section = document.createElement('div');
+    section.className = 'content-section' + (CONTENT_EXPANDED_BY_DEFAULT.has(sectionKey) ? '' : ' collapsed');
+
+    const header = document.createElement('div');
+    header.className = 'content-section__header';
+    header.innerHTML = `<span>${humanize(sectionKey)}</span><span class="chev">▾</span>`;
+    header.addEventListener('click', () => section.classList.toggle('collapsed'));
+
+    const body = document.createElement('div');
+    body.className = 'content-section__body';
+    renderContentNode(siteEn[sectionKey], [sectionKey], body);
+
+    section.appendChild(header);
+    section.appendChild(body);
+    form.appendChild(section);
+  });
+
+  const savebar = document.createElement('div');
+  savebar.className = 'content-savebar';
+  savebar.innerHTML = '<button id="contentSaveBtn">儲存中英文案</button>';
+  document.body.appendChild(savebar);
+  document.getElementById('contentSaveBtn').addEventListener('click', handleSaveContent);
+}
+
+async function loadContentPage() {
+  pageTitleEl.textContent = 'Content 文案';
+  pageMetaEl.textContent = '中英文對照編輯，改完按右下角「儲存」直接寫回檔案';
+  pageTabsEl.innerHTML = '';
+  document.querySelector('.content-savebar')?.remove();
+  contentEl.innerHTML = '<p style="padding:16px;color:var(--muted)">載入中…</p>';
+
+  const { en, zh } = await fetch(`${API}/api/site`).then((r) => r.json());
+  siteEn = en;
+  siteZh = zh;
+  renderContentForm();
+}
+
+async function handleSaveContent() {
+  try {
+    const [resEn, resZh] = await Promise.all([
+      fetch(`${API}/api/site/en`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(siteEn) }),
+      fetch(`${API}/api/site/zh`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(siteZh) }),
+    ]);
+    if (!resEn.ok || !resZh.ok) throw new Error(await (!resEn.ok ? resEn : resZh).text());
+    showToast('文案已儲存');
+  } catch (err) {
+    showToast(`儲存失敗：${err.message}`, true);
   }
 }
 
