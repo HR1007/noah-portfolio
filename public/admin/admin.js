@@ -474,6 +474,106 @@ function renderContentNode(enVal, keyPath, container) {
   }
 }
 
+// ---- 案例頁（src/content/projects/*.md frontmatter）：單一語言，不是 en/zh 對照 ----
+// type（決定用哪個區塊元件渲染）唯讀顯示，改了頁面版型會跟著跑掉；
+// imagePosition 是固定的 left/right 版面選項，用下拉選單避免打錯字。
+
+let projectSlugs = []; // [{slug, title}]
+let projectsData = {}; // slug -> frontmatter 物件
+
+function renderMonoRow(label, keyPath, dataObj, { readonly = false, select = null, isNumber = false } = {}) {
+  const row = document.createElement('div');
+  row.className = 'content-row';
+
+  const labelEl = document.createElement('div');
+  labelEl.className = 'content-row__label';
+  labelEl.textContent = label;
+  row.appendChild(labelEl);
+
+  const value = getPath(dataObj, keyPath) ?? '';
+  const wrap = document.createElement('div');
+
+  if (readonly) {
+    const span = document.createElement('div');
+    span.textContent = String(value);
+    span.style.padding = '6px 8px';
+    span.style.color = 'var(--muted)';
+    wrap.appendChild(span);
+  } else if (select) {
+    const el = document.createElement('select');
+    select.forEach((opt) => {
+      const o = document.createElement('option');
+      o.value = opt;
+      o.textContent = opt;
+      if (opt === value) o.selected = true;
+      el.appendChild(o);
+    });
+    el.addEventListener('change', () => setPath(dataObj, keyPath, el.value));
+    wrap.appendChild(el);
+  } else if (isNumber) {
+    const el = document.createElement('input');
+    el.type = 'number';
+    el.value = value;
+    el.addEventListener('input', () => setPath(dataObj, keyPath, Number(el.value)));
+    wrap.appendChild(el);
+  } else {
+    const el = makeFieldInput(String(value), (v) => setPath(dataObj, keyPath, v));
+    wrap.appendChild(el);
+  }
+
+  row.appendChild(wrap);
+  return row;
+}
+
+function renderMonoNode(val, keyPath, container, dataObj) {
+  const key = keyPath[keyPath.length - 1];
+
+  if (key === 'type') {
+    container.appendChild(renderMonoRow('Type（唯讀，決定區塊版型）', keyPath, dataObj, { readonly: true }));
+    return;
+  }
+  if (key === 'imagePosition') {
+    container.appendChild(renderMonoRow('Image Position', keyPath, dataObj, { select: ['left', 'right'] }));
+    return;
+  }
+
+  if (typeof val === 'string') {
+    container.appendChild(renderMonoRow(humanize(key), keyPath, dataObj));
+    return;
+  }
+  if (typeof val === 'number') {
+    container.appendChild(renderMonoRow(humanize(key), keyPath, dataObj, { isNumber: true }));
+    return;
+  }
+
+  if (Array.isArray(val)) {
+    if (val.length === 0) return;
+    if (typeof val[0] === 'string') {
+      val.forEach((_, i) => container.appendChild(renderMonoRow(`${humanize(key)} #${i + 1}`, [...keyPath, i], dataObj)));
+    } else {
+      val.forEach((item, i) => {
+        const group = document.createElement('div');
+        group.className = 'content-group';
+        const label = document.createElement('div');
+        label.className = 'content-group__label';
+        label.textContent = `${humanize(key)} #${i + 1}${item.type ? ` — ${item.type}` : ''}`;
+        group.appendChild(label);
+        Object.keys(item).forEach((k) => renderMonoNode(item[k], [...keyPath, i, k], group, dataObj));
+        container.appendChild(group);
+      });
+    }
+    return;
+  }
+
+  if (val && typeof val === 'object') {
+    const group = document.createElement('div');
+    group.className = 'content-group';
+    Object.keys(val).forEach((k) => renderMonoNode(val[k], [...keyPath, k], group, dataObj));
+    container.appendChild(group);
+    return;
+  }
+}
+
 function renderContentForm() {
   contentEl.innerHTML = '<div class="content-form" id="contentForm"></div>';
   const form = document.getElementById('contentForm');
@@ -496,33 +596,83 @@ function renderContentForm() {
     form.appendChild(section);
   });
 
+  const projectsHeading = document.createElement('h2');
+  projectsHeading.textContent = 'Portfolio 案例頁文案';
+  projectsHeading.style.margin = '32px 0 8px';
+  form.appendChild(projectsHeading);
+  const projectsHint = document.createElement('p');
+  projectsHint.textContent = '案例頁目前只有單一語言（沒有中英分開），下面每個欄位只有一格。';
+  projectsHint.style.cssText = 'color:var(--muted);font-size:13px;margin-bottom:12px';
+  form.appendChild(projectsHint);
+
+  projectSlugs.forEach(({ slug, title }) => {
+    const data = projectsData[slug];
+    if (!data) return;
+    const section = document.createElement('div');
+    section.className = 'content-section collapsed';
+
+    const header = document.createElement('div');
+    header.className = 'content-section__header';
+    header.innerHTML = `<span>${title}</span><span class="chev">▾</span>`;
+    header.addEventListener('click', () => section.classList.toggle('collapsed'));
+
+    const body = document.createElement('div');
+    body.className = 'content-section__body';
+    Object.keys(data).forEach((k) => renderMonoNode(data[k], [k], body, data));
+
+    section.appendChild(header);
+    section.appendChild(body);
+    form.appendChild(section);
+  });
+
   const savebar = document.createElement('div');
   savebar.className = 'content-savebar';
-  savebar.innerHTML = '<button id="contentSaveBtn">儲存中英文案</button>';
+  savebar.innerHTML = '<button id="contentSaveBtn">儲存所有文案</button>';
   document.body.appendChild(savebar);
   document.getElementById('contentSaveBtn').addEventListener('click', handleSaveContent);
 }
 
 async function loadContentPage() {
   pageTitleEl.textContent = 'Content 文案';
-  pageMetaEl.textContent = '中英文對照編輯，改完按右下角「儲存」直接寫回檔案';
+  pageMetaEl.textContent = '載入中…';
   pageTabsEl.innerHTML = '';
   document.querySelector('.content-savebar')?.remove();
   contentEl.innerHTML = '<p style="padding:16px;color:var(--muted)">載入中…</p>';
 
-  const { en, zh } = await fetch(`${API}/api/site`).then((r) => r.json());
+  const [{ en, zh }, slugs] = await Promise.all([
+    fetch(`${API}/api/site`).then((r) => r.json()),
+    fetch(`${API}/api/collections/projects`).then((r) => r.json()),
+  ]);
   siteEn = en;
   siteZh = zh;
+  projectSlugs = slugs;
+  projectsData = {};
+  await Promise.all(
+    slugs.map(async ({ slug }) => {
+      projectsData[slug] = await fetch(`${API}/api/projects/${slug}/content`).then((r) => r.json());
+    })
+  );
+
+  pageMetaEl.textContent = '中英文對照（網站文案）+ 案例頁單語欄位，改完按右下角「儲存」直接寫回檔案';
   renderContentForm();
 }
 
 async function handleSaveContent() {
   try {
-    const [resEn, resZh] = await Promise.all([
+    const requests = [
       fetch(`${API}/api/site/en`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(siteEn) }),
       fetch(`${API}/api/site/zh`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(siteZh) }),
-    ]);
-    if (!resEn.ok || !resZh.ok) throw new Error(await (!resEn.ok ? resEn : resZh).text());
+      ...projectSlugs.map(({ slug }) =>
+        fetch(`${API}/api/projects/${slug}/content`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(projectsData[slug]),
+        })
+      ),
+    ];
+    const results = await Promise.all(requests);
+    const failed = results.find((r) => !r.ok);
+    if (failed) throw new Error(await failed.text());
     showToast('文案已儲存');
   } catch (err) {
     showToast(`儲存失敗：${err.message}`, true);

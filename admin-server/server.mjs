@@ -101,6 +101,37 @@ app.get('/api/collections/projects', async (req, res) => {
   }
 });
 
+function projectFilePath(slug) {
+  const resolved = path.join(PROJECTS_CONTENT_DIR, `${slug}.md`);
+  if (!resolved.startsWith(PROJECTS_CONTENT_DIR)) throw new Error('invalid slug');
+  return resolved;
+}
+
+app.get('/api/projects/:slug/content', async (req, res) => {
+  try {
+    const raw = await fs.readFile(projectFilePath(req.params.slug), 'utf-8');
+    const { data } = matter(raw);
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+// body 是整份 frontmatter 物件，寫回時保留原本的 markdown 內文（目前案例頁都用 sections
+// 版型，內文本身沒有實際顯示在頁面上，但還是原樣保留，不憑空清空）。
+app.put('/api/projects/:slug/content', async (req, res) => {
+  try {
+    const file = projectFilePath(req.params.slug);
+    const raw = await fs.readFile(file, 'utf-8');
+    const { content } = matter(raw);
+    const next = matter.stringify(content, req.body);
+    await fs.writeFile(file, next, 'utf-8');
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
 app.get('/api/collections/:type/:slug/images', async (req, res) => {
   try {
     res.json(await listSlugImages(req.params.type, req.params.slug));

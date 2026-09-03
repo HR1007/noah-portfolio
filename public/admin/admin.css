@@ -332,9 +332,8 @@ svg {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  align-items: flex-end;
+  text-align: left;
   padding: var(--sp-2);
   font-size: 13px;
   color: var(--muted);
