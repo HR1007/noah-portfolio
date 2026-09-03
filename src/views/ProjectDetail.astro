@@ -3,6 +3,7 @@ import { getEntry, render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Media from '../components/Media.astro';
+import BackLink from '../components/BackLink.astro';
 import ProjectHero from '../components/project/ProjectHero.astro';
 import TextSection from '../components/project/TextSection.astro';
 import DeviceShowcase from '../components/project/DeviceShowcase.astro';
@@ -25,6 +26,7 @@ const isMigrated = hero !== undefined && sections.length > 0;
 
 const site = await getEntry('site', `main-${locale}`);
 const { projectQuote } = site!.data;
+const { backLabel } = site!.data.nav;
 
 // 圖片不寫路徑/檔名在內容裡：依區塊在頁面上出現的順序，依序從該專案資料夾取下一張圖。
 // 資料夾裡沒圖時 getProjectImages 回傳空陣列，取值自然是 undefined，Media 元件會自動顯示佔位框。
@@ -36,6 +38,9 @@ const { Content } = await render(project);
 ---
 
 <BaseLayout title={`${project.data.title} — Noah Wen`} description={project.data.summary}>
+  <div class="project-back">
+    <BackLink label={backLabel} href={`/${locale}/portfolio`} />
+  </div>
   {
     isMigrated ? (
       <Fragment>
@@ -134,6 +139,12 @@ const { Content } = await render(project);
 </BaseLayout>
 
 <style>
+  .project-back {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: var(--sp-4) var(--sp-3) 0;
+  }
+
   .project-hero,
   .project-showcase,
   .project-body {

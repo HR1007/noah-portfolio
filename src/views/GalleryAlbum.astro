@@ -3,6 +3,7 @@ import { getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionIntro from '../components/SectionIntro.astro';
 import Media from '../components/Media.astro';
+import BackLink from '../components/BackLink.astro';
 import PhotoGrid from '../components/gallery/PhotoGrid.astro';
 import { getGalleryImage, getGalleryAlbumImages } from '../lib/media';
 
@@ -15,6 +16,7 @@ interface Props {
 const { locale, slug, title } = Astro.props;
 const site = await getEntry('site', `main-${locale}`);
 const { eyebrow, intro } = site!.data.gallery;
+const { backLabel } = site!.data.nav;
 
 const heroImage = getGalleryImage('hero');
 const images = getGalleryAlbumImages(slug);
@@ -22,6 +24,7 @@ const images = getGalleryAlbumImages(slug);
 
 <BaseLayout title={`${title} — Noah Wen`} description={intro}>
   <section class="gallery-album">
+    <BackLink label={backLabel} href={`/${locale}/gallery`} />
     <div class="gallery-album__hero">
       <div class="gallery-album__hero-illustration">
         <Media image={heroImage} ratio="159/436" alt={`${title} illustration`} loading="eager" />

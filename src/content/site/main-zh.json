@@ -14,7 +14,8 @@
         "label": "藝廊",
         "href": "/zh/gallery"
       }
-    ]
+    ],
+    "backLabel": "返回上一頁"
   },
   "marquee": {
     "items": [

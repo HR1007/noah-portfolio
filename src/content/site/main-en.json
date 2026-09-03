@@ -14,7 +14,8 @@
         "label": "Gallery",
         "href": "/en/gallery"
       }
-    ]
+    ],
+    "backLabel": "Back"
   },
   "marquee": {
     "items": [

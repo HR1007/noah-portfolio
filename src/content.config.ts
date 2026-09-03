@@ -104,6 +104,8 @@ const site = defineCollection({
     nav: z.object({
       logo: z.string(),
       links: z.array(z.object({ label: z.string(), href: z.string() })),
+      // 案例頁／相簿頁左上角的返回鍵文案
+      backLabel: z.string(),
     }),
     marquee: z.object({
       items: z.array(z.string()),

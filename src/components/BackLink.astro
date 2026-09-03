@@ -1,0 +1,199 @@
+---
+interface Props {
+  label: string;
+  href: string;
+}
+
+const { label, href } = Astro.props;
+
+// 左向箭頭的像素圖：5×5 網格，值為該格是否填滿。
+// 逐格拆成獨立元素（而非 box-shadow 畫法）才能對每一格做延遲位移，做出「倒帶」的波動感。
+const ARROW = [
+  [0, 0, 1, 0, 0],
+  [0, 1, 1, 0, 0],
+  [1, 1, 1, 1, 1],
+  [0, 1, 1, 0, 0],
+  [0, 0, 1, 0, 0],
+];
+
+const blocks = ARROW.flatMap((cells, row) =>
+  cells.map((on, col) => (on ? { row, col } : null)).filter((cell) => cell !== null)
+);
+---
+
+<a class="back-link" href={href} data-back>
+  <span class="back-link__sprite" aria-hidden="true">
+    <span class="back-link__ghosts">
+      <i></i>
+      <i></i>
+    </span>
+    <span class="back-link__arrow">
+      {
+        blocks.map((block) => (
+          <i style={`grid-row:${block!.row + 1};grid-column:${block!.col + 1};--col:${block!.col}`} />
+        ))
+      }
+    </span>
+  </span>
+  <span class="back-link__label">{label}</span>
+</a>
+
+<script>
+  // 漸進增強：站內來源才真的走 history.back()，否則保留 href 的上層頁面連結，
+  // 避免從外部連進來時把訪客送回站外。
+  document.querySelectorAll<HTMLAnchorElement>('a[data-back]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      const ref = document.referrer;
+      if (!ref || history.length <= 1) return;
+      try {
+        if (new URL(ref).origin !== location.origin) return;
+      } catch {
+        return;
+      }
+      event.preventDefault();
+      history.back();
+    });
+  });
+</script>
+
+<style>
+  .back-link {
+    /* 像素單位取 8px 網格的一半，維持與間距階梯同源 */
+    --u: calc(var(--sp-1) / 2);
+    --step: calc(var(--u) * 2);
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-1) var(--sp-2);
+    margin-left: calc(var(--sp-2) * -1);
+    border-radius: var(--radius-pill);
+    color: var(--color-ink);
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-semibold);
+    background: transparent;
+    transition: background 240ms ease;
+  }
+
+  .back-link:hover,
+  .back-link:focus-visible {
+    background: var(--color-surface);
+  }
+
+  /* 箭頭與殘影共用同一個定位框，殘影疊在箭頭原本的位置上 */
+  .back-link__sprite {
+    position: relative;
+    flex: none;
+    width: calc(var(--u) * 5);
+    height: calc(var(--u) * 5);
+  }
+
+  .back-link__arrow {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(5, var(--u));
+    grid-template-rows: repeat(5, var(--u));
+  }
+
+  .back-link__arrow i {
+    background: currentColor;
+    /* 每一格依所在欄位延後啟動：最左欄先走，形成由左往右追上的倒帶波 */
+    transition: transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1);
+    transition-delay: calc(var(--col) * 26ms);
+  }
+
+  .back-link:hover .back-link__arrow i,
+  .back-link:focus-visible .back-link__arrow i {
+    transform: translateX(calc(var(--step) * -1));
+  }
+
+  /* 殘影：箭頭讓出的位置上，兩塊方塊依序亮起再淡出 */
+  .back-link__ghosts {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(5, var(--u));
+    grid-template-rows: repeat(5, var(--u));
+  }
+
+  .back-link__ghosts i {
+    grid-row: 3;
+    background: currentColor;
+    opacity: 0;
+  }
+
+  .back-link__ghosts i:nth-child(1) {
+    grid-column: 4;
+  }
+
+  .back-link__ghosts i:nth-child(2) {
+    grid-column: 5;
+  }
+
+  .back-link:hover .back-link__ghosts i,
+  .back-link:focus-visible .back-link__ghosts i {
+    animation: back-link-ghost 900ms ease-out infinite;
+  }
+
+  .back-link:hover .back-link__ghosts i:nth-child(2),
+  .back-link:focus-visible .back-link__ghosts i:nth-child(2) {
+    animation-delay: 90ms;
+  }
+
+  @keyframes back-link-ghost {
+    0% {
+      opacity: 0.45;
+    }
+    60%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* 文字讓出一點空間，底線由右往左收，方向與「返回」一致 */
+  .back-link__label {
+    position: relative;
+    transition: transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+
+  .back-link__label::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--u) * -1);
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 300ms cubic-bezier(0.2, 0.9, 0.3, 1);
+  }
+
+  .back-link:hover .back-link__label::after,
+  .back-link:focus-visible .back-link__label::after {
+    transform: scaleX(1);
+  }
+
+  .back-link:active .back-link__sprite {
+    transform: translateX(calc(var(--u) * -1));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .back-link__arrow i,
+    .back-link__label,
+    .back-link__label::after {
+      transition: none;
+    }
+
+    .back-link:hover .back-link__arrow i,
+    .back-link:focus-visible .back-link__arrow i {
+      transform: none;
+    }
+
+    .back-link:hover .back-link__ghosts i,
+    .back-link:focus-visible .back-link__ghosts i {
+      animation: none;
+    }
+  }
+</style>
