@@ -3,7 +3,8 @@ import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionIntro from '../components/SectionIntro.astro';
 import PortfolioCard from '../components/PortfolioCard.astro';
-import { getProjectImages } from '../lib/media';
+import Media from '../components/Media.astro';
+import { getProjectImages, getPortfolioImage } from '../lib/media';
 
 interface Props {
   locale: 'en' | 'zh';
@@ -14,11 +15,26 @@ const site = await getEntry('site', `main-${locale}`);
 const { eyebrow, headline, intro } = site!.data.portfolio;
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const heroImage = getPortfolioImage('hero');
 ---
 
 <BaseLayout title={`${headline} — Noah Wen`} description={intro}>
   <section class="portfolio">
-    <SectionIntro eyebrow={eyebrow} headline={headline} body={intro} />
+    <div class="portfolio__hero">
+      {
+        heroImage && (
+          <div class="portfolio__hero-illustration">
+            <Media
+              image={heroImage}
+              ratio={`${heroImage.width}/${heroImage.height}`}
+              alt={`${headline} illustration`}
+              loading="eager"
+            />
+          </div>
+        )
+      }
+      <SectionIntro eyebrow={eyebrow} headline={headline} body={intro} />
+    </div>
     <div class="portfolio__list">
       {
         projects.map((project, index) => (
@@ -43,8 +59,31 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     padding: var(--sp-7) var(--sp-3);
   }
 
+  .portfolio__hero {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-5);
+    margin-bottom: var(--sp-6);
+  }
+
+  .portfolio__hero :global(.section-intro) {
+    margin-bottom: 0;
+  }
+
+  .portfolio__hero-illustration {
+    flex: none;
+    width: 160px;
+  }
+
   .portfolio__list {
     display: flex;
     flex-direction: column;
+  }
+
+  @media (max-width: 767px) {
+    .portfolio__hero {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 </style>

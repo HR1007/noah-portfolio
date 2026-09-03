@@ -22,6 +22,11 @@ const homeImageModules = import.meta.glob<ImageModule>(
   { eager: true }
 );
 
+const portfolioImageModules = import.meta.glob<ImageModule>(
+  '/src/assets/portfolio/*.{png,jpg,jpeg,webp,avif}',
+  { eager: true }
+);
+
 function sortedByFilename(modules: Record<string, ImageModule>): [string, ImageMetadata][] {
   return Object.entries(modules)
     .map(([path, mod]) => [path, mod.default] as [string, ImageMetadata])
@@ -39,6 +44,15 @@ export function getProjectImages(slug: string): ImageMetadata[] {
 /** 依語意檔名（不含副檔名）取單張 Gallery 頁面圖片，例如 getGalleryImage('hero')；找不到時回傳 undefined。 */
 export function getGalleryImage(name: string): ImageMetadata | undefined {
   const match = sortedByFilename(galleryImageModules).find(([path]) => {
+    const filename = path.split('/').pop() ?? '';
+    return filename.replace(/\.[^.]+$/, '') === name;
+  });
+  return match?.[1];
+}
+
+/** 依語意檔名（不含副檔名）取單張作品集頁面圖片，例如 getPortfolioImage('hero')；找不到時回傳 undefined。 */
+export function getPortfolioImage(name: string): ImageMetadata | undefined {
+  const match = sortedByFilename(portfolioImageModules).find(([path]) => {
     const filename = path.split('/').pop() ?? '';
     return filename.replace(/\.[^.]+$/, '') === name;
   });
