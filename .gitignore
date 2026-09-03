@@ -25,3 +25,4 @@ pnpm-debug.log*
 
 # reference screenshots / raw exports, never shipped
 raw-assets/
+.vercel
