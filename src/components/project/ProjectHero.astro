@@ -48,17 +48,21 @@ const { title, ctaLabel, ctaHref, image } = Astro.props;
 
   /*
     沒有真實 hero 圖時，底下是 Placeholder 的條紋背景（跟 --color-bg 同一色系），
-    白色/背景色文字會直接被吃掉、幾乎看不見。這種情況改用一般內文色，
-    並把內容靠上排版，避開 Placeholder 自己在框底部顯示的檔名標籤，
-    圖片上傳之後 Placeholder 消失，恢復成疊在照片上的正常樣式。
+    白色/背景色文字會直接被吃掉、幾乎看不見，改用一般內文色。
+    排版維持置中不變，圖片上傳後直接變成疊在照片上的樣子，不會有視覺跳動。
   */
-  .project-hero__overlay--placeholder {
-    justify-content: flex-start;
-    padding-top: var(--sp-4);
-  }
-
   .project-hero__overlay--placeholder .project-hero__title {
     color: var(--color-ink);
+  }
+
+  /*
+    Placeholder 自己在框底部顯示的檔名標籤（例如「Foodlet hero」）跟這裡的大標題
+    是同一件事重複講兩次，長標題換行更容易疊在一起。這裡的大標題已經說明了
+    「這是什麼」，底部標籤在 hero 這個位置沒有必要，直接隱藏，圖片上傳後
+    Placeholder 整個消失，這條規則自然不會有作用。
+  */
+  .project-hero__media :global(.placeholder__label) {
+    display: none;
   }
 
   @media (max-width: 767px) {

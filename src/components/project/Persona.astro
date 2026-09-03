@@ -1,0 +1,95 @@
+---
+import type { ImageMetadata } from 'astro';
+import Media from '../Media.astro';
+
+interface PersonaCard {
+  name: string;
+  role: string;
+  description: string;
+  ratio: string;
+  alt: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  personas: PersonaCard[];
+  images: (ImageMetadata | undefined)[];
+}
+
+const { eyebrow, heading, personas, images } = Astro.props;
+---
+
+<section class="persona">
+  <div class="persona__intro">
+    {eyebrow && <p class="persona__eyebrow">{eyebrow}</p>}
+    <h2 class="persona__heading">{heading}</h2>
+  </div>
+  <div class="persona__grid">
+    {
+      personas.map((persona, index) => (
+        <div class="persona__card">
+          <Media image={images[index]} ratio={persona.ratio} alt={persona.alt} />
+          <p class="persona__name">{persona.name}</p>
+          <p class="persona__role">{persona.role}</p>
+          <p class="persona__description">{persona.description}</p>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .persona {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: var(--sp-6) var(--sp-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+  }
+
+  .persona__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .persona__eyebrow {
+    font-size: var(--font-size-meta);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .persona__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--sp-4);
+  }
+
+  .persona__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+  }
+
+  .persona__name {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+    margin-top: var(--sp-2);
+  }
+
+  .persona__role {
+    font-size: var(--font-size-label);
+    color: var(--color-muted);
+  }
+
+  .persona__description {
+    font-size: var(--font-size-body);
+    line-height: 1.7;
+    color: var(--color-muted);
+    text-align: left;
+    margin-top: var(--sp-1);
+  }
+</style>

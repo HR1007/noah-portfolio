@@ -1,0 +1,77 @@
+---
+interface Theme {
+  title: string;
+  description: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  themes: Theme[];
+}
+
+const { eyebrow, heading, themes } = Astro.props;
+---
+
+<section class="design-themes">
+  <div class="design-themes__intro">
+    {eyebrow && <p class="design-themes__eyebrow">{eyebrow}</p>}
+    <h2 class="design-themes__heading">{heading}</h2>
+  </div>
+  <div class="design-themes__grid">
+    {
+      themes.map((theme) => (
+        <div class="design-themes__card">
+          <h3 class="design-themes__title">{theme.title}</h3>
+          <p class="design-themes__description">{theme.description}</p>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .design-themes {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: var(--sp-6) var(--sp-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+  }
+
+  .design-themes__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .design-themes__eyebrow {
+    font-size: var(--font-size-meta);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .design-themes__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--sp-4);
+  }
+
+  .design-themes__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    padding: var(--sp-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .design-themes__description {
+    font-size: var(--font-size-body);
+    line-height: 1.7;
+    color: var(--color-muted);
+    text-align: left;
+  }
+</style>

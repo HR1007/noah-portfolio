@@ -67,6 +67,45 @@ const illustrationGridBlock = z.object({
   alt: z.string(),
 });
 
+const researchFrameworkBlock = z.object({
+  type: z.literal('researchFramework'),
+  eyebrow: z.string().optional(),
+  heading: z.string(),
+  paragraphs: z.array(z.string()),
+  ratio: z.string(),
+  alt: z.string(),
+});
+
+const personaBlock = z.object({
+  type: z.literal('persona'),
+  eyebrow: z.string().optional(),
+  heading: z.string(),
+  personas: z.array(
+    z.object({
+      name: z.string(),
+      role: z.string(),
+      description: z.string(),
+      ratio: z.string(),
+      alt: z.string(),
+    })
+  ),
+});
+
+const designThemesBlock = z.object({
+  type: z.literal('designThemes'),
+  eyebrow: z.string().optional(),
+  heading: z.string(),
+  themes: z.array(z.object({ title: z.string(), description: z.string() })),
+});
+
+const flowBlock = z.object({
+  type: z.literal('flow'),
+  eyebrow: z.string().optional(),
+  heading: z.string(),
+  body: z.string().optional(),
+  steps: z.array(z.object({ label: z.string(), ratio: z.string(), alt: z.string() })),
+});
+
 const projectSection = z.discriminatedUnion('type', [
   textSectionBlock,
   deviceShowcaseBlock,
@@ -75,6 +114,10 @@ const projectSection = z.discriminatedUnion('type', [
   featureGridBlock,
   imageRowBlock,
   illustrationGridBlock,
+  researchFrameworkBlock,
+  personaBlock,
+  designThemesBlock,
+  flowBlock,
 ]);
 
 const projects = defineCollection({

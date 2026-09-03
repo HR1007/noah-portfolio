@@ -128,6 +128,22 @@ async function computeProjectSlotLabels(slug) {
           labels.push(`#${n} Illustration Grid — #${i + 1}`);
         }
         break;
+      case 'researchFramework':
+        labels.push(`#${n} Research Framework`);
+        break;
+      case 'persona':
+        (section.personas || []).forEach((p) => {
+          labels.push(`#${n} Persona — ${p.name || 'Untitled'}`);
+        });
+        break;
+      case 'designThemes':
+        // 純文字卡片，沒有圖片欄位，不佔用任何圖片位置。
+        break;
+      case 'flow':
+        (section.steps || []).forEach((s, i) => {
+          labels.push(`#${n} Flow — Step ${i + 1}${s.label ? ` (${s.label})` : ''}`);
+        });
+        break;
       default:
         break;
     }

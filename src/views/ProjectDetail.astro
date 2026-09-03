@@ -12,6 +12,10 @@ import FeatureSplit from '../components/project/FeatureSplit.astro';
 import FeatureGrid from '../components/project/FeatureGrid.astro';
 import ImageRow from '../components/project/ImageRow.astro';
 import IllustrationGrid from '../components/project/IllustrationGrid.astro';
+import ResearchFramework from '../components/project/ResearchFramework.astro';
+import Persona from '../components/project/Persona.astro';
+import DesignThemes from '../components/project/DesignThemes.astro';
+import Flow from '../components/project/Flow.astro';
 import ProjectQuote from '../components/project/ProjectQuote.astro';
 import { getProjectImages } from '../lib/media';
 
@@ -110,6 +114,40 @@ const { Content } = await render(project);
                   body={section.body}
                   alt={section.alt}
                   images={Array.from({ length: section.count }, () => nextImage())}
+                />
+              );
+            case 'researchFramework':
+              return (
+                <ResearchFramework
+                  eyebrow={section.eyebrow}
+                  heading={section.heading}
+                  paragraphs={section.paragraphs}
+                  image={nextImage()}
+                  ratio={section.ratio}
+                  alt={section.alt}
+                />
+              );
+            case 'persona':
+              return (
+                <Persona
+                  eyebrow={section.eyebrow}
+                  heading={section.heading}
+                  personas={section.personas}
+                  images={section.personas.map(() => nextImage())}
+                />
+              );
+            case 'designThemes':
+              return (
+                <DesignThemes eyebrow={section.eyebrow} heading={section.heading} themes={section.themes} />
+              );
+            case 'flow':
+              return (
+                <Flow
+                  eyebrow={section.eyebrow}
+                  heading={section.heading}
+                  body={section.body}
+                  steps={section.steps}
+                  images={section.steps.map(() => nextImage())}
                 />
               );
             default:
