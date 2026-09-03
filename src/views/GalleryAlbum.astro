@@ -23,8 +23,10 @@ const images = getGalleryAlbumImages(slug);
 ---
 
 <BaseLayout title={`${title} — Noah Wen`} description={intro}>
-  <section class="gallery-album">
+  <div class="gallery-album__back">
     <BackLink label={backLabel} href={`/${locale}/gallery`} />
+  </div>
+  <section class="gallery-album">
     <div class="gallery-album__hero">
       <div class="gallery-album__hero-illustration">
         <Media image={heroImage} ratio="159/436" alt={`${title} illustration`} loading="eager" />
@@ -37,6 +39,11 @@ const images = getGalleryAlbumImages(slug);
 </BaseLayout>
 
 <style>
+  /* 返回鍵是全域導覽元件，對齊 Nav 的滿版 padding，跟案例頁同一條線 */
+  .gallery-album__back {
+    padding: var(--sp-3) var(--sp-3) 0;
+  }
+
   .gallery-album {
     max-width: 1120px;
     margin: 0 auto;

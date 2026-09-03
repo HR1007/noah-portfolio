@@ -139,10 +139,9 @@ const { Content } = await render(project);
 </BaseLayout>
 
 <style>
+  /* 返回鍵是全域導覽元件，對齊 Nav 的滿版 padding，而非各區塊寬度不一的內容欄 */
   .project-back {
-    max-width: 1120px;
-    margin: 0 auto;
-    padding: var(--sp-4) var(--sp-3) 0;
+    padding: var(--sp-3) var(--sp-3) 0;
   }
 
   .project-hero,
