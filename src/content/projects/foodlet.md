@@ -6,7 +6,7 @@ summary: >-
   Web3-driven rewards and digital collections.
 hero:
   ctaLabel: Try it out
-  ctaHref: 'https://www.figma.com/proto/aVnuImBK2EgVqq3Vt6FpQw/%E4%BD%9C%E5%93%81%E9%9B%86%E5%82%99%E4%BB%BD?page-id=43%3A11182&node-id=43-12924&viewport=259%2C-291%2C0.2&t=IpjmNNtrU528dBhZ-1&scaling=min-zoom&content-scaling=fixed'
+  ctaHref: 'https://www.figma.com/proto/aVnuImBK2EgVqq3Vt6FpQw/%E4%BD%9C%E5%93%81%E9%9B%86%E5%82%99%E4%BB%BD?page-id=43%3A11182&node-id=43-12924&p=f&viewport=76%2C306%2C0.05&t=IInl5MtWo3LS1WHp-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=43%3A12924'
   gradient: warm
 sections:
   - type: textSection
