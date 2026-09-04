@@ -1,5 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { HERO_GRADIENTS } from './lib/hero-gradients.mjs';
 
 // 案例頁區塊：每個專案依自己的 wireframe 排列不同組合與順序的區塊。
 // 區塊一律不帶圖片路徑／檔名，頁面依 sections 出現順序，依序從該專案的圖片資料夾取下一張圖（沒有圖就顯示佔位框）。
@@ -137,7 +138,7 @@ const projects = defineCollection({
         ctaHref: z.string().default('#'), // [需確認] 待設計師提供實際 demo／prototype 連結
         // 漸層底色只存名稱，實際色值定義在 src/styles/tokens.css，
         // 避免把 hex 散進內容檔。
-        gradient: z.enum(['warm', 'cool', 'violet', 'mint', 'slate']).default('slate'),
+        gradient: z.enum(HERO_GRADIENTS).default('slate'),
       })
       .optional(),
     sections: z.array(projectSection).default([]),

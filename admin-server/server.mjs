@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { imageSize } from 'image-size';
 import matter from 'gray-matter';
 import { getImageSlots } from '../src/lib/image-slots.mjs';
+import { HERO_GRADIENTS } from '../src/lib/hero-gradients.mjs';
 import {
   CONTENT_PATHS, changedFiles, outsideFiles, buildMessage,
   validateBuild, remoteBehind, commitAndPush,
@@ -102,6 +103,10 @@ async function computeProjectSlotLabels(slug) {
   const { data } = matter(raw);
   return getImageSlots(data).map((slot) => slot.label);
 }
+
+// 漸層清單由 src/lib/hero-gradients.mjs 提供，與 content schema 同一份，
+// 後台不自行維護一份選項，避免兩邊選項不一致。
+app.get('/api/hero-gradients', (req, res) => res.json(HERO_GRADIENTS));
 
 app.get('/api/collections/gallery', async (req, res) => {
   try {

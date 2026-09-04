@@ -50,6 +50,13 @@
     色彩本身集中在這裡，內容檔只存名稱。
     [需確認] 以下色值是暫定的，等設計師提供 Figma 的正式漸層色再替換。
   */
+  /*
+    疊在漸層上的文字色。漸層本身不隨主題反轉（深淺模式都是同一組色），
+    所以這個色也刻意不跟著翻——用 --color-ink 會在深色模式變成淺色，
+    落在淺色漸層上就看不見了。
+  */
+  --color-on-gradient: #2b2b2b;
+
   --gradient-warm: linear-gradient(135deg, #f5c99b, #e08a5f);
   --gradient-cool: linear-gradient(135deg, #a8c8ec, #5b7fb8);
   --gradient-violet: linear-gradient(135deg, #c3b3e8, #8168c0);
