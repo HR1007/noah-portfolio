@@ -53,6 +53,11 @@ const PLACEHOLDER_RATIO = '1040 / 675.66';
   .project-hero[data-gradient='mint'] { background: var(--gradient-mint); }
   .project-hero[data-gradient='slate'] { background: var(--gradient-slate); }
 
+  .project-hero {
+    /* hero 圖的高度上限；改這一個值就能調整所有案例的 hero 高度 */
+    --hero-max-height: 675.66px;
+  }
+
   .project-hero__inner {
     /* 對齊設計稿的 hero 寬度 */
     max-width: 1040px;
@@ -88,12 +93,17 @@ const PLACEHOLDER_RATIO = '1040 / 675.66';
   }
 
   /*
-    max-width 而非 width：圖片維持原始尺寸，只有超出容器寬度時才縮小，
-    不會被放大到超過原始解析度而變糊。height: auto 保留原始比例，不裁切。
+    用 max-* 而非 width/height：圖片維持原始尺寸，只有超出容器寬度或高度上限
+    時才縮小，不會被放大到超過原始解析度而變糊。
+
+    width/height 同時保持 auto 是關鍵——只鎖一邊（例如只給 max-height）會讓
+    另一邊維持原值，圖片就被壓扁或拉長。兩邊都 auto，瀏覽器才會等比例縮放。
   */
   .project-hero__frame :global(img) {
-    max-width: 100%;
+    width: auto;
     height: auto;
+    max-width: 100%;
+    max-height: var(--hero-max-height);
     display: block;
   }
 
