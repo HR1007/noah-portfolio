@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro';
-import Media from '../Media.astro';
+import { Image } from 'astro:assets';
+import Placeholder from '../Placeholder.astro';
 import Button from '../Button.astro';
 
 interface Props {
@@ -12,7 +13,11 @@ interface Props {
 }
 
 const { title, ctaLabel, ctaHref, image, gradient = 'slate' } = Astro.props;
-// [需確認] hero 圖比例依 wireframe 目測抓 21/9，待設計師提供實際素材尺寸後調整。
+
+// hero 圖不套固定比例：直接用圖片自己的原始尺寸，只有寬度超過容器（1040px）
+// 時才等比例縮小。這樣不同案例的 hero 可以是不同形狀，也永遠不會被裁切或
+// 被放大超過原始解析度。沒有圖時佔位框才需要一個比例，用設計稿的 1040×675.66。
+const PLACEHOLDER_RATIO = '1040 / 675.66';
 ---
 
 <section class="project-hero" data-gradient={gradient}>
@@ -20,7 +25,13 @@ const { title, ctaLabel, ctaHref, image, gradient = 'slate' } = Astro.props;
     <h1 class="project-hero__title">{title}</h1>
     <Button label={ctaLabel} href={ctaHref} variant="secondary" />
     <div class="project-hero__frame">
-      <Media image={image} ratio="21/9" alt={`${title} hero`} loading="eager" fetchpriority="high" />
+      {
+        image ? (
+          <Image src={image} alt={`${title} hero`} loading="eager" fetchpriority="high" />
+        ) : (
+          <Placeholder ratio={PLACEHOLDER_RATIO} label={`${title} hero`} />
+        )
+      }
     </div>
   </div>
 </section>
@@ -43,7 +54,8 @@ const { title, ctaLabel, ctaHref, image, gradient = 'slate' } = Astro.props;
   .project-hero[data-gradient='slate'] { background: var(--gradient-slate); }
 
   .project-hero__inner {
-    max-width: 1000px;
+    /* 對齊設計稿的 hero 寬度 */
+    max-width: 1040px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -70,6 +82,19 @@ const { title, ctaLabel, ctaHref, image, gradient = 'slate' } = Astro.props;
     width: 100%;
     border-radius: var(--radius);
     overflow: hidden;
+    /* 圖片比容器窄時置中，不要靠左 */
+    display: flex;
+    justify-content: center;
+  }
+
+  /*
+    max-width 而非 width：圖片維持原始尺寸，只有超出容器寬度時才縮小，
+    不會被放大到超過原始解析度而變糊。height: auto 保留原始比例，不裁切。
+  */
+  .project-hero__frame :global(img) {
+    max-width: 100%;
+    height: auto;
+    display: block;
   }
 
   /*
