@@ -32,10 +32,13 @@ const { eyebrow, headline, body } = Astro.props;
     font-size: var(--font-size-h1);
   }
 
+  /*
+    不設 max-width：內文右緣要與同頁下方的內容區塊（相簿卡片、照片牆）對齊在
+    同一條邊界上。字數上限交由外層容器的 max-width 控制，不在這裡另外收窄。
+  */
   .section-intro__body {
     font-size: var(--font-size-body);
     color: var(--color-muted);
-    max-width: 65ch;
     line-height: 1.7;
   }
 </style>
