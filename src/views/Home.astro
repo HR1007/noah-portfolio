@@ -1,7 +1,9 @@
 ---
 import { getEntry } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Media from '../components/Media.astro';
+import Placeholder from '../components/Placeholder.astro';
 import PullQuote from '../components/PullQuote.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
 import ConnectChannel from '../components/ConnectChannel.astro';
@@ -50,7 +52,18 @@ const hobbyPhotos = getHomeImageSet('hobby');
   <section class="about">
     <h2 class="about__heading">{home.aboutHeading}</h2>
     <div class="about__grid">
-      <Media image={aboutImage} ratio="483/342" alt={home.heroName} />
+      <div
+        class="about__photo"
+        style={aboutImage ? `aspect-ratio:${aboutImage.width}/${aboutImage.height}; max-height:${aboutImage.height}px` : undefined}
+      >
+        {
+          aboutImage ? (
+            <Image src={aboutImage} alt={home.heroName} />
+          ) : (
+            <Placeholder ratio="4/5" label={home.heroName} />
+          )
+        }
+      </div>
       <div>
         <h3 class="about__subheading">{home.aboutSubheading}</h3>
         <p class="about__intro">{home.aboutIntro}</p>
@@ -173,11 +186,30 @@ const hobbyPhotos = getHomeImageSet('hobby');
     margin-bottom: var(--sp-4);
   }
 
+  /*
+    照片欄用 auto 寬度、跟文字欄一樣 stretch 滿版高：讓照片「高度」貼齊文字區塊，
+    不強制裁切成固定比例框。照片本身用 max-width/max-height 鎖住原始像素尺寸
+    （見下面 .about__photo img），所以文字比較短時照片不會被拉大過原始解析度，
+    比較長時也只會長到跟文字一樣高，不會超版。
+  */
   .about__grid {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: auto 1fr;
     gap: var(--sp-5);
-    align-items: start;
+    align-items: stretch;
+  }
+
+  .about__photo {
+    height: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .about__photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
   }
 
   .about__subheading {
