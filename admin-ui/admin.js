@@ -19,7 +19,7 @@ const previewFrameEl = document.getElementById('previewFrame');
 const previewSelectEl = document.getElementById('previewPageSelect');
 const previewLocaleBtn = document.getElementById('previewLocaleToggle');
 
-let currentPage = 'gallery'; // 'gallery' | 'portfolio' | 'home'
+let currentPage = 'home'; // 'gallery' | 'portfolio' | 'home' | 'content'
 let currentType = 'gallery'; // 'gallery' | 'projects' —— 對應後端 /api/collections/:type
 let currentSlug = null;
 let currentImages = [];
@@ -833,4 +833,5 @@ fileInputEl.addEventListener('change', async () => {
   }
 });
 
-loadCollectionList().catch((err) => showToast(`載入失敗：${err.message}`, true));
+// 開啟後台預設停在 Home 首頁圖片；currentPage 與側欄的 active 標記要一起對上。
+loadHome().catch((err) => showToast(`載入失敗：${err.message}`, true));
