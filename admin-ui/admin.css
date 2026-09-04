@@ -120,15 +120,28 @@ svg {
   flex-direction: column;
 }
 
+/*
+  兩列結構：第一列是標題與發布按鈕，第二列是分頁標籤。
+  原本三者擠在同一列（space-between 再加 margin-left:auto），
+  分頁標籤會被推到發布按鈕右邊，案例多的時候整列很擁擠。
+*/
 .topbar {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+  flex-direction: column;
   gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-4) var(--sp-3);
+  padding: var(--sp-4);
   border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
+
+.topbar__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.topbar__heading { min-width: 0; }
 
 .topbar__title {
   margin: 0;
@@ -142,8 +155,12 @@ svg {
   font-size: 14px;
 }
 
+/* 沒有分頁標籤的頁面（Home、Content）不要留下空白間距 */
+.topbar__tabs:empty { display: none; }
+
 .topbar__tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--sp-1);
 }
 
@@ -740,7 +757,6 @@ svg {
 }
 
 /* ---------- 發布按鈕與確認面板 ---------- */
-.topbar__right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 
 .publish-btn {
   display: inline-flex;

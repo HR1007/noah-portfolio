@@ -931,8 +931,22 @@ fileInputEl.addEventListener('change', async () => {
   }
 });
 
-// 開啟後台預設停在 Home 首頁圖片；currentPage 與側欄的 active 標記要一起對上。
-loadHome().catch((err) => showToast(`載入失敗：${err.message}`, true));
+/*
+  開啟後台預設停在 Home 首頁圖片；網址帶 hash（#gallery / #portfolio / #content）
+  時改開該頁，方便直接連到特定分頁。currentPage、側欄 active 標記與實際載入的
+  內容三者必須一致，所以統一走側欄按鈕的 click 流程，不另外複製一套切換邏輯。
+*/
+function openInitialPage() {
+  const wanted = location.hash.replace('#', '');
+  const btn = sidebarItems.find((b) => b.dataset.page === wanted && !b.disabled);
+  if (btn) {
+    btn.click();
+    return;
+  }
+  loadHome().catch((err) => showToast(`載入失敗：${err.message}`, true));
+}
+
+openInitialPage();
 
 // ---------- 發布 ----------
 // 只送出 src/content 與 src/assets（文字與圖片），程式碼永遠不會被帶走；
