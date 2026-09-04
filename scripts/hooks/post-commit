@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# commit 後自動重新產生進度報告（.report/progress-report.html）。
+#
+# 這份是版控中的原始檔，實際生效的是 .git/hooks/post-commit —— 後者不進版控，
+# 重新 clone 之後要跑 `npm run hooks:install` 才會裝回去。
+#
+# 兩個原則：
+#   1. 絕不讓 commit 失敗。報告只是附加產物，產生失敗不該影響版控操作，
+#      所以最後一律 exit 0。
+#   2. 不產生任何 commit。輸出目錄 .report/ 已在 .gitignore，
+#      不會觸發另一次 commit，也就不會遞迴。
+
+# rebase / merge / cherry-pick 進行中時跳過：那些流程會連續產生多個 commit，
+# 每個都重跑一次既慢又沒意義，等流程結束後再手動或下次 commit 時更新即可。
+git_dir=$(git rev-parse --git-dir 2>/dev/null) || exit 0
+for marker in rebase-merge rebase-apply MERGE_HEAD CHERRY_PICK_HEAD; do
+  if [ -e "$git_dir/$marker" ]; then
+    exit 0
+  fi
+done
+
+root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+cd "$root" || exit 0
+
+if ! command -v npm >/dev/null 2>&1; then
+  exit 0
+fi
+
+if out=$(npm run report --silent 2>&1); then
+  # 只印摘要那一行，不要讓 hook 的輸出蓋過 git commit 自己的訊息
+  echo "$out" | sed -n '2p'
+else
+  echo "post-commit: 進度報告產生失敗（不影響本次 commit）"
+  echo "$out" | tail -3
+fi
+
+exit 0
