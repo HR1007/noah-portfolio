@@ -54,7 +54,7 @@ sections:
       - name: '[需確認] Persona 名稱'
         role: '[需確認] 角色／身分'
         description: '[需確認] Persona 描述，待設計師提供實際內容。'
-        ratio: 3/4 # [需確認]
+        ratio: 3/4
         alt: '[需確認] Persona portrait'
   - type: designThemes
     eyebrow: DESIGN THEMES
@@ -70,10 +70,10 @@ sections:
     body: '[需確認] Flow 說明文字，待設計師提供實際內容。'
     steps:
       - label: '[需確認] Step 1'
-        ratio: 3/4 # [需確認]
+        ratio: 3/4
         alt: '[需確認] Flow step 1'
       - label: '[需確認] Step 2'
-        ratio: 3/4 # [需確認]
+        ratio: 3/4
         alt: '[需確認] Flow step 2'
   - type: featureSplit
     heading: Unified Task Surface
