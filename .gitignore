@@ -26,3 +26,6 @@ pnpm-debug.log*
 # reference screenshots / raw exports, never shipped
 raw-assets/
 .vercel
+
+# 產生的進度報告（由 npm run report 重建，不進版控）
+.report/

@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "admin": "node admin-server/server.mjs"
+    "admin": "node admin-server/server.mjs",
+    "report": "node scripts/build-report.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

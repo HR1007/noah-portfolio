@@ -1,0 +1,693 @@
+<title>Noah Portfolio 進度報告</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+  /* 色階與間距階梯沿用專案的 src/styles/tokens.css，讓報告跟站台同一套語言 */
+  :root {
+    --bg: #f2f2f2;
+    --surface: #ffffff;
+    --raised: #ffffff;
+    --ink: #333333;
+    --muted: rgba(51, 51, 51, 0.58);
+    --faint: rgba(51, 51, 51, 0.4);
+    --border: rgba(51, 51, 51, 0.14);
+    --grid-line: rgba(51, 51, 51, 0.055);
+    --hit: rgba(150, 102, 26, 0.18);
+
+    --ok: #2f7d5d;
+    --ok-soft: rgba(47, 125, 93, 0.1);
+    --warn: #96661a;
+    --warn-soft: rgba(150, 102, 26, 0.11);
+    --stop: #a8402f;
+    --stop-soft: rgba(168, 64, 47, 0.1);
+    --info: #3a6b96;
+    --info-soft: rgba(58, 107, 150, 0.11);
+
+    --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Noto Sans TC', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    --sp-1: 8px; --sp-2: 16px; --sp-3: 24px; --sp-4: 32px;
+    --sp-5: 40px; --sp-6: 64px; --sp-7: 80px;
+    --radius: 16px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #18181a; --surface: #222225; --raised: #2a2a2e;
+      --ink: #f2f2f2; --muted: rgba(242,242,242,0.62); --faint: rgba(242,242,242,0.42);
+      --border: rgba(242,242,242,0.16); --grid-line: rgba(242,242,242,0.05);
+      --hit: rgba(217,164,65,0.26);
+      --ok: #6ec79b; --ok-soft: rgba(110,199,155,0.13);
+      --warn: #d9a441; --warn-soft: rgba(217,164,65,0.14);
+      --stop: #e08573; --stop-soft: rgba(224,133,115,0.14);
+      --info: #7fb0dc; --info-soft: rgba(127,176,220,0.14);
+    }
+  }
+
+  :root[data-theme='dark'] {
+    --bg: #18181a; --surface: #222225; --raised: #2a2a2e;
+    --ink: #f2f2f2; --muted: rgba(242,242,242,0.62); --faint: rgba(242,242,242,0.42);
+    --border: rgba(242,242,242,0.16); --grid-line: rgba(242,242,242,0.05);
+    --hit: rgba(217,164,65,0.26);
+    --ok: #6ec79b; --ok-soft: rgba(110,199,155,0.13);
+    --warn: #d9a441; --warn-soft: rgba(217,164,65,0.14);
+    --stop: #e08573; --stop-soft: rgba(224,133,115,0.14);
+    --info: #7fb0dc; --info-soft: rgba(127,176,220,0.14);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 8px 8px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: var(--sp-6) var(--sp-3) var(--sp-7);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-6);
+  }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint);
+    margin: 0;
+  }
+
+  .head { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .head h1 {
+    margin: 0; font-size: 44px; font-weight: 900;
+    letter-spacing: -0.03em; line-height: 1.05; text-wrap: balance;
+  }
+  .head__meta {
+    display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-1) var(--sp-3);
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+  }
+  .head__meta a { color: inherit; text-decoration-color: var(--border); }
+  .head__meta a:hover { color: var(--ink); }
+
+  .verdict { font-size: 17px; line-height: 1.65; color: var(--muted); max-width: 62ch; margin: 0; }
+  .verdict strong { color: var(--ink); font-weight: 600; }
+
+  .tiles {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    background: var(--border); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .tile { background: var(--surface); padding: var(--sp-3); display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
+  .tile__k { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); }
+  .tile__v { font-family: var(--mono); font-size: 26px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .tile__n { font-size: 12px; color: var(--muted); font-family: var(--sans); }
+
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 999px; margin-right: 6px; vertical-align: 1px; }
+  .dot--ok { background: var(--ok); }
+
+  section { display: flex; flex-direction: column; gap: var(--sp-3); }
+
+  h2 {
+    margin: 0; font-size: 13px; font-weight: 700; font-family: var(--mono);
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink);
+    padding-bottom: var(--sp-1); border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-2);
+  }
+  h2 span { font-weight: 500; color: var(--faint); letter-spacing: 0.06em; text-transform: none; }
+
+  /* ── 進度查詢 ── */
+  .finder { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+  .search {
+    position: relative; display: flex; align-items: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0 var(--sp-2);
+  }
+  .search:focus-within { border-color: var(--muted); }
+  .search svg { flex: none; width: 16px; height: 16px; color: var(--faint); }
+  .search input {
+    flex: 1; border: 0; background: transparent; color: var(--ink);
+    font-family: var(--sans); font-size: 15px; padding: 13px var(--sp-2);
+    outline: none; min-width: 0;
+  }
+  .search input::placeholder { color: var(--faint); }
+  .search__clear {
+    flex: none; border: 0; background: transparent; color: var(--faint);
+    font-family: var(--mono); font-size: 11px; cursor: pointer; padding: 6px 8px;
+    border-radius: 8px; letter-spacing: 0.08em;
+  }
+  .search__clear:hover { color: var(--ink); background: var(--bg); }
+  .search__clear[hidden] { display: none; }
+
+  .filters { display: flex; flex-direction: column; gap: var(--sp-1); }
+  .filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .filter-row > .lbl {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--faint); width: 52px; flex: none;
+  }
+
+  .chip {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    padding: 5px 10px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: var(--muted);
+    display: inline-flex; align-items: center; gap: 6px; line-height: 1.4;
+  }
+  .chip:hover { color: var(--ink); border-color: var(--muted); }
+  .chip[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+  .chip .n { font-variant-numeric: tabular-nums; opacity: 0.65; }
+  .chip:focus-visible { outline: 2px solid var(--info); outline-offset: 2px; }
+
+  .result-bar {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline;
+    gap: var(--sp-2); font-family: var(--mono); font-size: 12px; color: var(--faint);
+  }
+  .result-bar b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* ── 清單 ── */
+  .list { display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+
+  .list__head {
+    display: grid; grid-template-columns: 108px 74px 88px 1fr 96px;
+    gap: var(--sp-2); padding: 10px var(--sp-3);
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--faint);
+  }
+
+  .daygroup { border-bottom: 1px solid var(--border); }
+  .daygroup:last-child { border-bottom: 0; }
+  .daygroup__label {
+    display: flex; align-items: baseline; gap: var(--sp-2);
+    padding: 10px var(--sp-3); background: var(--bg);
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    position: sticky; top: 0; z-index: 2;
+    border-bottom: 1px solid var(--border);
+  }
+  .daygroup__label b { color: var(--ink); font-weight: 700; letter-spacing: 0.04em; }
+  .daygroup__label .cnt { color: var(--faint); }
+
+  .row {
+    display: grid; grid-template-columns: 108px 74px 88px 1fr 96px;
+    gap: var(--sp-2); padding: 12px var(--sp-3);
+    border-bottom: 1px solid var(--border); align-items: baseline;
+    cursor: pointer; background: var(--surface); text-align: left;
+    border-left: 0; border-right: 0; border-top: 0; width: 100%;
+    font: inherit; color: inherit;
+  }
+  .row:last-child { border-bottom: 0; }
+  .row:hover { background: var(--bg); }
+  .row:focus-visible { outline: 2px solid var(--info); outline-offset: -2px; }
+
+  .row__meta { font-family: var(--mono); font-size: 11px; color: var(--faint); font-variant-numeric: tabular-nums; }
+  .row__title { font-size: 14px; line-height: 1.5; min-width: 0; }
+  .row__title .expand { color: var(--faint); font-family: var(--mono); font-size: 10px; margin-left: 6px; }
+  .row__delta { font-family: var(--mono); font-size: 11px; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .row__delta .plus { color: var(--ok); }
+  .row__delta .minus { color: var(--stop); }
+
+  .type {
+    font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+    padding: 2px 7px; border-radius: 5px; display: inline-block; text-transform: uppercase;
+  }
+  .type--feat { background: var(--info-soft); color: var(--info); }
+  .type--fix { background: var(--stop-soft); color: var(--stop); }
+  .type--content { background: var(--ok-soft); color: var(--ok); }
+  .type--style { background: var(--warn-soft); color: var(--warn); }
+  .type--chore, .type--merge, .type--init { background: var(--bg); color: var(--faint); border: 1px solid var(--border); }
+
+  .area { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  .body {
+    grid-column: 1 / -1; margin-top: var(--sp-1); padding: var(--sp-2);
+    background: var(--bg); border-radius: 10px; border: 1px solid var(--border);
+    font-size: 13px; line-height: 1.7; color: var(--muted);
+    white-space: pre-wrap; font-family: var(--sans);
+  }
+
+  mark { background: var(--hit); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+  .empty { padding: var(--sp-5) var(--sp-3); text-align: center; color: var(--faint); font-size: 14px; }
+  .empty b { display: block; color: var(--muted); font-size: 15px; margin-bottom: 4px; }
+
+  /* ── 其餘區塊 ── */
+  .gap {
+    border: 1px solid var(--border); border-left: 3px solid var(--warn);
+    border-radius: var(--radius); background: var(--surface); padding: var(--sp-3);
+    display: flex; flex-direction: column; gap: var(--sp-2);
+  }
+  .gap__row {
+    display: grid; grid-template-columns: 92px 1fr; gap: var(--sp-2);
+    align-items: start; padding-bottom: var(--sp-2); border-bottom: 1px solid var(--border);
+  }
+  .gap__row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .hash { font-family: var(--mono); font-size: 12px; color: var(--muted); font-weight: 500; }
+  .gap__t { font-weight: 600; }
+  .gap__d { color: var(--muted); font-size: 14px; margin: 0; }
+
+  .blocks { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .blk {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: var(--sp-3); display: grid; grid-template-columns: auto 1fr;
+    gap: var(--sp-1) var(--sp-2); align-items: baseline;
+  }
+  .tag {
+    font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+  }
+  .tag--you { background: var(--stop-soft); color: var(--stop); }
+  .tag--wait { background: var(--warn-soft); color: var(--warn); }
+  .blk__t { font-weight: 600; }
+  .blk__b { grid-column: 2; color: var(--muted); font-size: 14px; }
+  .blk__b p { margin: 0 0 var(--sp-1); }
+  .blk__b p:last-child { margin-bottom: 0; }
+  .check {
+    display: inline-block; font-family: var(--mono); font-size: 12px;
+    background: var(--ok-soft); color: var(--ok); padding: 2px 8px;
+    border-radius: 6px; margin-top: 4px;
+  }
+
+  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2); }
+  .note {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: var(--sp-3); display: flex; flex-direction: column; gap: 6px;
+  }
+  .note b { font-size: 14px; }
+  .note p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  code { font-family: var(--mono); font-size: 0.92em; }
+  .note code, .blk__b code, .gap__d code, .verdict code {
+    background: var(--bg); padding: 1px 5px; border-radius: 4px; border: 1px solid var(--border);
+  }
+
+  .foot {
+    display: flex; flex-wrap: wrap; gap: var(--sp-1) var(--sp-4);
+    padding-top: var(--sp-3); border-top: 1px solid var(--border);
+    font-family: var(--mono); font-size: 12px; color: var(--faint);
+  }
+  .foot b { color: var(--muted); font-weight: 500; }
+
+  @media (max-width: 767px) {
+    .wrap { padding: var(--sp-4) var(--sp-2) var(--sp-6); gap: var(--sp-5); }
+    .head h1 { font-size: 32px; }
+    .tiles { grid-template-columns: 1fr 1fr; }
+    .notes { grid-template-columns: 1fr; }
+    .gap__row { grid-template-columns: 1fr; gap: 4px; }
+    .list__head { display: none; }
+    .row { grid-template-columns: 1fr auto; gap: 4px var(--sp-1); }
+    .row__meta { grid-row: 1; }
+    .row__delta { grid-row: 1; grid-column: 2; }
+    .row__title { grid-column: 1 / -1; }
+    .row .type, .row .area { grid-row: 3; }
+    .row .type { grid-column: 1; justify-self: start; }
+    .row .area { grid-column: 2; justify-self: end; }
+    .filter-row > .lbl { width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="head">
+    <p class="eyebrow">Project Log · <!--__RANGE__--></p>
+    <h1>Noah Portfolio 進度報告</h1>
+    <div class="head__meta">
+      <span><span class="dot dot--ok"></span>站台運行正常</span>
+      <span><!--__COMMITS__--> commits</span>
+      <span><!--__DAYS__--> 天</span>
+      <a href="https://noah-portfolio-tawny.vercel.app" target="_blank" rel="noopener">noah-portfolio-tawny.vercel.app</a>
+    </div>
+    <p class="verdict">
+      站台健康，<strong>15 條路由全部回應 200</strong>。下方是完整開發時間線，可用關鍵字搜尋，
+      或用類型／範圍欄位篩選；點任一列可展開該次變更的完整說明。
+    </p>
+  </header>
+
+  <section>
+    <h2>運行狀態 <span>產生時間 <!--__GENERATED__--></span></h2>
+    <div class="tiles">
+      <div class="tile">
+        <span class="tile__k">Production</span>
+        <span class="tile__v" style="color: var(--ok)">Ready</span>
+        <span class="tile__n">最後部署 15:44，建置 7 秒</span>
+      </div>
+      <div class="tile">
+        <span class="tile__k">路由健康</span>
+        <span class="tile__v">15<span style="color: var(--faint)">/15</span></span>
+        <span class="tile__n">全部回傳 200，無 404</span>
+      </div>
+      <div class="tile">
+        <span class="tile__k">線上 commit</span>
+        <span class="tile__v" style="font-size: 20px">27a7b69</span>
+        <span class="tile__n">落後本機，尚有修正未推送</span>
+      </div>
+      <div class="tile">
+        <span class="tile__k">建置錯誤</span>
+        <span class="tile__v">0</span>
+        <span class="tile__n">24 頁、44 張優化圖片</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>進度查詢 <span><!--__COMMITS__--> 筆紀錄</span></h2>
+
+    <div class="finder">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path>
+        </svg>
+        <input id="q" type="search" placeholder="搜尋進度：關鍵字、commit hash、日期（例如 去背、hero、9/2、fix）" autocomplete="off" aria-label="搜尋進度紀錄">
+        <button class="search__clear" id="clear" type="button" hidden>清除</button>
+      </div>
+
+      <div class="filters">
+        <div class="filter-row" id="type-filters" role="group" aria-label="依類型篩選">
+          <span class="lbl">類型</span>
+        </div>
+        <div class="filter-row" id="area-filters" role="group" aria-label="依範圍篩選">
+          <span class="lbl">範圍</span>
+        </div>
+      </div>
+
+      <div class="result-bar">
+        <span id="count">顯示全部 <b><!--__COMMITS__--></b> 筆</span>
+        <span id="range"></span>
+      </div>
+    </div>
+
+    <div class="list">
+      <div class="list__head" aria-hidden="true">
+        <span>時間</span><span>類型</span><span>範圍</span><span>內容</span><span style="text-align:right">變更</span>
+      </div>
+      <div id="rows"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>尚未上線的內容</h2>
+    <div class="gap">
+      <div class="gap__row">
+        <span class="hash">be7e2c0</span>
+        <div>
+          <div class="gap__t">插畫白邊清除 ＋ 停用會裁到圖案的圓角</div>
+          <p class="gap__d">
+            在本機 main，未推送。線上首頁 hero 仍有 463px 中性灰光暈，
+            <code>Media</code> 的 16px 圓角也仍在裁掉鞋子（87px）。
+          </p>
+        </div>
+      </div>
+      <div class="gap__row">
+        <span class="hash">4 commits</span>
+        <div>
+          <div class="gap__t">像素風返回鍵（<code>feature/back-link</code>）</div>
+          <p class="gap__d">依你的要求開分支保留，等確認動畫效果後才推。箭頭像素圖的方向錯誤已由你修正（<code>e77423d</code>）。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>待處理</h2>
+    <div class="blocks">
+      <div class="blk">
+        <span class="tag tag--you">需要你</span>
+        <span class="blk__t">首頁 hero 頭頂被裁切</span>
+        <div class="blk__b">
+          <p>
+            git 歷史三個版本與 Downloads 裡三個匯出檔，<b>每一個 <code>y=0</code> 都有圖案</b>（15–40px），
+            帽子頂端在第 0 列就是平切面。匯出畫框壓在頭頂上，無法從像素還原。
+          </p>
+          <p>請把畫框往上延伸再匯出，存到 <code>src/assets/home/hero.png</code>。</p>
+          <span class="check">驗收：最上面一列完全空白（y=0 不透明像素 = 0）</span>
+        </div>
+      </div>
+
+      <div class="blk">
+        <span class="tag tag--you">需要你</span>
+        <span class="blk__t">佔位文案仍顯示在線上</span>
+        <div class="blk__b">
+          <p>
+            <code>main-zh.json</code> 的 <code>heroQuote</code> 開頭是 <code>[需確認 — 草稿翻譯…麻煩校對]</code>，
+            中文首頁大標語目前直接顯示給訪客看。需要你決定最終文案。
+          </p>
+        </div>
+      </div>
+
+      <div class="blk">
+        <span class="tag tag--wait">等確認</span>
+        <span class="blk__t">返回鍵與未推送的 commit</span>
+        <div class="blk__b">
+          <p>確認後我會把 <code>feature/back-link</code> 與 main 上的白邊修正一起推上線。</p>
+        </div>
+      </div>
+
+      <div class="blk">
+        <span class="tag tag--wait">等確認</span>
+        <span class="blk__t">兩份未使用的 cta-avatar.png</span>
+        <div class="blk__b">
+          <p>
+            <code>home/</code> 與 <code>projects/</code> 各一份沒有任何頁面引用，實際只有 <code>gallery/</code> 那份在用。
+            未追蹤檔案刪掉救不回來，所以我沒動。
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>維運筆記</h2>
+    <div class="notes">
+      <div class="note">
+        <b>兩層快取，位置不同</b>
+        <p>
+          圖片優化快取在 <code>node_modules/.astro/assets</code>，會讓改過的圖在 build 時被舊版覆蓋；
+          內容集合快取在專案根目錄的 <code>.astro/data-store.json</code>。
+        </p>
+      </div>
+      <div class="note">
+        <b>schema 加欄位要清內容快取</b>
+        <p>
+          新增欄位後 dev server 會讀到 <code>undefined</code>——舊 store 是用舊 schema 建的，
+          Zod 驗證時把未知欄位剝掉。<code>rm -rf .astro</code> 才會生效，靜態建置不受影響。
+        </p>
+      </div>
+      <div class="note">
+        <b>比例要跟著圖檔實際尺寸</b>
+        <p>
+          寫死的 <code>ratio</code> 與圖檔不符時，<code>object-fit: cover</code> 會靜靜裁掉內容。
+          作品集頁改成由 <code>image.width/height</code> 推導，換圖不用改程式。
+        </p>
+      </div>
+      <div class="note">
+        <b>透明插畫不要套圓角</b>
+        <p>
+          <code>Media</code> 的 16px <code>border-radius</code> 會裁掉碰到邊角的圖案（鞋子、頭髮）。
+          去背後的插畫沒有矩形底，圓角只有壞處。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span><b><!--__COMMITS__--></b> commits</span>
+    <span><b><!--__DAYS__--></b> 天</span>
+    <span><b>24</b> HTML 頁面</span>
+    <span><b>44</b> 優化圖片</span>
+    <span><b>709 B</b> 全站 inline JS</span>
+  </div>
+
+</div>
+
+<script>
+const DATA = /*__TIMELINE_DATA__*/[];
+
+const TYPE_LABEL = {
+  feat: '新功能', fix: '修正', content: '內容',
+  style: '樣式', chore: '雜項', merge: '合併', init: '初始'
+};
+
+const state = { q: '', types: new Set(), areas: new Set() };
+
+const rowsEl = document.getElementById('rows');
+const countEl = document.getElementById('count');
+const rangeEl = document.getElementById('range');
+const qEl = document.getElementById('q');
+const clearEl = document.getElementById('clear');
+
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+// 把查詢字串裡的日期寫法正規化，讓「9/2」「9-2」都能對到 2026-09-02
+function normalizeQuery(q) {
+  const m = q.match(/^(\d{1,2})\s*[\/\-.]\s*(\d{1,2})$/);
+  if (m) return `-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}`;
+  return q;
+}
+
+function haystack(d) {
+  return [d.date, d.time, d.sha, d.raw, d.title, d.body, d.type, TYPE_LABEL[d.type] || '', d.area]
+    .join(' ').toLowerCase();
+}
+
+function highlight(text, q) {
+  const safe = esc(text);
+  if (!q) return safe;
+  const needle = q.trim();
+  if (!needle) return safe;
+  const idx = safe.toLowerCase().indexOf(needle.toLowerCase());
+  if (idx === -1) return safe;
+  return safe.slice(0, idx) + '<mark>' + safe.slice(idx, idx + needle.length) + '</mark>' + safe.slice(idx + needle.length);
+}
+
+function filtered() {
+  const q = normalizeQuery(state.q.trim()).toLowerCase();
+  return DATA.filter((d) => {
+    if (state.types.size && !state.types.has(d.type)) return false;
+    if (state.areas.size && !state.areas.has(d.area)) return false;
+    if (q && !haystack(d).includes(q)) return false;
+    return true;
+  });
+}
+
+function buildChips(containerId, key, values) {
+  const box = document.getElementById(containerId);
+  values.forEach(([val, n]) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip';
+    b.setAttribute('aria-pressed', 'false');
+    b.dataset.val = val;
+    const label = key === 'types' ? (TYPE_LABEL[val] || val) : val;
+    b.innerHTML = esc(label) + ' <span class="n">' + n + '</span>';
+    b.addEventListener('click', () => {
+      const set = state[key];
+      if (set.has(val)) { set.delete(val); b.setAttribute('aria-pressed', 'false'); }
+      else { set.add(val); b.setAttribute('aria-pressed', 'true'); }
+      render();
+    });
+    box.appendChild(b);
+  });
+}
+
+function tally(key) {
+  const m = new Map();
+  DATA.forEach((d) => m.set(d[key], (m.get(d[key]) || 0) + 1));
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+function render() {
+  const list = filtered();
+  const q = state.q.trim();
+  rowsEl.textContent = '';
+
+  if (!list.length) {
+    const e = document.createElement('div');
+    e.className = 'empty';
+    e.innerHTML = '<b>沒有符合的進度紀錄</b>換個關鍵字，或清掉篩選條件再試一次。';
+    rowsEl.appendChild(e);
+    countEl.innerHTML = '找到 <b>0</b> 筆';
+    rangeEl.textContent = '';
+    return;
+  }
+
+  // 由新到舊，依日期分組
+  const byDay = new Map();
+  [...list].reverse().forEach((d) => {
+    if (!byDay.has(d.date)) byDay.set(d.date, []);
+    byDay.get(d.date).push(d);
+  });
+
+  byDay.forEach((items, day) => {
+    const g = document.createElement('div');
+    g.className = 'daygroup';
+
+    const label = document.createElement('div');
+    label.className = 'daygroup__label';
+    const wd = ['日', '一', '二', '三', '四', '五', '六'][new Date(day + 'T00:00:00').getDay()];
+    label.innerHTML = '<b>' + day + '</b><span>週' + wd + '</span><span class="cnt">' + items.length + ' 筆</span>';
+    g.appendChild(label);
+
+    items.forEach((d) => {
+      const r = document.createElement('button');
+      r.className = 'row';
+      r.type = 'button';
+      r.setAttribute('aria-expanded', 'false');
+      r.innerHTML =
+        '<span class="row__meta">' + d.time + ' · ' + d.sha + '</span>' +
+        '<span><span class="type type--' + d.type + '">' + (TYPE_LABEL[d.type] || d.type) + '</span></span>' +
+        '<span class="area">' + esc(d.area) + '</span>' +
+        '<span class="row__title">' + highlight(d.title, q) +
+          (d.body ? '<span class="expand">詳情</span>' : '') + '</span>' +
+        '<span class="row__delta">' +
+          (d.ins ? '<span class="plus">+' + d.ins + '</span> ' : '') +
+          (d.del ? '<span class="minus">−' + d.del + '</span>' : '') +
+          (!d.ins && !d.del ? '—' : '') +
+        '</span>';
+
+      if (d.body) {
+        r.addEventListener('click', () => {
+          const open = r.getAttribute('aria-expanded') === 'true';
+          const existing = r.querySelector('.body');
+          if (open && existing) { existing.remove(); r.setAttribute('aria-expanded', 'false'); return; }
+          const p = document.createElement('div');
+          p.className = 'body';
+          p.innerHTML = highlight(d.body, q);
+          r.appendChild(p);
+          r.setAttribute('aria-expanded', 'true');
+        });
+      }
+      g.appendChild(r);
+    });
+
+    rowsEl.appendChild(g);
+  });
+
+  const isAll = list.length === DATA.length;
+  countEl.innerHTML = (isAll ? '顯示全部 <b>' : '找到 <b>') + list.length + '</b> 筆';
+  const days = byDay.size;
+  const ins = list.reduce((a, d) => a + d.ins, 0);
+  const del = list.reduce((a, d) => a + d.del, 0);
+  rangeEl.textContent = days + ' 天 · +' + ins + ' / −' + del;
+}
+
+buildChips('type-filters', 'types', tally('type'));
+buildChips('area-filters', 'areas', tally('area'));
+
+qEl.addEventListener('input', () => {
+  state.q = qEl.value;
+  clearEl.hidden = !state.q;
+  render();
+});
+
+clearEl.addEventListener('click', () => {
+  qEl.value = '';
+  state.q = '';
+  clearEl.hidden = true;
+  qEl.focus();
+  render();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.activeElement === qEl && qEl.value) {
+    qEl.value = ''; state.q = ''; clearEl.hidden = true; render();
+  }
+});
+
+render();
+
+</script>
