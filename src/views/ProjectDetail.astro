@@ -18,6 +18,7 @@ import DesignThemes from '../components/project/DesignThemes.astro';
 import Flow from '../components/project/Flow.astro';
 import ProjectQuote from '../components/project/ProjectQuote.astro';
 import { getProjectImages } from '../lib/media';
+import { assignImages } from '../lib/image-slots.mjs';
 
 interface Props {
   project: CollectionEntry<'projects'>;
@@ -32,11 +33,12 @@ const site = await getEntry('site', `main-${locale}`);
 const { projectQuote } = site!.data;
 const { backLabel } = site!.data.nav;
 
-// 圖片不寫路徑/檔名在內容裡：依區塊在頁面上出現的順序，依序從該專案資料夾取下一張圖。
-// 資料夾裡沒圖時 getProjectImages 回傳空陣列，取值自然是 undefined，Media 元件會自動顯示佔位框。
+// 圖片不寫路徑/檔名在內容裡：依區塊在頁面上出現的順序，依序從該專案資料夾取圖。
+// 版位規則集中在 lib/image-slots.mjs，後台顯示「第 N 格是哪個區塊」也是讀同一支，
+// 兩邊不會各自算一套而失去同步。資料夾沒圖時取值為 undefined，Media 會顯示佔位框。
 const images = getProjectImages(project.id);
-let cursor = 0;
-const nextImage = () => images[cursor++];
+const { hero: heroImage, bySection } = assignImages(project.data, images);
+const imagesFor = (i: number) => bySection[i] ?? [];
 
 const { Content } = await render(project);
 ---
@@ -52,10 +54,10 @@ const { Content } = await render(project);
           title={project.data.title}
           ctaLabel={hero!.ctaLabel}
           ctaHref={hero!.ctaHref}
-          image={nextImage()}
+          image={heroImage}
         />
 
-        {sections.map((section) => {
+        {sections.map((section, sectionIndex) => {
           switch (section.type) {
             case 'textSection':
               return (
@@ -66,14 +68,14 @@ const { Content } = await render(project);
                 />
               );
             case 'deviceShowcase':
-              return <DeviceShowcase image={nextImage()} ratio={section.ratio} alt={section.alt} />;
+              return <DeviceShowcase image={imagesFor(sectionIndex)[0]} ratio={section.ratio} alt={section.alt} />;
             case 'experienceDemo':
               return (
                 <ExperienceDemo
                   eyebrow={section.eyebrow}
                   heading={section.heading}
                   body={section.body}
-                  image={nextImage()}
+                  image={imagesFor(sectionIndex)[0]}
                   ratio={section.ratio}
                   alt={section.alt}
                   ctaLabel={section.ctaLabel}
@@ -86,7 +88,7 @@ const { Content } = await render(project);
                   heading={section.heading}
                   body={section.body}
                   imagePosition={section.imagePosition}
-                  image={nextImage()}
+                  image={imagesFor(sectionIndex)[0]}
                   ratio={section.ratio}
                   alt={section.alt}
                   ctaLabel={section.ctaLabel}
@@ -99,12 +101,12 @@ const { Content } = await render(project);
                   eyebrow={section.eyebrow}
                   heading={section.heading}
                   columns={section.columns}
-                  images={section.columns.map(() => nextImage())}
+                  images={imagesFor(sectionIndex)}
                 />
               );
             case 'imageRow':
               return (
-                <ImageRow rows={section.images} images={section.images.map(() => nextImage())} />
+                <ImageRow rows={section.images} images={imagesFor(sectionIndex)} />
               );
             case 'illustrationGrid':
               return (
@@ -113,7 +115,7 @@ const { Content } = await render(project);
                   heading={section.heading}
                   body={section.body}
                   alt={section.alt}
-                  images={Array.from({ length: section.count }, () => nextImage())}
+                  images={imagesFor(sectionIndex)}
                 />
               );
             case 'researchFramework':
@@ -122,7 +124,7 @@ const { Content } = await render(project);
                   eyebrow={section.eyebrow}
                   heading={section.heading}
                   paragraphs={section.paragraphs}
-                  image={nextImage()}
+                  image={imagesFor(sectionIndex)[0]}
                   ratio={section.ratio}
                   alt={section.alt}
                 />
@@ -133,7 +135,7 @@ const { Content } = await render(project);
                   eyebrow={section.eyebrow}
                   heading={section.heading}
                   personas={section.personas}
-                  images={section.personas.map(() => nextImage())}
+                  images={imagesFor(sectionIndex)}
                 />
               );
             case 'designThemes':
@@ -147,7 +149,7 @@ const { Content } = await render(project);
                   heading={section.heading}
                   body={section.body}
                   steps={section.steps}
-                  images={section.steps.map(() => nextImage())}
+                  images={imagesFor(sectionIndex)}
                 />
               );
             default:

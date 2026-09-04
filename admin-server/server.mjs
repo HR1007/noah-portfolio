@@ -10,6 +10,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { imageSize } from 'image-size';
 import matter from 'gray-matter';
+import { getImageSlots } from '../src/lib/image-slots.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -85,70 +86,12 @@ async function listSlugImages(type, slug) {
   return { images, requiredSlots: null, slotLabels: null };
 }
 
-// 依 ProjectDetail.astro 裡 nextImage() 消耗圖片的順序，重算「第幾張圖對應哪個區塊」。
-// 這裡的順序邏輯要跟 src/views/ProjectDetail.astro 保持一致，那邊改了這裡也要跟著改。
+// 版位規則的唯一來源在 src/lib/image-slots.mjs，渲染端 (ProjectDetail.astro)
+// 讀的是同一支，後台不再自行維護一份，避免兩邊悄悄失去同步。
 async function computeProjectSlotLabels(slug) {
   const raw = await fs.readFile(projectFilePath(slug), 'utf-8');
   const { data } = matter(raw);
-  const labels = [];
-  const isMigrated = data.hero !== undefined && Array.isArray(data.sections) && data.sections.length > 0;
-
-  if (!isMigrated) {
-    labels.push('Showcase（舊版單圖版型，未拆解成 sections）');
-    return labels;
-  }
-
-  labels.push('Hero');
-  data.sections.forEach((section, si) => {
-    const n = si + 1;
-    switch (section.type) {
-      case 'textSection':
-        break;
-      case 'deviceShowcase':
-        labels.push(`#${n} Device Showcase`);
-        break;
-      case 'experienceDemo':
-        labels.push(`#${n} Experience Demo${section.heading ? ' — ' + section.heading : ''}`);
-        break;
-      case 'featureSplit':
-        labels.push(`#${n} Feature Split${section.heading ? ' — ' + section.heading : ''}`);
-        break;
-      case 'featureGrid':
-        (section.columns || []).forEach((col, ci) => {
-          labels.push(`#${n} Feature Grid — Column ${ci + 1}${col.heading ? ` (${col.heading})` : ''}`);
-        });
-        break;
-      case 'imageRow':
-        (section.images || []).forEach((_, ii) => {
-          labels.push(`#${n} Image Row — Image ${ii + 1}`);
-        });
-        break;
-      case 'illustrationGrid':
-        for (let i = 0; i < (section.count || 0); i++) {
-          labels.push(`#${n} Illustration Grid — #${i + 1}`);
-        }
-        break;
-      case 'researchFramework':
-        labels.push(`#${n} Research Framework`);
-        break;
-      case 'persona':
-        (section.personas || []).forEach((p) => {
-          labels.push(`#${n} Persona — ${p.name || 'Untitled'}`);
-        });
-        break;
-      case 'designThemes':
-        // 純文字卡片，沒有圖片欄位，不佔用任何圖片位置。
-        break;
-      case 'flow':
-        (section.steps || []).forEach((s, i) => {
-          labels.push(`#${n} Flow — Step ${i + 1}${s.label ? ` (${s.label})` : ''}`);
-        });
-        break;
-      default:
-        break;
-    }
-  });
-  return labels;
+  return getImageSlots(data).map((slot) => slot.label);
 }
 
 app.get('/api/collections/gallery', async (req, res) => {
