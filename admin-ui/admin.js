@@ -1,7 +1,8 @@
 // 本機後台前端邏輯 —— 純原生 JS，不依賴任何框架。
-// 只跟 admin-server（npm run admin, http://localhost:5174）溝通，
-// 不會影響正式站台的任何一行程式碼或打包內容。
-const API = 'http://localhost:5174';
+// 這份介面由 admin-server 自己提供（npm run admin, http://localhost:5174），
+// 與 API 同源，所以請求都走相對路徑。刻意不放在 public/：那裡的檔案會被
+// 打包進 dist 部署到線上，後台不該出現在正式站台上。
+const API = '';
 
 const sidebarItems = [...document.querySelectorAll('.sidebar__item[data-page]')];
 const pageTitleEl = document.getElementById('pageTitle');

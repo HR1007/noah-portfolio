@@ -18,6 +18,7 @@ const GALLERY_DIR = path.join(ROOT, 'src/assets/gallery');
 const PROJECTS_ASSET_DIR = path.join(ROOT, 'src/assets/projects');
 const PROJECTS_CONTENT_DIR = path.join(ROOT, 'src/content/projects');
 const HOME_DIR = path.join(ROOT, 'src/assets/home');
+const ADMIN_UI_DIR = path.join(ROOT, 'admin-ui');
 const SITE_CONTENT_DIR = path.join(ROOT, 'src/content/site');
 const SITE_EN = path.join(SITE_CONTENT_DIR, 'main-en.json');
 const SITE_ZH = path.join(SITE_CONTENT_DIR, 'main-zh.json');
@@ -301,11 +302,17 @@ app.put('/api/site/:locale', async (req, res) => {
   }
 });
 
+// 後台介面由這支 server 自己提供，不放在 public/：public 底下的東西會被
+// 一併打包進 dist 部署到線上，訪客就能看到後台外殼。後台只跟本機檔案系統
+// 溝通，本來就沒有理由出現在正式站台上。
+app.use(express.static(ADMIN_UI_DIR));
+
 app.use('/gallery-src', express.static(GALLERY_DIR));
 app.use('/projects-src', express.static(PROJECTS_ASSET_DIR));
 app.use('/home-src', express.static(HOME_DIR));
 
 const PORT = 5174;
 app.listen(PORT, () => {
-  console.log(`Admin server listening on http://localhost:${PORT}`);
+  console.log(`後台介面與 API： http://localhost:${PORT}`);
+  console.log('Preview 功能另需 `npm run dev`（http://localhost:4321）');
 });
