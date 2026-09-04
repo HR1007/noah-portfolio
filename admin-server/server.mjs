@@ -12,6 +12,10 @@ import { fileURLToPath } from 'node:url';
 import { imageSize } from 'image-size';
 import matter from 'gray-matter';
 import { getImageSlots } from '../src/lib/image-slots.mjs';
+import {
+  CONTENT_PATHS, changedFiles, outsideFiles, buildMessage,
+  validateBuild, remoteBehind, commitAndPush,
+} from '../scripts/publish-core.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -368,6 +372,44 @@ app.put('/api/site/:locale', async (req, res) => {
 // 後台介面由這支 server 自己提供，不放在 public/：public 底下的東西會被
 // 一併打包進 dist 部署到線上，訪客就能看到後台外殼。後台只跟本機檔案系統
 // 溝通，本來就沒有理由出現在正式站台上。
+// ---------- 發布（把後台改好的內容 commit + push，讓 Vercel 重新建置） ----------
+// 邏輯全部來自 scripts/publish-core.mjs，與 npm run publish 完全同一套：
+// 發布範圍僅限 src/content 與 src/assets，程式碼永遠不會被送出。
+
+app.get('/api/publish/status', async (req, res) => {
+  try {
+    const [files, outside, behind] = await Promise.all([
+      changedFiles(), outsideFiles(), remoteBehind(),
+    ]);
+    const message = files.length ? await buildMessage(files) : null;
+    res.json({ scope: CONTENT_PATHS, files, outside, behind, message });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+app.post('/api/publish', async (req, res) => {
+  try {
+    const files = await changedFiles();
+    if (!files.length) return res.status(400).json({ error: '沒有待發布的內容變更' });
+
+    const behind = await remoteBehind();
+    if (behind) {
+      return res.status(409).json({ error: `遠端有 ${behind} 個本機沒有的 commit，請先在終端機執行 git pull --rebase` });
+    }
+
+    // 內容不符 schema 就擋下：寧可發布失敗，也不要讓線上網站建置爆掉
+    const build = await validateBuild();
+    if (!build.ok) return res.status(422).json({ error: '建置驗證失敗，已中止發布', log: build.log });
+
+    const { subject, body } = await buildMessage(files);
+    const sha = await commitAndPush(subject, body);
+    res.json({ ok: true, sha, subject, count: files.length });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
 app.use(express.static(ADMIN_UI_DIR));
 
 app.use('/gallery-src', express.static(GALLERY_DIR));

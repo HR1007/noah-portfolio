@@ -738,3 +738,81 @@ svg {
   font-size: 12px;
   color: var(--muted);
 }
+
+/* ---------- 發布按鈕與確認面板 ---------- */
+.topbar__right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+.publish-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.publish-btn:hover { border-color: var(--muted); }
+.publish-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+/* 有待發布內容時才強調，沒有變更時保持安靜 */
+.publish-btn--ready { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.publish-btn__count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+}
+
+.publish-btn--go { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.publish-btn--go:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.publish-panel {
+  margin: 0 0 20px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.publish-panel__head,
+.publish-panel__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+}
+.publish-panel__head { border-bottom: 1px solid var(--border); }
+.publish-panel__foot { border-top: 1px solid var(--border); }
+.publish-panel__foot span { font-size: 12px; color: var(--muted); }
+.publish-panel__close {
+  border: 0; background: transparent; color: var(--muted);
+  font-size: 12px; cursor: pointer; padding: 4px 8px; border-radius: 6px;
+}
+.publish-panel__close:hover { background: var(--bg); color: var(--ink); }
+
+.publish-panel__body { padding: 16px; display: flex; flex-direction: column; gap: 16px; max-height: 46vh; overflow-y: auto; }
+.publish-section { display: flex; flex-direction: column; gap: 8px; }
+.publish-section strong { font-size: 13px; }
+
+.publish-files, .publish-outside ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.publish-files li, .publish-outside li { font-size: 12px; font-family: ui-monospace, Menlo, monospace; color: var(--muted); }
+.publish-status { display: inline-block; width: 24px; color: var(--accent); font-weight: 700; }
+
+.publish-outside { padding: 10px 12px; border-radius: 10px; background: var(--bg); display: flex; flex-direction: column; gap: 6px; }
+.publish-outside strong { font-size: 12px; color: var(--muted); }
+
+.publish-msg {
+  margin: 0; padding: 10px 12px; border-radius: 10px;
+  background: var(--bg); border: 1px solid var(--border);
+  font-size: 12px; line-height: 1.6; white-space: pre-wrap;
+  font-family: ui-monospace, Menlo, monospace; color: var(--ink);
+}
+.publish-empty { margin: 0; font-size: 13px; color: var(--muted); }

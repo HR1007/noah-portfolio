@@ -36,8 +36,28 @@
             <h1 class="topbar__title" id="pageTitle">Gallery 相簿</h1>
             <p class="topbar__meta" id="pageMeta">載入中…</p>
           </div>
+          <div class="topbar__right">
+            <button class="publish-btn" id="publishBtn" type="button">
+              <svg viewBox="0 0 24 24"><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></svg>
+              <span id="publishBtnLabel">發布</span>
+              <span class="publish-btn__count" id="publishCount" hidden></span>
+            </button>
+          </div>
           <div class="topbar__tabs" id="pageTabs"></div>
         </header>
+
+        <!-- 發布前的確認面板：列出這次會送出什麼、留在本機的有哪些，確認後才執行 -->
+        <div class="publish-panel" id="publishPanel" hidden>
+          <div class="publish-panel__head">
+            <strong>確認發布內容</strong>
+            <button class="publish-panel__close" id="publishClose" type="button">關閉</button>
+          </div>
+          <div class="publish-panel__body" id="publishBody"></div>
+          <div class="publish-panel__foot">
+            <span id="publishHint"></span>
+            <button class="publish-btn publish-btn--go" id="publishConfirm" type="button">確定發布</button>
+          </div>
+        </div>
 
         <section class="content" id="content"></section>
       </main>

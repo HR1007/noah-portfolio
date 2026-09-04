@@ -923,3 +923,100 @@ fileInputEl.addEventListener('change', async () => {
 
 // 開啟後台預設停在 Home 首頁圖片；currentPage 與側欄的 active 標記要一起對上。
 loadHome().catch((err) => showToast(`載入失敗：${err.message}`, true));
+
+// ---------- 發布 ----------
+// 只送出 src/content 與 src/assets（文字與圖片），程式碼永遠不會被帶走；
+// 送出前會先跑一次建置驗證，內容有問題就擋下，線上網站維持原狀。
+
+const publishBtn = document.getElementById('publishBtn');
+const publishPanel = document.getElementById('publishPanel');
+const publishBody = document.getElementById('publishBody');
+const publishHint = document.getElementById('publishHint');
+const publishConfirm = document.getElementById('publishConfirm');
+const publishCount = document.getElementById('publishCount');
+
+async function refreshPublishBadge() {
+  try {
+    const s = await fetch(`${API}/api/publish/status`).then((r) => r.json());
+    const n = (s.files || []).length;
+    publishCount.textContent = String(n);
+    publishCount.hidden = n === 0;
+    publishBtn.classList.toggle('publish-btn--ready', n > 0);
+  } catch {
+    publishCount.hidden = true;
+  }
+}
+
+async function openPublishPanel() {
+  publishPanel.hidden = false;
+  publishBody.innerHTML = '<p class="publish-empty">檢查中…</p>';
+  publishHint.textContent = '';
+  publishConfirm.disabled = true;
+
+  try {
+    const s = await fetch(`${API}/api/publish/status`).then((r) => r.json());
+
+    if (!s.files.length) {
+      publishBody.innerHTML = '<p class="publish-empty">目前沒有待發布的變更。</p>';
+      return;
+    }
+    if (s.behind) {
+      publishBody.innerHTML = `<p class="publish-empty">遠端有 ${s.behind} 個本機沒有的 commit，請先在終端機執行 <code>git pull --rebase</code>。</p>`;
+      return;
+    }
+
+    const rows = s.files
+      .map((f) => `<li><span class="publish-status">${f.status}</span>${f.file}</li>`)
+      .join('');
+    const outside = s.outside.length
+      ? `<div class="publish-outside">
+           <strong>以下不在發布範圍，會留在本機</strong>
+           <ul>${s.outside.map((f) => `<li>${f}</li>`).join('')}</ul>
+         </div>`
+      : '';
+
+    publishBody.innerHTML = `
+      <div class="publish-section">
+        <strong>將發布 ${s.files.length} 個檔案</strong>
+        <ul class="publish-files">${rows}</ul>
+      </div>
+      ${outside}
+      <div class="publish-section">
+        <strong>commit 訊息（自動產生）</strong>
+        <pre class="publish-msg">${s.message.subject}\n\n${s.message.body}</pre>
+      </div>
+    `;
+    publishHint.textContent = '送出前會先跑建置驗證，內容有問題會擋下。';
+    publishConfirm.disabled = false;
+  } catch (err) {
+    publishBody.innerHTML = `<p class="publish-empty">讀取失敗：${err.message}</p>`;
+  }
+}
+
+publishBtn.addEventListener('click', openPublishPanel);
+document.getElementById('publishClose').addEventListener('click', () => { publishPanel.hidden = true; });
+
+publishConfirm.addEventListener('click', async () => {
+  publishConfirm.disabled = true;
+  publishHint.textContent = '驗證建置並發布中，約需十秒…';
+  try {
+    const res = await fetch(`${API}/api/publish`, { method: 'POST' });
+    const data = await res.json();
+    if (!res.ok) {
+      publishHint.textContent = '';
+      publishBody.innerHTML = `<p class="publish-empty">${data.error}</p>` +
+        (data.log ? `<pre class="publish-msg">${data.log}</pre>` : '');
+      return;
+    }
+    publishPanel.hidden = true;
+    showToast(`已發布 ${data.sha}，Vercel 建置中`);
+    await refreshPublishBadge();
+  } catch (err) {
+    publishHint.textContent = '';
+    publishBody.innerHTML = `<p class="publish-empty">發布失敗：${err.message}</p>`;
+  } finally {
+    publishConfirm.disabled = false;
+  }
+});
+
+refreshPublishBadge();
