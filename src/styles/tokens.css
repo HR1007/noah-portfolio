@@ -45,6 +45,17 @@
   --sp-8: 120px;
   --sp-9: 240px;
 
+  /*
+    案例頁 hero 的漸層底色。每個案例在自己的 .md 用 hero.gradient 指定要哪一組，
+    色彩本身集中在這裡，內容檔只存名稱。
+    [需確認] 以下色值是暫定的，等設計師提供 Figma 的正式漸層色再替換。
+  */
+  --gradient-warm: linear-gradient(135deg, #f5c99b, #e08a5f);
+  --gradient-cool: linear-gradient(135deg, #a8c8ec, #5b7fb8);
+  --gradient-violet: linear-gradient(135deg, #c3b3e8, #8168c0);
+  --gradient-mint: linear-gradient(135deg, #a9dcc8, #5aa78c);
+  --gradient-slate: linear-gradient(135deg, #c9ccd1, #7b828c);
+
   /* 圓角 */
   --radius: 16px;
   --radius-pill: 999px; /* [需確認] 目前站上沒有藥丸形元件，先保留備用 */

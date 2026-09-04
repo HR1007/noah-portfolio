@@ -8,25 +8,49 @@ interface Props {
   ctaLabel: string;
   ctaHref: string;
   image: ImageMetadata | undefined;
+  gradient?: 'warm' | 'cool' | 'violet' | 'mint' | 'slate';
 }
 
-const { title, ctaLabel, ctaHref, image } = Astro.props;
+const { title, ctaLabel, ctaHref, image, gradient = 'slate' } = Astro.props;
 // [需確認] hero 圖比例依 wireframe 目測抓 21/9，待設計師提供實際素材尺寸後調整。
 ---
 
-<section class="project-hero">
-  <div class="project-hero__media">
-    <Media image={image} ratio="21/9" alt={`${title} hero`} loading="eager" fetchpriority="high" />
-  </div>
-  <div class="project-hero__overlay" class:list={{ 'project-hero__overlay--placeholder': !image }}>
-    <h1 class="project-hero__title">{title}</h1>
-    <Button label={ctaLabel} href={ctaHref} variant="secondary" />
+<section class="project-hero" data-gradient={gradient}>
+  <div class="project-hero__inner">
+    <div class="project-hero__frame" class:list={{ 'project-hero__frame--placeholder': !image }}>
+      <Media image={image} ratio="21/9" alt={`${title} hero`} loading="eager" fetchpriority="high" />
+      <div class="project-hero__overlay">
+        <h1 class="project-hero__title">{title}</h1>
+        <Button label={ctaLabel} href={ctaHref} variant="secondary" />
+      </div>
+    </div>
   </div>
 </section>
 
 <style>
+  /*
+    三層結構：漸層滿版做底 → 圖片內縮讓漸層形成邊框 → 標題疊在圖片上。
+    漸層色只用名稱對應到 tokens.css 的變數，不在這裡寫死任何色值。
+  */
   .project-hero {
+    padding: var(--sp-6) var(--sp-3);
+  }
+
+  .project-hero[data-gradient='warm'] { background: var(--gradient-warm); }
+  .project-hero[data-gradient='cool'] { background: var(--gradient-cool); }
+  .project-hero[data-gradient='violet'] { background: var(--gradient-violet); }
+  .project-hero[data-gradient='mint'] { background: var(--gradient-mint); }
+  .project-hero[data-gradient='slate'] { background: var(--gradient-slate); }
+
+  .project-hero__inner {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .project-hero__frame {
     position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
   }
 
   .project-hero__overlay {
@@ -41,31 +65,54 @@ const { title, ctaLabel, ctaHref, image } = Astro.props;
     padding: var(--sp-3);
   }
 
+  /*
+    標題疊在照片上，照片內容深淺不可控，單靠文字顏色一定會有讀不到的情況。
+    這裡加一層由下而上的深色遮罩確保對比——這是原本版型缺的東西，
+    也是標題會跟底圖「打架」的主因。
+  */
+  .project-hero__overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.15));
+  }
+
+  .project-hero__overlay > * {
+    position: relative;
+  }
+
   .project-hero__title {
     font-size: var(--font-size-h1);
-    color: var(--color-bg);
+    color: #ffffff; /* 遮罩固定是深色，這裡不跟著主題反轉，否則淺色模式下會看不見 */
+    text-wrap: balance;
   }
 
   /*
-    沒有真實 hero 圖時，底下是 Placeholder 的條紋背景（跟 --color-bg 同一色系），
-    白色/背景色文字會直接被吃掉、幾乎看不見，改用一般內文色。
-    排版維持置中不變，圖片上傳後直接變成疊在照片上的樣子，不會有視覺跳動。
+    還沒有真實 hero 圖時，底下是 Placeholder 的淺色條紋，深色遮罩疊上去反而
+    讓佔位框看起來像壞掉。這種情況拿掉遮罩、標題改用內文色，圖片上傳後
+    自動恢復成疊在照片上的樣子。
   */
-  .project-hero__overlay--placeholder .project-hero__title {
+  .project-hero__frame--placeholder .project-hero__overlay::before {
+    display: none;
+  }
+
+  .project-hero__frame--placeholder .project-hero__title {
     color: var(--color-ink);
   }
 
   /*
-    Placeholder 自己在框底部顯示的檔名標籤（例如「Foodlet hero」）跟這裡的大標題
-    是同一件事重複講兩次，長標題換行更容易疊在一起。這裡的大標題已經說明了
-    「這是什麼」，底部標籤在 hero 這個位置沒有必要，直接隱藏，圖片上傳後
-    Placeholder 整個消失，這條規則自然不會有作用。
+    Placeholder 自己在框底部顯示的檔名標籤跟這裡的大標題是同一件事講兩次，
+    長標題換行時更容易疊在一起。圖片上傳後 Placeholder 消失，這條自然失效。
   */
-  .project-hero__media :global(.placeholder__label) {
+  .project-hero__frame :global(.placeholder__label) {
     display: none;
   }
 
   @media (max-width: 767px) {
+    .project-hero {
+      padding: var(--sp-4) var(--sp-2);
+    }
+
     .project-hero__title {
       font-size: var(--font-size-h2);
     }

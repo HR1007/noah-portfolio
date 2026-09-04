@@ -135,6 +135,9 @@ const projects = defineCollection({
       .object({
         ctaLabel: z.string(),
         ctaHref: z.string().default('#'), // [需確認] 待設計師提供實際 demo／prototype 連結
+        // 漸層底色只存名稱，實際色值定義在 src/styles/tokens.css，
+        // 避免把 hex 散進內容檔。
+        gradient: z.enum(['warm', 'cool', 'violet', 'mint', 'slate']).default('slate'),
       })
       .optional(),
     sections: z.array(projectSection).default([]),

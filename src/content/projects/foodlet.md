@@ -7,6 +7,7 @@ summary: >-
 hero:
   ctaLabel: Learn More
   ctaHref: '#'
+  gradient: warm
 sections:
   - type: textSection
     eyebrow: ORIGIN & INSPIRATION
