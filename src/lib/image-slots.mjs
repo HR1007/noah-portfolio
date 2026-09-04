@@ -151,8 +151,11 @@ export function getImageSlots(data) {
  * 回傳 { hero, bySection }：bySection[sectionIndex] 是該區塊拿到的圖片陣列
  * （長度等於該區塊的版位數，缺圖時為 undefined，由 Media 顯示佔位框）。
  *
+ * images 是「檔名編號 → 圖片」的對照表，不是陣列——用陣列的話，刪掉中間某張圖
+ * 會讓後面的圖全部往前遞補一格，整頁圖片悄悄錯位。用編號對應則是刪哪格空哪格。
+ *
  * @param {any} data
- * @param {any[]} images 依檔名排序後的圖片
+ * @param {Record<number, any>} images 檔名編號對照表（00.png → 0）
  */
 export function assignImages(data, images) {
   const slots = getImageSlots(data);

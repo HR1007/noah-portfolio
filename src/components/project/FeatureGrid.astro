@@ -32,7 +32,7 @@ const { eyebrow, heading, columns, images } = Astro.props;
     {
       columns.map((column, index) => (
         <div class="feature-grid__column">
-          <Media image={images[index]} ratio={column.ratio} alt={column.alt} />
+          <Media fit="natural" image={images[index]} ratio={column.ratio} alt={column.alt} />
           <h3 class="feature-grid__column-heading">{column.heading}</h3>
           <p class="feature-grid__column-body">{column.body}</p>
         </div>

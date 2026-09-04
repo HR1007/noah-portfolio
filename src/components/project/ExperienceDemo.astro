@@ -25,7 +25,7 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref } = Astro.p
     {ctaLabel && ctaHref && <Button label={ctaLabel} href={ctaHref} variant="primary" />}
   </div>
   <div class="experience-demo__media">
-    <Media image={image} ratio={ratio} alt={alt} />
+    <Media fit="natural" image={image} ratio={ratio} alt={alt} />
   </div>
 </section>
 

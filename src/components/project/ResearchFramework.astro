@@ -21,7 +21,7 @@ const { eyebrow, heading, paragraphs, image, ratio, alt } = Astro.props;
     {paragraphs.map((paragraph) => <p class="research-framework__body">{paragraph}</p>)}
   </div>
   <div class="research-framework__media">
-    <Media image={image} ratio={ratio} alt={alt} />
+    <Media fit="natural" image={image} ratio={ratio} alt={alt} />
   </div>
 </section>
 

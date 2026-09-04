@@ -29,7 +29,7 @@ const { eyebrow, heading, personas, images } = Astro.props;
     {
       personas.map((persona, index) => (
         <div class="persona__card">
-          <Media image={images[index]} ratio={persona.ratio} alt={persona.alt} />
+          <Media fit="natural" image={images[index]} ratio={persona.ratio} alt={persona.alt} />
           <p class="persona__name">{persona.name}</p>
           <p class="persona__role">{persona.role}</p>
           <p class="persona__description">{persona.description}</p>

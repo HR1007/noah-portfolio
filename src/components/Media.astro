@@ -10,14 +10,39 @@ interface Props {
   label?: string;
   loading?: 'eager' | 'lazy';
   fetchpriority?: 'high' | 'low' | 'auto';
+  /**
+   * cover（預設）：裁切成 ratio 指定的固定比例。用在需要統一格線的地方
+   *   （藝廊照片牆、作品集卡片），照片形狀不一也能排得整齊。
+   * natural：不裁切，圖片用自己的原始比例顯示，只有超出容器寬度或高度上限
+   *   時才等比縮小。用在案例頁內容圖片——那些圖是作品本身，裁掉就失真。
+   */
+  fit?: 'cover' | 'natural';
+  /** natural 模式的高度上限，預設 675.66px（取自設計稿的 hero 高度） */
+  maxHeight?: string;
 }
 
-const { image, ratio, alt, label, loading = 'lazy', fetchpriority = 'auto' } = Astro.props;
+const {
+  image,
+  ratio,
+  alt,
+  label,
+  loading = 'lazy',
+  fetchpriority = 'auto',
+  fit = 'cover',
+  maxHeight,
+} = Astro.props;
+
+const isNatural = fit === 'natural';
 ---
 
 {
   image ? (
-    <div class="media" style={`aspect-ratio: ${ratio}`}>
+    <div
+      class:list={['media', { 'media--natural': isNatural }]}
+      style={isNatural
+        ? (maxHeight ? `--media-max-height: ${maxHeight}` : undefined)
+        : `aspect-ratio: ${ratio}`}
+    >
       <Image src={image} alt={alt} loading={loading} fetchpriority={fetchpriority} />
     </div>
   ) : (
@@ -35,5 +60,26 @@ const { image, ratio, alt, label, loading = 'lazy', fetchpriority = 'auto' } = A
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  /*
+    natural：圖片維持原始尺寸與比例，不裁切。
+    width/height 兩邊都保持 auto 是關鍵——只鎖一邊會讓另一邊維持原值，
+    圖片就被壓扁或拉長；兩邊都 auto、只用 max-* 設上限，才會等比例縮放。
+    用 max-width 而非 width 則確保不會被放大超過原始解析度而變糊。
+  */
+  .media--natural {
+    --media-max-height: 675.66px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .media--natural :global(img) {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: var(--media-max-height);
+    object-fit: initial;
+    display: block;
   }
 </style>

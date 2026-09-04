@@ -41,6 +41,29 @@ export function getProjectImages(slug: string): ImageMetadata[] {
     .map(([, image]) => image);
 }
 
+/**
+ * 依檔名的數字編號回傳圖片對照表（00.png → 0、03.webp → 3）。
+ *
+ * 案例頁的版位要用「檔名編號」對應，不能用陣列位置：資料夾裡刪掉中間某張圖後，
+ * 陣列會塌陷，後面的圖全部往前遞補一格，等於整頁的圖悄悄錯位。用編號對應則是
+ * 刪掉哪一格就空哪一格，其餘圖片留在原位。
+ *
+ * 檔名不是純數字的圖片會被忽略（那類檔案沒有明確的版位歸屬）。
+ */
+export function getProjectImageMap(slug: string): Record<number, ImageMetadata> {
+  const prefix = `/src/assets/projects/${slug}/`;
+  const map: Record<number, ImageMetadata> = {};
+
+  for (const [path, image] of sortedByFilename(projectImageModules)) {
+    if (!path.startsWith(prefix)) continue;
+    const base = path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? '';
+    if (!/^\d+$/.test(base)) continue;
+    map[Number(base)] = image;
+  }
+
+  return map;
+}
+
 /** 依語意檔名（不含副檔名）取單張 Gallery 頁面圖片，例如 getGalleryImage('hero')；找不到時回傳 undefined。 */
 export function getGalleryImage(name: string): ImageMetadata | undefined {
   const match = sortedByFilename(galleryImageModules).find(([path]) => {

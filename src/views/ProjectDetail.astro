@@ -17,7 +17,7 @@ import Persona from '../components/project/Persona.astro';
 import DesignThemes from '../components/project/DesignThemes.astro';
 import Flow from '../components/project/Flow.astro';
 import ProjectQuote from '../components/project/ProjectQuote.astro';
-import { getProjectImages } from '../lib/media';
+import { getProjectImageMap } from '../lib/media';
 import { assignImages } from '../lib/image-slots.mjs';
 
 interface Props {
@@ -36,7 +36,7 @@ const { backLabel } = site!.data.nav;
 // 圖片不寫路徑/檔名在內容裡：依區塊在頁面上出現的順序，依序從該專案資料夾取圖。
 // 版位規則集中在 lib/image-slots.mjs，後台顯示「第 N 格是哪個區塊」也是讀同一支，
 // 兩邊不會各自算一套而失去同步。資料夾沒圖時取值為 undefined，Media 會顯示佔位框。
-const images = getProjectImages(project.id);
+const images = getProjectImageMap(project.id);
 const { hero: heroImage, bySection } = assignImages(project.data, images);
 const imagesFor = (i: number) => bySection[i] ?? [];
 

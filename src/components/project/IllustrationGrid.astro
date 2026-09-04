@@ -21,7 +21,7 @@ const { eyebrow, heading, body, alt, images } = Astro.props;
   </div>
   <div class="illustration-grid__tiles">
     {images.map((image, index) => (
-      <Media image={image} ratio="1/1" alt={`${alt} ${index + 1}`} />
+      <Media fit="natural" image={image} ratio="1/1" alt={`${alt} ${index + 1}`} />
     ))}
   </div>
 </section>

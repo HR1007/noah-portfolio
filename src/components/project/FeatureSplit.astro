@@ -19,7 +19,7 @@ const { heading, body, imagePosition, image, ratio, alt, ctaLabel, ctaHref } = A
 
 <section class:list={['feature-split', `feature-split--${imagePosition}`]}>
   <div class="feature-split__media">
-    <Media image={image} ratio={ratio} alt={alt} />
+    <Media fit="natural" image={image} ratio={ratio} alt={alt} />
   </div>
   <div class="feature-split__body">
     <h2 class="feature-split__heading">{heading}</h2>

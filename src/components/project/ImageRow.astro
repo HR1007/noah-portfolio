@@ -16,7 +16,7 @@ const { rows, images } = Astro.props;
 ---
 
 <section class="image-row" style={`--columns: ${rows.length}`}>
-  {rows.map((row, index) => <Media image={images[index]} ratio={row.ratio} alt={row.alt} />)}
+  {rows.map((row, index) => <Media fit="natural" image={images[index]} ratio={row.ratio} alt={row.alt} />)}
 </section>
 
 <style>
