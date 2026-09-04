@@ -187,10 +187,12 @@ const hobbyPhotos = getHomeImageSet('hobby');
   }
 
   /*
-    照片欄用 auto 寬度、跟文字欄一樣 stretch 滿版高：讓照片「高度」貼齊文字區塊，
-    不強制裁切成固定比例框。照片本身用 max-width/max-height 鎖住原始像素尺寸
-    （見下面 .about__photo img），所以文字比較短時照片不會被拉大過原始解析度，
-    比較長時也只會長到跟文字一樣高，不會超版。
+    .about__photo 用行內 style 帶入圖片原始寬高比（aspect-ratio）與原始像素高度
+    （max-height），讓 Grid 在 auto-track 階段就能算出寬度，避免其寬度依賴
+    尚未 resolve 的 stretch 高度造成的循環相依（img width:auto + height:100% 會讓寬度塌陷為 0）。
+    文字比較長時，欄位會被 align-items:stretch 撐到跟文字一樣高，但不會超過
+    max-height（原始像素高度），所以不會被放大過原始解析度；文字比較短時，
+    照片維持自己的原始比例與高度，不強制裁切。
   */
   .about__grid {
     display: grid;
