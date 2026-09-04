@@ -710,3 +710,31 @@ svg {
     border-top: 1px solid var(--border);
   }
 }
+
+/* Home 上數量可變的圖組（例如 Beyond the Grid 生活照）。
+   磚塊本身沿用 .tile 既有樣式，這裡只補區塊標題與間距。 */
+.home-set {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.home-set__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.home-set__head strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.home-set__head span {
+  font-size: 12px;
+  color: var(--muted);
+}

@@ -2,7 +2,8 @@
 // 管三種素材：
 //   /api/collections/gallery/:slug   Gallery 三個相簿（編號序列）
 //   /api/collections/projects/:slug  Portfolio 五個 case study（編號序列，對應 content.config.ts 的 sections）
-//   /api/home                        Home 頁面的固定命名圖片（hero / avatar / about / beyond-grid）
+//   /api/home                        Home 頁面的固定命名圖片（hero / avatar / about）
+//   /api/home/sets/:set              Home 上數量可變的圖組（hobby = Beyond the Grid 生活照）
 import express from 'express';
 import cors from 'cors';
 import fs from 'node:fs/promises';
@@ -24,7 +25,10 @@ const SITE_EN = path.join(SITE_CONTENT_DIR, 'main-en.json');
 const SITE_ZH = path.join(SITE_CONTENT_DIR, 'main-zh.json');
 
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif']);
-const HOME_SLOTS = ['hero', 'avatar', 'about', 'beyond-grid'];
+const HOME_SLOTS = ['hero', 'avatar', 'about'];
+// Home 上數量可變的圖組：網站端用 getHomeImageSet(prefix) 依檔名排序取用，
+// 所以檔名一律是 <prefix>-NN，可以隨時追加。
+const HOME_SETS = { hobby: 'Beyond the Grid（生活照）' };
 
 const COLLECTIONS = {
   gallery: { dir: GALLERY_DIR, urlBase: '/gallery-src' },
@@ -267,6 +271,65 @@ app.delete('/api/home/:name', async (req, res) => {
     const files = await fs.readdir(HOME_DIR);
     const match = files.find((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()) && path.basename(f, path.extname(f)) === name);
     if (match) await fs.unlink(path.join(HOME_DIR, match));
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+// ---------- Home 圖組（數量可變，例如 Beyond the Grid 的生活照） ----------
+
+function homeSetFiles(files, prefix) {
+  return files
+    .filter((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()))
+    .filter((f) => new RegExp(`^${prefix}-\\d+$`).test(path.basename(f, path.extname(f))))
+    .sort();
+}
+
+app.get('/api/home/sets/:set', async (req, res) => {
+  try {
+    const { set } = req.params;
+    if (!HOME_SETS[set]) return res.status(400).json({ error: 'unknown home set' });
+    const files = await fs.readdir(HOME_DIR);
+    const images = await Promise.all(
+      homeSetFiles(files, set).map((f) => describeFile(path.join(HOME_DIR, f), `/home-src/${f}`))
+    );
+    res.json({ set, label: HOME_SETS[set], images });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+app.post('/api/home/sets/:set', express.raw({ type: '*/*', limit: '25mb' }), async (req, res) => {
+  try {
+    const { set } = req.params;
+    if (!HOME_SETS[set]) return res.status(400).json({ error: 'unknown home set' });
+    const ext = path.extname(String(req.query.filename || '')).toLowerCase();
+    if (!IMAGE_EXT.has(ext)) return res.status(400).json({ error: 'unsupported extension' });
+
+    // 一律接在最後一個編號之後，避免覆蓋既有檔案、也不會讓網站端的排序跳號
+    const files = await fs.readdir(HOME_DIR);
+    const maxIndex = homeSetFiles(files, set).reduce((max, f) => {
+      const n = parseInt(path.basename(f, path.extname(f)).slice(set.length + 1), 10);
+      return Number.isNaN(n) ? max : Math.max(max, n);
+    }, 0);
+
+    const filename = `${set}-${String(maxIndex + 1).padStart(2, '0')}${ext}`;
+    await fs.writeFile(path.join(HOME_DIR, filename), req.body);
+    res.json({ filename });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+app.delete('/api/home/sets/:set/:filename', async (req, res) => {
+  try {
+    const { set, filename } = req.params;
+    if (!HOME_SETS[set]) return res.status(400).json({ error: 'unknown home set' });
+    if (path.basename(filename) !== filename) return res.status(400).json({ error: 'invalid filename' });
+    const target = path.join(HOME_DIR, filename);
+    if (!target.startsWith(HOME_DIR)) return res.status(400).json({ error: 'invalid filename' });
+    await fs.unlink(target).catch(() => {});
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: String(err) });

@@ -391,16 +391,16 @@ async function handleSwap(indexA, indexB) {
   }
 }
 
-// ---------- Home（固定命名圖片：hero / avatar / about / beyond-grid） ----------
+// ---------- Home（固定命名圖片 + 數量可變的圖組） ----------
 
 const HOME_LABELS = {
   hero: 'Hero（首頁最上方全身照）',
   avatar: 'Avatar（引言旁的圓形頭像）',
   about: 'About（About me 區塊照片）',
-  'beyond-grid': 'Beyond the Grid（生活照）',
 };
 
 let currentHomeSlots = [];
+let currentHomeSets = [];
 
 async function loadHome() {
   pageTitleEl.textContent = 'Home 首頁圖片';
@@ -408,7 +408,12 @@ async function loadHome() {
   pageTabsEl.innerHTML = '';
   contentEl.innerHTML = '<div class="home-grid" id="homeGrid"></div>';
 
-  currentHomeSlots = await fetch(`${API}/api/home`).then((r) => r.json());
+  const [slots, hobby] = await Promise.all([
+    fetch(`${API}/api/home`).then((r) => r.json()),
+    fetch(`${API}/api/home/sets/hobby`).then((r) => r.json()),
+  ]);
+  currentHomeSlots = slots;
+  currentHomeSets = [hobby];
   renderHomeGrid();
   syncPreview();
 }
@@ -460,6 +465,79 @@ function renderHomeGrid() {
 
     homeGridEl.appendChild(card);
   });
+
+  currentHomeSets.forEach(renderHomeSet);
+}
+
+// 數量可變的圖組（例如 Beyond the Grid 生活照）。磚塊刻意跟 Gallery／Portfolio
+// 用同一套 tile 結構與樣式：放大檢視、刪除、尺寸與檔案大小的呈現都要一致，
+// 不要因為在不同頁面就長得不一樣。
+function renderHomeSet(set) {
+  const wrap = document.createElement('section');
+  wrap.className = 'home-set';
+  wrap.innerHTML = `
+    <div class="home-set__head">
+      <strong>${set.label}</strong>
+      <span>${set.images.length} 張 · 依檔名順序顯示在網站上，可隨時追加</span>
+    </div>
+    <div class="grid home-set__grid"></div>
+  `;
+  const gridEl = wrap.querySelector('.home-set__grid');
+
+  set.images.forEach((img, index) => {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.innerHTML = `
+      <div class="tile__image-wrap">
+        <span class="tile__badge">第 ${index + 1} 張</span>
+        <img src="${imgUrl(img)}" alt="${img.filename}" loading="lazy" />
+        <button class="tile__expand" title="放大查看">
+          <svg viewBox="0 0 24 24"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg>
+        </button>
+        <button class="tile__delete" title="刪除">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
+        </button>
+      </div>
+      <div class="tile__meta">
+        <strong>${img.filename}</strong>
+        <span>${img.width && img.height ? `${img.width}×${img.height}` : '—'} · ${formatBytes(img.sizeBytes)}</span>
+      </div>
+    `;
+
+    tile.querySelector('.tile__expand').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openLightbox(img, `${set.label} 第 ${index + 1} 張`);
+    });
+    tile.querySelector('.tile__delete').addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleHomeSetDelete(set.set, img.filename, set.label);
+    });
+
+    gridEl.appendChild(tile);
+  });
+
+  const addTile = document.createElement('div');
+  addTile.className = 'tile tile--add';
+  addTile.innerHTML = '<span class="plus">+</span>';
+  addTile.addEventListener('click', () => {
+    pendingUpload = { kind: 'home-set', set: set.set };
+    fileInputEl.click();
+  });
+  gridEl.appendChild(addTile);
+
+  document.getElementById('homeGrid').parentElement.appendChild(wrap);
+}
+
+async function handleHomeSetDelete(set, filename, label) {
+  if (!confirm(`確定要從「${label}」刪除 ${filename} 嗎？`)) return;
+  try {
+    const res = await fetch(`${API}/api/home/sets/${set}/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error(await res.text());
+    showToast('已刪除');
+    await loadHome();
+  } catch (err) {
+    showToast(`刪除失敗：${err.message}`, true);
+  }
 }
 
 async function handleHomeDelete(name) {
@@ -818,6 +896,16 @@ fileInputEl.addEventListener('change', async () => {
       const { filename } = await res.json();
       showToast(`已上傳為 ${filename}`);
       await loadImages();
+    } else if (pending.kind === 'home-set') {
+      const res = await fetch(`${API}/api/home/sets/${pending.set}?filename=${encodeURIComponent(file.name)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        body: file,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const { filename } = await res.json();
+      showToast(`已新增 ${filename}`);
+      await loadHome();
     } else if (pending.kind === 'home') {
       const res = await fetch(`${API}/api/home/${pending.name}?filename=${encodeURIComponent(file.name)}`, {
         method: 'POST',
