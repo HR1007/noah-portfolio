@@ -5,8 +5,8 @@ summary: >-
   A modern sports website designed to deliver clear information, engaging
   visuals, and a seamless browsing experience.
 hero:
-  ctaLabel: Learn More
-  ctaHref: '#'
+  ctaLabel: Try it out
+  ctaHref: 'https://new-formosa-sport.netlify.app/index.html#home'
   gradient: mint
 sections:
   - type: textSection

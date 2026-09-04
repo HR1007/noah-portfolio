@@ -5,8 +5,8 @@ summary: >-
   [需確認] live 網站上這裡的說明文字目前跟 New Formosa Sport 卡片一字不差（複製貼上沒改到的內容錯誤），需要設計師提供 OSCE
   專案正確的一句話摘要，這裡先不沿用錯誤內容。
 hero:
-  ctaLabel: Learn More
-  ctaHref: '#'
+  ctaLabel: Try it out
+  ctaHref: 'https://osce-medical-assessment-platform.figma.site'
   gradient: cool
 sections:
   - type: textSection

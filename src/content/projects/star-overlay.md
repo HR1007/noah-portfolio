@@ -5,8 +5,8 @@ summary: >-
   Star Overlay turns a photo into a split composition. This is the system that
   gives that tool a coherent, considered look.
 hero:
-  ctaLabel: Learn More
-  ctaHref: '#'
+  ctaLabel: Try it out
+  ctaHref: 'https://star-overlay.vercel.app/'
   gradient: violet
 sections:
   - type: textSection

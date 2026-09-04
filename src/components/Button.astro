@@ -6,9 +6,20 @@ interface Props {
 }
 
 const { label, href, variant = 'primary' } = Astro.props;
+
+// 外部連結（demo／prototype）開新分頁，訪客不會因此離開案例頁；
+// rel 的 noopener 是安全考量，避免目標頁面透過 window.opener 操作原分頁。
+const isExternal = /^https?:\/\//.test(href);
 ---
 
-<a href={href} class={`button button--${variant}`}>{label}</a>
+<a
+  href={href}
+  class={`button button--${variant}`}
+  target={isExternal ? '_blank' : undefined}
+  rel={isExternal ? 'noopener noreferrer' : undefined}
+>
+  {label}
+</a>
 
 <style>
   .button {

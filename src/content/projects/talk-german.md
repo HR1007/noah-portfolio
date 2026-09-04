@@ -6,8 +6,8 @@ summary: >-
   complex academic structures and spontaneous speech, seamlessly merging
   information management logic with intuitive design.
 hero:
-  ctaLabel: Learn More
-  ctaHref: '#'
+  ctaLabel: Try it out
+  ctaHref: 'https://deutsch-translater.figma.site'
   gradient: slate
 sections:
   - type: textSection
