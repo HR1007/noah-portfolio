@@ -29,3 +29,7 @@ raw-assets/
 
 # 產生的進度報告（由 npm run report 重建，不進版控）
 .report/
+
+# Claude Code 的本機專屬設定（.local 後綴依慣例不進版控）；
+# 共用的 .claude/settings.json 或自訂 skill 仍可正常追蹤
+.claude/settings.local.json
