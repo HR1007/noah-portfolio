@@ -12,7 +12,8 @@
     "astro": "astro",
     "admin": "node admin-server/server.mjs",
     "report": "node scripts/build-report.mjs",
-    "hooks:install": "node scripts/install-hooks.mjs"
+    "hooks:install": "node scripts/install-hooks.mjs",
+    "publish": "node scripts/publish.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
