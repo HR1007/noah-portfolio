@@ -66,6 +66,8 @@ const { Content } = await render(project);
                   eyebrow={section.eyebrow}
                   heading={section.heading}
                   paragraphs={section.paragraphs}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
                 />
               );
             case 'deviceShowcase':
@@ -75,6 +77,8 @@ const { Content } = await render(project);
                   alt={section.alt}
                   eyebrow={section.eyebrow}
                   heading={section.heading}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
                 />;
             case 'experienceDemo':
               return (
@@ -111,6 +115,8 @@ const { Content } = await render(project);
                   heading={section.heading}
                   columns={section.columns}
                   images={imagesFor(sectionIndex)}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
                 />
               );
             case 'imageRow':
@@ -120,6 +126,8 @@ const { Content } = await render(project);
                   images={imagesFor(sectionIndex)}
                   eyebrow={section.eyebrow}
                   heading={section.heading}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
                 />
               );
             case 'illustrationGrid':
@@ -130,6 +138,8 @@ const { Content } = await render(project);
                   body={section.body}
                   alt={section.alt}
                   images={imagesFor(sectionIndex)}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
                 />
               );
             case 'researchFramework':
@@ -142,6 +152,8 @@ const { Content } = await render(project);
                   ratio={section.ratio}
                   alt={section.alt}
                   layout={section.layout}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
                 />
               );
             case 'persona':
@@ -151,11 +163,13 @@ const { Content } = await render(project);
                   heading={section.heading}
                   personas={section.personas}
                   images={imagesFor(sectionIndex)}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
                 />
               );
             case 'designThemes':
               return (
-                <DesignThemes eyebrow={section.eyebrow} heading={section.heading} themes={section.themes} images={imagesFor(sectionIndex)} />
+                <DesignThemes eyebrow={section.eyebrow} heading={section.heading} themes={section.themes} images={imagesFor(sectionIndex)} ctaLabel={section.ctaLabel} ctaHref={section.ctaHref} />
               );
             case 'flow':
               return (
@@ -166,6 +180,8 @@ const { Content } = await render(project);
                   steps={section.steps}
                   direction={section.direction}
                   images={imagesFor(sectionIndex)}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
                 />
               );
             default:

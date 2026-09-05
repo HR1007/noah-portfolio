@@ -9,6 +9,10 @@ const textSectionBlock = z.object({
   eyebrow: z.string().optional(),
   heading: z.string(),
   paragraphs: z.array(z.string()),
+  // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
+  // 每種段落都支援，後台的「進階設定」可以逐段開關。
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
 });
 
 const deviceShowcaseBlock = z.object({
@@ -17,6 +21,10 @@ const deviceShowcaseBlock = z.object({
   heading: z.string().optional(),
   ratio: z.string(),
   alt: z.string(),
+  // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
+  // 每種段落都支援，後台的「進階設定」可以逐段開關。
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
 });
 
 const experienceDemoBlock = z.object({
@@ -57,6 +65,10 @@ const featureGridBlock = z.object({
       alt: z.string(),
     })
   ),
+  // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
+  // 每種段落都支援，後台的「進階設定」可以逐段開關。
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
 });
 
 const imageRowBlock = z.object({
@@ -64,6 +76,10 @@ const imageRowBlock = z.object({
   eyebrow: z.string().optional(),
   heading: z.string().optional(),
   images: z.array(z.object({ ratio: z.string(), alt: z.string() })).min(1).max(3),
+  // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
+  // 每種段落都支援，後台的「進階設定」可以逐段開關。
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
 });
 
 // 圖片數量可調：設計師之後增減插畫素材時，把這裡的 count 改成資料夾裡實際的插畫張數即可。
@@ -74,6 +90,10 @@ const illustrationGridBlock = z.object({
   body: z.string().optional(),
   count: z.number(),
   alt: z.string(),
+  // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
+  // 每種段落都支援，後台的「進階設定」可以逐段開關。
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
 });
 
 const researchFrameworkBlock = z.object({
@@ -86,6 +106,10 @@ const researchFrameworkBlock = z.object({
   // stacked：文字在上、圖片在下（預設）；split：文字在左、圖片在右
   // stacked 文上圖下／split 左文右圖／split-reverse 左圖右文
   layout: z.enum(['stacked', 'split', 'split-reverse']).default('stacked'),
+  // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
+  // 每種段落都支援，後台的「進階設定」可以逐段開關。
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
 });
 
 // Persona 圖本身就是完整的人物看板（姓名、角色、Goals、Needs… 都印在圖上），
@@ -102,6 +126,10 @@ const personaBlock = z.object({
       alt: z.string(),
     })
   ),
+  // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
+  // 每種段落都支援，後台的「進階設定」可以逐段開關。
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
 });
 
 const designThemesBlock = z.object({
@@ -115,6 +143,10 @@ const designThemesBlock = z.object({
       description: z.string().optional(),
     })
   ),
+  // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
+  // 每種段落都支援，後台的「進階設定」可以逐段開關。
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
 });
 
 const flowBlock = z.object({
@@ -125,6 +157,10 @@ const flowBlock = z.object({
   // horizontal：步驟並排成一列（預設）；vertical：一步一列往下排
   direction: z.enum(['horizontal', 'vertical']).default('horizontal'),
   steps: z.array(z.object({ label: z.string(), ratio: z.string(), alt: z.string() })),
+  // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
+  // 每種段落都支援，後台的「進階設定」可以逐段開關。
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
 });
 
 const projectSection = z.discriminatedUnion('type', [

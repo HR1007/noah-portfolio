@@ -1,17 +1,20 @@
 ---
+import SectionCta from './SectionCta.astro';
 interface Props {
   eyebrow?: string;
   heading: string;
-  paragraphs: string[];
+  paragraphs: string[];  ctaLabel?: string;
+  ctaHref?: string;
 }
 
-const { eyebrow, heading, paragraphs } = Astro.props;
+const { eyebrow, heading, paragraphs, ctaLabel, ctaHref } = Astro.props;
 ---
 
 <section class="text-section">
   {eyebrow && <p class="text-section__eyebrow">{eyebrow}</p>}
   <h2 class="text-section__heading">{heading}</h2>
   {paragraphs.map((paragraph) => <p class="text-section__body">{paragraph}</p>)}
+  <SectionCta label={ctaLabel} href={ctaHref} />
 </section>
 
 <style>

@@ -1,16 +1,18 @@
 ---
 import type { ImageMetadata } from 'astro';
 import Media from '../Media.astro';
+import SectionCta from './SectionCta.astro';
 
 interface Props {
   eyebrow?: string;
   heading: string;
   body?: string;
   alt: string;
-  images: (ImageMetadata | undefined)[];
+  images: (ImageMetadata | undefined)[];  ctaLabel?: string;
+  ctaHref?: string;
 }
 
-const { eyebrow, heading, body, alt, images } = Astro.props;
+const { eyebrow, heading, body, alt, images, ctaLabel, ctaHref } = Astro.props;
 ---
 
 <section class="illustration-grid">
@@ -19,6 +21,7 @@ const { eyebrow, heading, body, alt, images } = Astro.props;
     <h2 class="illustration-grid__heading">{heading}</h2>
     {body && <p class="illustration-grid__body">{body}</p>}
   </div>
+  <SectionCta label={ctaLabel} href={ctaHref} />
   <div class="illustration-grid__tiles">
     {images.map((image, index) => (
       <Media fit="natural" image={image} ratio="1/1" alt={`${alt} ${index + 1}`} />

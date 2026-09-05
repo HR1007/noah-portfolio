@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro';
 import Media from '../Media.astro';
+import SectionCta from './SectionCta.astro';
 
 interface PersonaCard {
   name: string;
@@ -12,10 +13,11 @@ interface Props {
   eyebrow?: string;
   heading: string;
   personas: PersonaCard[];
-  images: (ImageMetadata | undefined)[];
+  images: (ImageMetadata | undefined)[];  ctaLabel?: string;
+  ctaHref?: string;
 }
 
-const { eyebrow, heading, personas, images } = Astro.props;
+const { eyebrow, heading, personas, images, ctaLabel, ctaHref } = Astro.props;
 ---
 
 <section class="persona">
@@ -23,6 +25,7 @@ const { eyebrow, heading, personas, images } = Astro.props;
     {eyebrow && <p class="persona__eyebrow">{eyebrow}</p>}
     <h2 class="persona__heading">{heading}</h2>
   </div>
+  <SectionCta label={ctaLabel} href={ctaHref} />
   <div class="persona__grid">
     {
       /*

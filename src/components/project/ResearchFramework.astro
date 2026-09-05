@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro';
 import Media from '../Media.astro';
+import SectionCta from './SectionCta.astro';
 
 interface Props {
   eyebrow?: string;
@@ -9,10 +10,11 @@ interface Props {
   image: ImageMetadata | undefined;
   ratio: string;
   alt: string;
-  layout?: 'stacked' | 'split';
+  layout?: 'stacked' | 'split';  ctaLabel?: string;
+  ctaHref?: string;
 }
 
-const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked' } = Astro.props;
+const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked', ctaLabel, ctaHref } = Astro.props;
 ---
 
 <section class="research-framework" data-layout={layout}>
@@ -21,6 +23,7 @@ const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked' } = 
     <h2 class="research-framework__heading">{heading}</h2>
     {paragraphs.map((paragraph) => <p class="research-framework__body">{paragraph}</p>)}
   </div>
+  <SectionCta label={ctaLabel} href={ctaHref} />
   <div class="research-framework__media">
     <Media fit="natural" image={image} ratio={ratio} alt={alt} />
   </div>

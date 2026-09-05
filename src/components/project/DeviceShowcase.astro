@@ -1,16 +1,18 @@
 ---
 import type { ImageMetadata } from 'astro';
 import Media from '../Media.astro';
+import SectionCta from './SectionCta.astro';
 
 interface Props {
   image: ImageMetadata | undefined;
   ratio: string;
   alt: string;
   eyebrow?: string;
-  heading?: string;
+  heading?: string;  ctaLabel?: string;
+  ctaHref?: string;
 }
 
-const { image, ratio, alt, eyebrow, heading } = Astro.props;
+const { image, ratio, alt, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
 ---
 
 <section class="device-showcase">
@@ -22,6 +24,7 @@ const { image, ratio, alt, eyebrow, heading } = Astro.props;
       </div>
     )
   }
+  <SectionCta label={ctaLabel} href={ctaHref} />
   <Media fit="natural" image={image} ratio={ratio} alt={alt} />
 </section>
 

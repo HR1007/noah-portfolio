@@ -1,0 +1,31 @@
+---
+import Button from '../Button.astro';
+
+interface Props {
+  label?: string;
+  href?: string;
+}
+
+const { label, href } = Astro.props;
+---
+
+{
+  /*
+    段落選填的 CTA 按鈕。每種段落型別都可以在後台的「進階設定」開啟，
+    所以對齊方式集中在這裡，不要 9 個元件各自寫一份。
+    兩個欄位都有值才渲染——只填按鈕文字卻沒有連結，等於一顆按不動的按鈕。
+  */
+  label && href && (
+    <div class="section-cta">
+      <Button label={label} href={href} variant="primary" />
+    </div>
+  )
+}
+
+<style>
+  /* 段落容器多半是 flex column，不設 align-self 的話按鈕會被拉滿整行 */
+  .section-cta {
+    display: flex;
+    align-self: flex-start;
+  }
+</style>

@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro';
 import Media from '../Media.astro';
+import SectionCta from './SectionCta.astro';
 
 interface Theme {
   title: string;
@@ -11,10 +12,11 @@ interface Props {
   eyebrow?: string;
   heading: string;
   themes: Theme[];
-  images?: (ImageMetadata | undefined)[];
+  images?: (ImageMetadata | undefined)[];  ctaLabel?: string;
+  ctaHref?: string;
 }
 
-const { eyebrow, heading, themes, images = [] } = Astro.props;
+const { eyebrow, heading, themes, images = [], ctaLabel, ctaHref } = Astro.props;
 ---
 
 <section class="design-themes">
@@ -22,6 +24,7 @@ const { eyebrow, heading, themes, images = [] } = Astro.props;
     {eyebrow && <p class="design-themes__eyebrow">{eyebrow}</p>}
     <h2 class="design-themes__heading">{heading}</h2>
   </div>
+  <SectionCta label={ctaLabel} href={ctaHref} />
   <div class="design-themes__grid">
     {
       themes.map((theme, i) => (
