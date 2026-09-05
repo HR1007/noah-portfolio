@@ -51,12 +51,9 @@ sections:
     heading: '[需確認] Flow 標題，待設計師提供'
     body: '[需確認] Flow 說明文字，待設計師提供實際內容。'
     steps:
-      - label: '[需確認] Step 1'
+      - label: '[需確認] Step'
         ratio: 3/4
-        alt: '[需確認] Flow step 1'
-      - label: '[需確認] Step 2'
-        ratio: 3/4
-        alt: '[需確認] Flow step 2'
+        alt: '[需確認] Flow step'
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
     heading: See Talk German in Action

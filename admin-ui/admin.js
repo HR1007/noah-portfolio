@@ -222,10 +222,23 @@ async function loadCollectionList() {
   pageTitleEl.textContent = currentType === 'gallery' ? 'Gallery 相簿' : 'Portfolio 案例圖片';
   pageMetaEl.textContent = '載入中…';
   pageTabsEl.innerHTML = '';
-  contentEl.innerHTML =
+  // 這一頁只管圖片；文字欄位在 Content 分頁。沒有這句提示，使用者會在這裡
+  // 找不到能改文案的地方，以為功能不存在。
+  const hint =
     currentType === 'projects'
+      ? '<p class="page-hint">這一頁只放圖片。標題、小標與內文請到左側「Content 文案」頁編輯，' +
+        '該頁也能直接上傳每個段落的圖片。<button class="page-hint__link" id="gotoContent">前往 Content 文案</button></p>'
+      : '';
+
+  contentEl.innerHTML =
+    hint +
+    (currentType === 'projects'
       ? '<div class="sections" id="sections"></div>'
-      : '<div class="grid" id="grid"></div>';
+      : '<div class="grid" id="grid"></div>');
+
+  document.getElementById('gotoContent')?.addEventListener('click', () => {
+    sidebarItems.find((b) => b.dataset.page === 'content')?.click();
+  });
 
   if (currentType === 'projects') await ensureSectionTypes();
 

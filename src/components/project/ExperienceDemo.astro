@@ -44,16 +44,37 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = '
     split：文字在左、圖片在右。用 grid 而非 flex-direction: row，
     兩欄才能各自等分且在 768 以下乾淨地落回單欄。
   */
-  .experience-demo[data-layout='split'] {
+  /*
+    split：左文右圖；split-reverse：左圖右文。
+    兩者共用同一套 grid，只用 order 交換視覺順序——不動 DOM 順序，
+    螢幕閱讀器與鍵盤仍照「先標題文字、後圖片」的邏輯讀，不會因為
+    視覺翻面就把閱讀順序也翻掉。
+  */
+  .experience-demo[data-layout='split'],
+  .experience-demo[data-layout='split-reverse'] {
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
     gap: var(--sp-5);
   }
 
+  .experience-demo[data-layout='split-reverse'] .experience-demo__intro {
+    order: 2;
+  }
+
+  .experience-demo[data-layout='split-reverse'] .experience-demo__media {
+    order: 1;
+  }
+
   @media (max-width: 767px) {
-    .experience-demo[data-layout='split'] {
+    .experience-demo[data-layout='split'],
+    .experience-demo[data-layout='split-reverse'] {
       grid-template-columns: 1fr;
+    }
+
+    .experience-demo[data-layout='split-reverse'] .experience-demo__intro,
+    .experience-demo[data-layout='split-reverse'] .experience-demo__media {
+      order: initial;
     }
   }
 

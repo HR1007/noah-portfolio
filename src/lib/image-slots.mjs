@@ -53,8 +53,8 @@ const TBD = '[需確認]';
  * 集中宣告在這裡，後台照著渲染選單，選了才寫進檔案。
  */
 export const SECTION_OPTIONS = {
-  experienceDemo: { layout: ['stacked', 'split'] },
-  researchFramework: { layout: ['stacked', 'split'] },
+  experienceDemo: { layout: ['stacked', 'split', 'split-reverse'] },
+  researchFramework: { layout: ['stacked', 'split', 'split-reverse'] },
   featureSplit: { imagePosition: ['right', 'left'] },
   flow: { direction: ['horizontal', 'vertical'] },
   featureGrid: { direction: ['horizontal', 'vertical'] },

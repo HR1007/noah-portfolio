@@ -1121,3 +1121,26 @@ svg {
   color: var(--accent);
   border-color: var(--accent);
 }
+
+/* 分頁用途說明：告訴使用者這一頁做什麼、其他事要去哪做 */
+.page-hint {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.page-hint__link {
+  margin-left: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}

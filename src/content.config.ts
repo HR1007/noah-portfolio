@@ -29,7 +29,8 @@ const experienceDemoBlock = z.object({
   ctaLabel: z.string().optional(),
   ctaHref: z.string().optional(),
   // stacked：文字在上、圖片在下（預設）；split：文字在左、圖片在右
-  layout: z.enum(['stacked', 'split']).default('stacked'),
+  // stacked 文上圖下／split 左文右圖／split-reverse 左圖右文
+  layout: z.enum(['stacked', 'split', 'split-reverse']).default('stacked'),
 });
 
 const featureSplitBlock = z.object({
@@ -83,7 +84,8 @@ const researchFrameworkBlock = z.object({
   ratio: z.string(),
   alt: z.string(),
   // stacked：文字在上、圖片在下（預設）；split：文字在左、圖片在右
-  layout: z.enum(['stacked', 'split']).default('stacked'),
+  // stacked 文上圖下／split 左文右圖／split-reverse 左圖右文
+  layout: z.enum(['stacked', 'split', 'split-reverse']).default('stacked'),
 });
 
 // Persona 圖本身就是完整的人物看板（姓名、角色、Goals、Needs… 都印在圖上），

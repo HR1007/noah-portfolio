@@ -37,16 +37,37 @@ const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked' } = 
   }
 
   /* split：文字在左、圖片在右；768 以下落回單欄 */
-  .research-framework[data-layout='split'] {
+  /*
+    split：左文右圖；split-reverse：左圖右文。
+    兩者共用同一套 grid，只用 order 交換視覺順序——不動 DOM 順序，
+    螢幕閱讀器與鍵盤仍照「先標題文字、後圖片」的邏輯讀，不會因為
+    視覺翻面就把閱讀順序也翻掉。
+  */
+  .research-framework[data-layout='split'],
+  .research-framework[data-layout='split-reverse'] {
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
     gap: var(--sp-5);
   }
 
+  .research-framework[data-layout='split-reverse'] .research-framework__intro {
+    order: 2;
+  }
+
+  .research-framework[data-layout='split-reverse'] .research-framework__media {
+    order: 1;
+  }
+
   @media (max-width: 767px) {
-    .research-framework[data-layout='split'] {
+    .research-framework[data-layout='split'],
+    .research-framework[data-layout='split-reverse'] {
       grid-template-columns: 1fr;
+    }
+
+    .research-framework[data-layout='split-reverse'] .research-framework__intro,
+    .research-framework[data-layout='split-reverse'] .research-framework__media {
+      order: initial;
     }
   }
 
