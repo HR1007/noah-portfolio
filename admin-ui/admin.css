@@ -832,3 +832,105 @@ svg {
   font-family: ui-monospace, Menlo, monospace; color: var(--ink);
 }
 .publish-empty { margin: 0; font-size: 13px; color: var(--muted); }
+
+/* ---------- Content：段落卡片 ---------- */
+.sec-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.sec-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.sec-card__head strong { font-size: 14px; }
+
+.sec-card__type {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.sec-card__del {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--danger);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.sec-card__del:hover { background: rgba(214, 69, 69, 0.1); }
+
+.sec-card__body { padding: 12px 14px; }
+
+/* 段落內的圖片格 */
+.slot-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+.slot-cell {
+  width: 116px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--bg);
+}
+.slot-cell:hover { border-color: var(--accent); }
+
+.slot-cell img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.slot-cell--empty {
+  border-style: dashed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+}
+
+.slot-cell__plus { font-size: 20px; color: var(--muted); }
+
+.slot-cell__name {
+  display: block;
+  padding: 4px 6px;
+  font-size: 10px;
+  color: var(--muted);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sec-add { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.sec-add select { padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border); }
+.sec-add button {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 13px;
+}
+.sec-add button:hover { border-color: var(--accent); color: var(--accent); }

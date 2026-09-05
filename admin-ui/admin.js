@@ -422,6 +422,8 @@ let currentHomeSlots = [];
 let currentHomeSets = [];
 // 漸層選項向後端拿，與 content schema 同一份清單
 let heroGradients = ['slate'];
+let projectSlots = {};   // slug -> 版位清單（含所屬段落）
+let projectImages = {};  // slug -> 已上傳的圖片
 
 async function loadHome() {
   pageTitleEl.textContent = 'Home 首頁圖片';
@@ -824,29 +826,11 @@ function renderContentForm() {
   projectsHeading.style.margin = '32px 0 8px';
   form.appendChild(projectsHeading);
   const projectsHint = document.createElement('p');
-  projectsHint.textContent = '案例頁目前只有單一語言（沒有中英分開），下面每個欄位只有一格。';
+  projectsHint.textContent = '每張卡片是頁面上的一個段落，卡片內同時有該段落的文字與圖片。新增／刪除段落會立即寫檔。';
   projectsHint.style.cssText = 'color:var(--muted);font-size:13px;margin-bottom:12px';
   form.appendChild(projectsHint);
 
-  projectSlugs.forEach(({ slug, title }) => {
-    const data = projectsData[slug];
-    if (!data) return;
-    const section = document.createElement('div');
-    section.className = 'content-section collapsed';
-
-    const header = document.createElement('div');
-    header.className = 'content-section__header';
-    header.innerHTML = `<span>${title}</span><span class="chev">▾</span>`;
-    header.addEventListener('click', () => section.classList.toggle('collapsed'));
-
-    const body = document.createElement('div');
-    body.className = 'content-section__body';
-    Object.keys(data).forEach((k) => renderMonoNode(data[k], [k], body, data));
-
-    section.appendChild(header);
-    section.appendChild(body);
-    form.appendChild(section);
-  });
+  projectSlugs.forEach(({ slug, title }) => renderProjectCard(slug, title, form));
 
   const savebar = document.createElement('div');
   savebar.className = 'content-savebar';
@@ -874,13 +858,191 @@ async function loadContentPage() {
   projectsData = {};
   await Promise.all(
     slugs.map(async ({ slug }) => {
-      projectsData[slug] = await fetch(`${API}/api/projects/${slug}/content`).then((r) => r.json());
+      const [content, slots, imgs] = await Promise.all([
+        fetch(`${API}/api/projects/${slug}/content`).then((r) => r.json()),
+        fetch(`${API}/api/projects/${slug}/slots`).then((r) => r.json()).catch(() => []),
+        fetch(`${API}/api/collections/projects/${slug}/images`).then((r) => r.json()).catch(() => ({ images: [] })),
+      ]);
+      projectsData[slug] = content;
+      projectSlots[slug] = slots;
+      projectImages[slug] = imgs.images || [];
     })
   );
 
-  pageMetaEl.textContent = '中英文對照（網站文案）+ 案例頁單語欄位，改完按右下角「儲存」直接寫回檔案';
+  pageMetaEl.textContent = '網站文案為中英對照；案例頁以段落分組，文字與圖片在同一張卡片內編輯';
   renderContentForm();
   syncPreview();
+}
+
+/*
+  以「段落」為單位呈現案例頁：每張卡片是頁面上的一個區塊，標題用該區塊實際的
+  heading（而不是 sections #3 這種泛型標籤），卡片內同時放這個區塊的文字欄位
+  與圖片格，改一個段落不必在兩個分頁之間來回。
+*/
+const SECTION_TYPES = {
+  textSection: '純文字段落',
+  deviceShowcase: '裝置展示圖',
+  experienceDemo: '體驗展示',
+  featureSplit: '圖文並排',
+  featureGrid: '功能格線',
+  imageRow: '並排圖片',
+  illustrationGrid: '插畫格線',
+  researchFramework: '研究架構',
+  persona: 'Persona',
+  designThemes: '設計主軸',
+  flow: '流程步驟',
+};
+
+// 段落卡片標題優先用 heading，其次 eyebrow，都沒有才退回型別名稱
+function sectionTitle(sec, i) {
+  const name = sec.heading || sec.eyebrow || SECTION_TYPES[sec.type] || sec.type;
+  return `${i + 1}. ${name}`;
+}
+
+function renderProjectCard(slug, title, form) {
+  const data = projectsData[slug];
+  if (!data) return;
+  const slots = projectSlots[slug] || [];
+  const images = projectImages[slug] || [];
+  const bySlot = new Map(images.filter((im) => im.slotIndex != null).map((im) => [im.slotIndex, im]));
+
+  const wrap = document.createElement('div');
+  wrap.className = 'content-section collapsed';
+  const header = document.createElement('div');
+  header.className = 'content-section__header';
+  header.innerHTML = `<span>${title}</span><span class="chev">▾</span>`;
+  header.addEventListener('click', () => wrap.classList.toggle('collapsed'));
+  const body = document.createElement('div');
+  body.className = 'content-section__body';
+
+  // Hero（不是 sections 的一員，單獨一張卡）
+  const heroCard = document.createElement('div');
+  heroCard.className = 'sec-card';
+  heroCard.innerHTML = '<div class="sec-card__head"><strong>Hero</strong></div>';
+  const heroBody = document.createElement('div');
+  heroBody.className = 'sec-card__body';
+  if (data.hero) Object.keys(data.hero).forEach((k) => renderMonoNode(data.hero[k], ['hero', k], heroBody, data));
+  const heroSlots = slots.filter((sl) => sl.sectionIndex === -1);
+  if (heroSlots.length) heroBody.appendChild(slotStrip(slug, heroSlots, bySlot));
+  heroCard.appendChild(heroBody);
+  body.appendChild(heroCard);
+
+  (data.sections || []).forEach((sec, i) => {
+    const card = document.createElement('div');
+    card.className = 'sec-card';
+
+    const head = document.createElement('div');
+    head.className = 'sec-card__head';
+    head.innerHTML = `<strong>${sectionTitle(sec, i)}</strong>
+      <span class="sec-card__type">${SECTION_TYPES[sec.type] || sec.type}</span>`;
+    const del = document.createElement('button');
+    del.className = 'sec-card__del';
+    del.textContent = '刪除段落';
+    del.addEventListener('click', () => deleteSection(slug, i));
+    head.appendChild(del);
+    card.appendChild(head);
+
+    const cardBody = document.createElement('div');
+    cardBody.className = 'sec-card__body';
+    Object.keys(sec).forEach((k) => renderMonoNode(sec[k], ['sections', i, k], cardBody, data));
+
+    const mine = slots.filter((sl) => sl.sectionIndex === i);
+    if (mine.length) cardBody.appendChild(slotStrip(slug, mine, bySlot));
+
+    card.appendChild(cardBody);
+    body.appendChild(card);
+  });
+
+  // 新增段落
+  const add = document.createElement('div');
+  add.className = 'sec-add';
+  const sel = document.createElement('select');
+  Object.entries(SECTION_TYPES).forEach(([v, label]) => {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = label; sel.appendChild(o);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.textContent = '＋ 新增段落';
+  addBtn.addEventListener('click', () => addSection(slug, sel.value));
+  add.appendChild(sel); add.appendChild(addBtn);
+  body.appendChild(add);
+
+  wrap.appendChild(header);
+  wrap.appendChild(body);
+  form.appendChild(wrap);
+}
+
+// 一個段落的圖片格：有圖顯示縮圖，沒有就是可點的空位，都直接上傳到指定版位
+function slotStrip(slug, slotList, bySlot) {
+  const strip = document.createElement('div');
+  strip.className = 'slot-strip';
+  slotList.forEach((sl) => {
+    const img = bySlot.get(sl.index);
+    const cell = document.createElement('div');
+    cell.className = 'slot-cell' + (img ? '' : ' slot-cell--empty');
+    cell.innerHTML = img
+      ? `<img src="${imgUrl(img)}" alt="${img.filename}" loading="lazy" />
+         <span class="slot-cell__name">${img.filename}</span>`
+      : `<span class="slot-cell__plus">＋</span><span class="slot-cell__name">待上傳</span>`;
+    cell.title = sl.label;
+    cell.addEventListener('click', () => {
+      pendingUpload = { kind: 'slot', slug, slot: sl.index };
+      fileInputEl.click();
+    });
+    strip.appendChild(cell);
+  });
+  return strip;
+}
+
+async function addSection(slug, type) {
+  const data = projectsData[slug];
+  const blank = { type };
+  if (type === 'featureGrid') blank.columns = [];
+  if (type === 'imageRow') blank.images = [];
+  if (type === 'persona') blank.personas = [];
+  if (type === 'flow') blank.steps = [];
+  if (type === 'designThemes') blank.themes = [];
+  if (type === 'illustrationGrid') { blank.count = 1; blank.alt = ''; }
+  if (type === 'textSection') blank.paragraphs = [''];
+  if (['deviceShowcase','experienceDemo','featureSplit','researchFramework'].includes(type)) {
+    blank.ratio = '4/3'; blank.alt = '';
+  }
+  if (['experienceDemo','featureSplit','researchFramework','textSection'].includes(type)) blank.heading = '新段落';
+  if (type === 'featureSplit') { blank.body = ''; blank.imagePosition = 'right'; }
+  data.sections = data.sections || [];
+  data.sections.push(blank);
+  await persistProject(slug, '已新增段落，記得按儲存');
+}
+
+async function deleteSection(slug, i) {
+  const data = projectsData[slug];
+  const sec = data.sections[i];
+  const slots = (projectSlots[slug] || []).filter((sl) => sl.sectionIndex === i);
+  const later = (projectSlots[slug] || []).filter((sl) => sl.sectionIndex > i).length;
+
+  let msg = `確定刪除段落「${sectionTitle(sec, i)}」？`;
+  if (slots.length) msg += `\n\n這個段落有 ${slots.length} 個圖片版位，圖檔會保留在資料夾裡不刪除。`;
+  if (later) msg += `\n⚠️ 後面還有 ${later} 個版位，刪除後版位編號會往前移，那些圖片會落到別的段落，需要你手動調整。`;
+  if (!confirm(msg)) return;
+
+  data.sections.splice(i, 1);
+  await persistProject(slug, '已刪除段落，記得檢查後面的圖片是否錯位');
+}
+
+// 結構改動（新增／刪除段落）立即寫回檔案，否則版位計算會跟畫面對不上
+async function persistProject(slug, toast) {
+  try {
+    const res = await fetch(`${API}/api/projects/${slug}/content`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(projectsData[slug]),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    showToast(toast);
+    await loadContentPage();
+  } catch (err) {
+    showToast(`儲存失敗：${err.message}`, true);
+  }
 }
 
 async function handleSaveContent() {
@@ -925,6 +1087,15 @@ fileInputEl.addEventListener('change', async () => {
       const { filename } = await res.json();
       showToast(`已上傳為 ${filename}`);
       await loadImages();
+    } else if (pending.kind === 'slot') {
+      const res = await fetch(
+        `${API}/api/collections/projects/${pending.slug}/images?filename=${encodeURIComponent(file.name)}&slot=${pending.slot}`,
+        { method: 'POST', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file }
+      );
+      if (!res.ok) throw new Error(await res.text());
+      const { filename } = await res.json();
+      showToast(`已上傳為 ${filename}`);
+      await loadContentPage();
     } else if (pending.kind === 'home-set') {
       const res = await fetch(`${API}/api/home/sets/${pending.set}?filename=${encodeURIComponent(file.name)}`, {
         method: 'POST',
