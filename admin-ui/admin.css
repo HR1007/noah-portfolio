@@ -1064,8 +1064,21 @@ svg {
   padding-right: 30px;
 }
 
-.sec-card--extras .sec-card__head {
-  color: var(--danger);
+/* 未使用的圖片不是錯誤狀態，只是還沒安置，用一般的卡片外觀就好 */
+.tile__move {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.tile__move select {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 11px;
 }
 
 /* 段落拖拉排序 */
@@ -1143,4 +1156,52 @@ svg {
   cursor: pointer;
   padding: 0;
   text-decoration: underline;
+}
+
+/* 頁面圖片：需要提醒的位置（例如一張圖被兩個頁面共用）加一行警語 */
+.home-card__note {
+  color: var(--danger);
+  font-size: 11px;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Content 分頁的分類標題（頁面文案／全站共用／作品集案例頁） */
+.content-group-head {
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+
+.content-group-head:first-child {
+  margin-top: 0;
+}
+
+.content-group-head h2 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.content-group-head p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* 段落進階設定裡的 CTA 開關 */
+.sec-cta-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.sec-cta-toggle input {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
 }

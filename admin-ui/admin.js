@@ -183,7 +183,7 @@ sidebarItems.forEach((btn) => {
       currentType = 'projects';
       loadCollectionList();
     } else if (page === 'home') {
-      loadHome();
+      loadPageImages();
     } else if (page === 'content') {
       loadContentPage();
     }
@@ -571,6 +571,11 @@ function buildTextItemList(section, list) {
   return wrap;
 }
 
+/*
+  編號超出版位範圍的圖片。通常是刪掉段落或版位之後留下來的——檔案還在，但頁面上
+  已經沒有位置放它。以前這裡只能刪，等於把「我不小心少了一格」變成「圖只好丟掉」；
+  現在直接給一個空版位的下拉，選了就把圖搬過去（走跟拖拉互換同一支 API）。
+*/
 function buildExtrasCard(extras) {
   const card = document.createElement('div');
   card.className = 'sec-card sec-card--extras';
@@ -579,20 +584,56 @@ function buildExtrasCard(extras) {
   head.className = 'sec-card__head';
   const title = document.createElement('strong');
   title.className = 'sec-card__title';
-  title.textContent = '沒有版位的圖片';
+  title.textContent = '未使用的圖片';
   head.appendChild(title);
   card.appendChild(head);
 
   const body = document.createElement('div');
   body.className = 'sec-card__body';
+
+  const filled = new Set(currentImages.filter((im) => im.slotIndex != null).map((im) => im.slotIndex));
+  const emptySlots = currentSlots.filter((slot) => !filled.has(slot.index));
+
   const note = document.createElement('p');
   note.className = 'sec-card__note';
-  note.textContent = '這些圖片的編號超出目前版位數（或檔名不是數字），頁面上不會用到。可以刪掉，或往上替某個段落多加一格版位讓它們有地方放。';
+  note.textContent = emptySlots.length
+    ? '這些圖片的編號超出目前的版位數，頁面上不會用到。選一個空版位把它搬過去，或直接刪掉。'
+    : '這些圖片的編號超出目前的版位數，頁面上不會用到。目前沒有空版位——先替某個段落多加一格，或直接刪掉。';
   body.appendChild(note);
 
   const grid = document.createElement('div');
   grid.className = 'grid';
-  extras.forEach((img) => grid.appendChild(buildTile(img, null)));
+  extras.forEach((img) => {
+    const tile = buildTile(img, null);
+    tile.draggable = false;
+
+    // 檔名不是數字的圖沒有編號可搬，只能刪
+    if (img.slotIndex != null && emptySlots.length) {
+      const move = document.createElement('div');
+      move.className = 'tile__move';
+
+      const sel = document.createElement('select');
+      emptySlots.forEach((slot) => {
+        const opt = document.createElement('option');
+        opt.value = String(slot.index);
+        opt.textContent = slot.label;
+        sel.appendChild(opt);
+      });
+
+      const btn = document.createElement('button');
+      btn.className = 'sec-btn';
+      btn.textContent = '移到這格';
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleSlotSwap(img.slotIndex, Number(sel.value));
+      });
+
+      move.append(sel, btn);
+      tile.querySelector('.tile__meta').appendChild(move);
+    }
+
+    grid.appendChild(tile);
+  });
   body.appendChild(grid);
 
   card.appendChild(body);
@@ -764,100 +805,116 @@ async function handleSwap(indexA, indexB) {
   }
 }
 
-// ---------- Home（固定命名圖片 + 數量可變的圖組） ----------
+// ---------- 頁面圖片（Home／Gallery／Portfolio 的固定位置圖 + 數量可變的圖組） ----------
+//
+// 這些圖用「語意檔名」對應頁面上的固定位置（hero.png 就是 hero），跟相簿與案例頁的
+// 編號序列是兩回事。三個頁面共用同一組 API，清單由 server 的 PAGE_IMAGES 提供——
+// 以前只有 Home 進得來，Gallery 與 Portfolio 的大圖只能手動丟檔案，後台換不了。
 
-const HOME_LABELS = {
-  hero: 'Hero（首頁最上方全身照）',
-  avatar: 'Avatar（引言旁的圓形頭像）',
-  about: 'About（About me 區塊照片）',
-};
-
-let currentHomeSlots = [];
+let currentPageImageGroups = [];
 let currentHomeSets = [];
 // 漸層選項向後端拿，與 content schema 同一份清單
 let heroGradients = ['slate'];
 let sectionOptions = {};  // 型別 -> { 欄位: [可選值] }
+let ctaDefault = { ctaLabel: "Let's Try Out", ctaHref: '#' }; // 由 /api/cta-default 覆寫
 let projectSlots = {};   // slug -> 版位清單（含所屬段落）
 let projectImages = {};  // slug -> 已上傳的圖片
 let contentSlug = null;  // Content 分頁目前正在編輯的案例
 let sectionDragFrom = null;
 
-async function loadHome() {
-  pageTitleEl.textContent = 'Home 首頁圖片';
+async function loadPageImages() {
+  pageTitleEl.textContent = '頁面圖片';
   pageMetaEl.textContent = '每個位置固定用途，點圖上傳／更換即可，不需要排序';
   pageTabsEl.innerHTML = '';
-  contentEl.innerHTML = '<div class="home-grid" id="homeGrid"></div>';
+  contentEl.innerHTML = '<div id="pageImages"></div>';
 
-  const [slots, hobby] = await Promise.all([
-    fetch(`${API}/api/home`).then((r) => r.json()),
+  const [groups, hobby] = await Promise.all([
+    fetch(`${API}/api/page-images`).then((r) => r.json()),
     fetch(`${API}/api/home/sets/hobby`).then((r) => r.json()),
   ]);
-  currentHomeSlots = slots;
+  currentPageImageGroups = groups;
   currentHomeSets = [hobby];
-  renderHomeGrid();
+  renderPageImages();
   syncPreview();
 }
 
-function renderHomeGrid() {
-  const homeGridEl = document.getElementById('homeGrid');
-  if (!homeGridEl) return;
-  homeGridEl.innerHTML = '';
+function renderPageImages() {
+  const host = document.getElementById('pageImages');
+  if (!host) return;
+  host.innerHTML = '';
 
-  currentHomeSlots.forEach((slot) => {
-    const card = document.createElement('div');
-    card.className = 'home-card';
-
-    const hasImage = !!slot.filename;
-    // 空位跟 Gallery/Portfolio 的「待上傳」格子共用同一套樣式（虛線框＋pending 徽章＋說明文字），
-    // 三個頁面的「這裡還沒有圖」視覺要一致，不要各刻一套。
-    card.innerHTML = `
-      <div class="tile__image-wrap home-card__image-wrap${hasImage ? '' : ' tile--empty-slot'}">
-        ${
-          hasImage
-            ? `<img src="${imgUrl(slot)}" alt="${slot.filename}" loading="lazy" />
-               <button class="tile__expand" title="放大查看"><svg viewBox="0 0 24 24"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg></button>
-               <button class="tile__delete" title="刪除，改回佔位框"><svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg></button>`
-            : `<span class="tile__badge tile__badge--pending">待上傳</span>
-               <span class="tile__empty-label">尚未上傳，點擊上傳</span>`
-        }
+  currentPageImageGroups.forEach((group) => {
+    const section = document.createElement('section');
+    section.className = 'home-set';
+    section.innerHTML = `
+      <div class="home-set__head">
+        <strong>${escapeHtml(group.label)}</strong>
+        <span>${group.slots.length} 個固定位置 · 換圖直接覆蓋同一個檔名</span>
       </div>
-      <div class="tile__meta home-card__meta">
-        <strong>${HOME_LABELS[slot.name] ?? slot.name}</strong>
-        <span>${hasImage ? `${slot.width && slot.height ? `${slot.width}×${slot.height}` : '—'} · ${formatBytes(slot.sizeBytes)}` : '—'}</span>
-      </div>
+      <div class="home-grid"></div>
     `;
+    const gridEl = section.querySelector('.home-grid');
+    group.slots.forEach((slot) => gridEl.appendChild(buildPageImageCard(slot)));
+    host.appendChild(section);
 
-    if (hasImage) {
-      card.querySelector('.tile__expand').addEventListener('click', (e) => {
-        e.stopPropagation();
-        openLightbox(slot, HOME_LABELS[slot.name] ?? slot.name);
-      });
-      card.querySelector('.tile__delete').addEventListener('click', (e) => {
-        e.stopPropagation();
-        handleHomeDelete(slot.name);
-      });
-    }
+    // 生活照圖組屬於 Home，就接在 Home 那一組後面，不另外飄在最下面
+    if (group.page === 'home') currentHomeSets.forEach((set) => host.appendChild(buildHomeSet(set)));
+  });
+}
 
-    card.querySelector('.home-card__image-wrap').addEventListener('click', () => {
-      pendingUpload = { kind: 'home', name: slot.name };
-      fileInputEl.click();
+function buildPageImageCard(slot) {
+  const card = document.createElement('div');
+  card.className = 'home-card';
+  const hasImage = !!slot.filename;
+
+  // 空位跟 Gallery/Portfolio 的「待上傳」格子共用同一套樣式（虛線框＋pending 徽章＋說明文字），
+  // 三個頁面的「這裡還沒有圖」視覺要一致，不要各刻一套。
+  card.innerHTML = `
+    <div class="tile__image-wrap home-card__image-wrap${hasImage ? '' : ' tile--empty-slot'}">
+      ${
+        hasImage
+          ? `<img src="${imgUrl(slot)}" alt="${escapeHtml(slot.filename)}" loading="lazy" />
+             <button class="tile__expand" title="放大查看"><svg viewBox="0 0 24 24"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg></button>
+             <button class="tile__delete" title="刪除，改回佔位框"><svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg></button>`
+          : `<span class="tile__badge tile__badge--pending">待上傳</span>
+             <span class="tile__empty-label">尚未上傳，點擊上傳</span>`
+      }
+    </div>
+    <div class="tile__meta home-card__meta">
+      <strong>${escapeHtml(slot.label)}</strong>
+      <span>${hasImage ? `${slot.width && slot.height ? `${slot.width}×${slot.height}` : '—'} · ${formatBytes(slot.sizeBytes)}` : '—'}</span>
+      ${slot.note ? `<span class="home-card__note">⚠️ ${escapeHtml(slot.note)}</span>` : ''}
+    </div>
+  `;
+
+  if (hasImage) {
+    card.querySelector('.tile__expand').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openLightbox(slot, slot.label);
     });
+    card.querySelector('.tile__delete').addEventListener('click', (e) => {
+      e.stopPropagation();
+      handlePageImageDelete(slot);
+    });
+  }
 
-    homeGridEl.appendChild(card);
+  card.querySelector('.home-card__image-wrap').addEventListener('click', () => {
+    pendingUpload = { kind: 'page-image', page: slot.page, name: slot.name };
+    fileInputEl.click();
   });
 
-  currentHomeSets.forEach(renderHomeSet);
+  return card;
 }
 
 // 數量可變的圖組（例如 Beyond the Grid 生活照）。磚塊刻意跟 Gallery／Portfolio
 // 用同一套 tile 結構與樣式：放大檢視、刪除、尺寸與檔案大小的呈現都要一致，
 // 不要因為在不同頁面就長得不一樣。
-function renderHomeSet(set) {
+function buildHomeSet(set) {
   const wrap = document.createElement('section');
   wrap.className = 'home-set';
   wrap.innerHTML = `
     <div class="home-set__head">
-      <strong>${set.label}</strong>
+      <strong>${escapeHtml(set.label)}</strong>
       <span>${set.images.length} 張 · 依檔名順序顯示在網站上，可隨時追加</span>
     </div>
     <div class="grid home-set__grid"></div>
@@ -865,47 +922,26 @@ function renderHomeSet(set) {
   const gridEl = wrap.querySelector('.home-set__grid');
 
   set.images.forEach((img, index) => {
-    const tile = document.createElement('div');
-    tile.className = 'tile';
-    tile.innerHTML = `
-      <div class="tile__image-wrap">
-        <span class="tile__badge">第 ${index + 1} 張</span>
-        <img src="${imgUrl(img)}" alt="${img.filename}" loading="lazy" />
-        <button class="tile__expand" title="放大查看">
-          <svg viewBox="0 0 24 24"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg>
-        </button>
-        <button class="tile__delete" title="刪除">
-          <svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
-        </button>
-      </div>
-      <div class="tile__meta">
-        <strong>${img.filename}</strong>
-        <span>${img.width && img.height ? `${img.width}×${img.height}` : '—'} · ${formatBytes(img.sizeBytes)}</span>
-      </div>
-    `;
-
-    tile.querySelector('.tile__expand').addEventListener('click', (e) => {
-      e.stopPropagation();
-      openLightbox(img, `${set.label} 第 ${index + 1} 張`);
-    });
-    tile.querySelector('.tile__delete').addEventListener('click', (e) => {
-      e.stopPropagation();
-      handleHomeSetDelete(set.set, img.filename, set.label);
-    });
-
+    const tile = buildTile(img, `第 ${index + 1} 張`);
+    tile.draggable = false;
+    tile.querySelector('.tile__delete').replaceWith(
+      (() => {
+        const btn = document.createElement('button');
+        btn.className = 'tile__delete';
+        btn.title = '刪除';
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>';
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          handleHomeSetDelete(set.set, img.filename, set.label);
+        });
+        return btn;
+      })()
+    );
     gridEl.appendChild(tile);
   });
 
-  const addTile = document.createElement('div');
-  addTile.className = 'tile tile--add';
-  addTile.innerHTML = '<span class="plus">+</span>';
-  addTile.addEventListener('click', () => {
-    pendingUpload = { kind: 'home-set', set: set.set };
-    fileInputEl.click();
-  });
-  gridEl.appendChild(addTile);
-
-  document.getElementById('homeGrid').parentElement.appendChild(wrap);
+  gridEl.appendChild(buildAddTile({ kind: 'home-set', set: set.set }));
+  return wrap;
 }
 
 async function handleHomeSetDelete(set, filename, label) {
@@ -914,19 +950,19 @@ async function handleHomeSetDelete(set, filename, label) {
     const res = await fetch(`${API}/api/home/sets/${set}/${encodeURIComponent(filename)}`, { method: 'DELETE' });
     if (!res.ok) throw new Error(await res.text());
     showToast('已刪除');
-    await loadHome();
+    await loadPageImages();
   } catch (err) {
     showToast(`刪除失敗：${err.message}`, true);
   }
 }
 
-async function handleHomeDelete(name) {
-  if (!confirm(`確定要刪除 ${HOME_LABELS[name] ?? name} 的圖片嗎？（會改回佔位框）`)) return;
+async function handlePageImageDelete(slot) {
+  if (!confirm(`確定要刪除「${slot.label}」的圖片嗎？（會改回佔位框）`)) return;
   try {
-    const res = await fetch(`${API}/api/home/${name}`, { method: 'DELETE' });
+    const res = await fetch(`${API}/api/page-images/${slot.page}/${slot.name}`, { method: 'DELETE' });
     if (!res.ok) throw new Error(await res.text());
     showToast('已刪除');
-    await loadHome();
+    await loadPageImages();
   } catch (err) {
     showToast(`刪除失敗：${err.message}`, true);
   }
@@ -936,7 +972,35 @@ async function handleHomeDelete(name) {
 
 let siteEn = null;
 let siteZh = null;
-const CONTENT_EXPANDED_BY_DEFAULT = new Set(['home', 'portfolio', 'gallery']);
+/*
+  Content 分頁的分類。原本是把 main-*.json 的頂層 key 直接攤成一長串，
+  「網站頁面的文案」跟「每頁都會出現的共用元素」混在一起，找欄位得一個個點開。
+  這裡分成三區，並用中文標題取代 humanize() 產生的 "Home" / "Project Quote"。
+
+  全部預設收合：欄位總數超過一百個，攤開來反而找不到東西——要找特定文案用上方
+  的搜尋框（命中的段落會自動展開），要瀏覽就點開你要的那一區。
+*/
+const CONTENT_GROUPS = [
+  {
+    title: '頁面文案',
+    hint: '這三個頁面各自的標題與內文。改這裡只會影響對應的那一頁。',
+    sections: [
+      { key: 'home', label: 'About Me（首頁）' },
+      { key: 'portfolio', label: 'Portfolio（作品集列表頁）' },
+      { key: 'gallery', label: 'Gallery（相片集頁）' },
+    ],
+  },
+  {
+    title: '全站共用',
+    hint: '每一頁都會出現的元素，改一次全站生效。',
+    sections: [
+      { key: 'nav', label: '導覽列（Logo、選單、返回鍵）' },
+      { key: 'marquee', label: '跑馬燈' },
+      { key: 'footer', label: '頁尾' },
+      { key: 'projectQuote', label: '案例頁引言（每個案例頁最下方）' },
+    ],
+  },
+];
 const CONTENT_META = '網站文案為中英對照；案例頁以段落分組，文字與圖片在同一張卡片內編輯';
 let contentQuery = ''; // 上方搜尋框的內容，換分頁重繪後仍要保留
 
@@ -1170,38 +1234,63 @@ function renderMonoNode(val, keyPath, container, dataObj) {
   }
 }
 
+/** 分類標題列（頁面文案／全站共用／作品集案例頁） */
+function buildContentGroupHead(title, hint) {
+  const wrap = document.createElement('div');
+  wrap.className = 'content-group-head';
+  wrap.innerHTML = `<h2>${escapeHtml(title)}</h2><p>${escapeHtml(hint)}</p>`;
+  return wrap;
+}
+
+/** 一個可收合的文案分區；一律預設收合，展開狀態記在 dataset 供搜尋清空後還原 */
+function buildContentSection(key, label) {
+  const section = document.createElement('div');
+  section.className = 'content-section collapsed';
+  section.dataset.collapsed = '1';
+
+  const header = document.createElement('div');
+  header.className = 'content-section__header';
+  header.innerHTML = `<span>${escapeHtml(label)}</span><span class="chev">▾</span>`;
+  bindSectionToggle(section, header);
+
+  const body = document.createElement('div');
+  body.className = 'content-section__body';
+  renderContentNode(siteEn[key], [key], body);
+
+  section.appendChild(header);
+  section.appendChild(body);
+  return section;
+}
+
 function renderContentForm() {
+  // 這支會被重複呼叫（切換案例、開關 CTA），舊的儲存列不清掉會一路往下疊
+  document.querySelector('.content-savebar')?.remove();
   contentEl.innerHTML = '<div class="content-form" id="contentForm"></div>';
   const form = document.getElementById('contentForm');
 
-  Object.keys(siteEn).forEach((sectionKey) => {
-    const expanded = CONTENT_EXPANDED_BY_DEFAULT.has(sectionKey);
-    const section = document.createElement('div');
-    section.className = 'content-section' + (expanded ? '' : ' collapsed');
-    section.dataset.collapsed = expanded ? '0' : '1';
-
-    const header = document.createElement('div');
-    header.className = 'content-section__header';
-    header.innerHTML = `<span>${humanize(sectionKey)}</span><span class="chev">▾</span>`;
-    bindSectionToggle(section, header);
-
-    const body = document.createElement('div');
-    body.className = 'content-section__body';
-    renderContentNode(siteEn[sectionKey], [sectionKey], body);
-
-    section.appendChild(header);
-    section.appendChild(body);
-    form.appendChild(section);
+  const listed = new Set();
+  CONTENT_GROUPS.forEach((group) => {
+    form.appendChild(buildContentGroupHead(group.title, group.hint));
+    group.sections.forEach(({ key, label }) => {
+      if (siteEn[key] === undefined) return; // 內容檔沒有這一區就跳過，不生出空卡片
+      listed.add(key);
+      form.appendChild(buildContentSection(key, label));
+    });
   });
 
-  const projectsHeading = document.createElement('h2');
-  projectsHeading.textContent = 'Portfolio 案例頁文案';
-  projectsHeading.style.margin = '32px 0 8px';
-  form.appendChild(projectsHeading);
-  const projectsHint = document.createElement('p');
-  projectsHint.textContent = '每張卡片是頁面上的一個段落，卡片內同時有該段落的文字與圖片。新增／刪除段落會立即寫檔。';
-  projectsHint.style.cssText = 'color:var(--muted);font-size:13px;margin-bottom:12px';
-  form.appendChild(projectsHint);
+  // main-*.json 之後多出來的頂層欄位不會憑空消失，收在最後一區，提醒要歸類
+  const extras = Object.keys(siteEn).filter((k) => !listed.has(k));
+  if (extras.length) {
+    form.appendChild(buildContentGroupHead('尚未分類', '這些欄位是後來加到內容檔的，還沒歸進上面的分類。'));
+    extras.forEach((key) => form.appendChild(buildContentSection(key, humanize(key))));
+  }
+
+  form.appendChild(
+    buildContentGroupHead(
+      '作品集案例頁',
+      '每張卡片是案例頁上的一個段落，卡片內同時有該段落的文字與圖片。新增／刪除段落會立即寫檔。'
+    )
+  );
 
   // 一次只渲染一個案例：五個案例、六十幾個段落全部攤開會變成一面牆
   if (!contentSlug || !projectSlugs.some((p) => p.slug === contentSlug)) {
@@ -1233,6 +1322,7 @@ async function loadContentPage() {
     fetch(`${API}/api/hero-gradients`).then((r) => r.json()).catch(() => ['slate']),
     fetch(`${API}/api/section-options`).then((r) => r.json()).catch(() => ({})),
     ensureSectionTypes(),
+    fetch(`${API}/api/cta-default`).then((r) => r.json()).then((d) => { ctaDefault = d; }).catch(() => {}),
   ]);
   heroGradients = gradients;
   sectionOptions = opts;
@@ -1475,7 +1565,7 @@ function renderProjectCard(slug, title, form) {
 
     // 文案欄位直接顯示；type/ratio/alt 這類技術欄位收進「進階」，
     // 平常編輯文字時不需要看到，但仍然改得到。
-    const TECHNICAL = new Set(['type', 'ratio', 'alt', 'imagePosition', 'count']);
+    const TECHNICAL = new Set(['type', 'ratio', 'alt', 'imagePosition', 'count', 'ctaLabel', 'ctaHref']);
     const plain = Object.keys(sec).filter((k) => !TECHNICAL.has(k));
     const tech = Object.keys(sec).filter((k) => TECHNICAL.has(k));
 
@@ -1489,13 +1579,14 @@ function renderProjectCard(slug, title, form) {
       cardBody.appendChild(renderMonoRow(label, ['sections', i, field], data, { select: values }));
     });
 
-    if (tech.length) {
-      const adv = document.createElement('details');
-      adv.className = 'sec-adv';
-      adv.innerHTML = `<summary>進階設定（${tech.length}）</summary>`;
-      tech.forEach((k) => renderMonoNode(sec[k], ['sections', i, k], adv, data));
-      cardBody.appendChild(adv);
-    }
+    // 進階設定一律顯示：CTA 開關住在這裡，就算這個段落還沒有任何技術欄位也要看得到
+    const adv = document.createElement('details');
+    adv.className = 'sec-adv';
+    adv.innerHTML = `<summary>進階設定</summary>`;
+    adv.appendChild(buildCtaToggle(i, sec, data));
+    tech.filter((k) => k !== 'ctaLabel' && k !== 'ctaHref')
+      .forEach((k) => renderMonoNode(sec[k], ['sections', i, k], adv, data));
+    cardBody.appendChild(adv);
 
     const mine = slots.filter((sl) => sl.sectionIndex === i);
     if (mine.length) cardBody.appendChild(slotStrip(slug, mine, bySlot));
@@ -1521,6 +1612,60 @@ function renderProjectCard(slug, title, form) {
   wrap.appendChild(header);
   wrap.appendChild(body);
   form.appendChild(wrap);
+}
+
+/*
+  每種段落都可以放一顆 CTA 按鈕。勾起來就把 ctaLabel／ctaHref 寫進這個段落
+  （預設值來自 /api/cta-default，跟內容裡既有的寫法一致），取消勾選就整組拿掉——
+  留著空字串的話 schema 會過，但頁面上會出現一顆沒有文字的按鈕。
+
+  只在原地增減那兩個欄位，不呼叫 renderContentForm()：整份表單重繪會把
+  <details> 關起來，等於勾完就看不到剛冒出來的欄位。實際寫檔仍是按「儲存所有文案」。
+*/
+function buildCtaToggle(index, sec, data) {
+  const box = document.createElement('div');
+
+  const row = document.createElement('div');
+  row.className = 'content-row';
+  const label = document.createElement('div');
+  label.className = 'content-row__label';
+  label.textContent = 'CTA 按鈕';
+  row.appendChild(label);
+
+  const control = document.createElement('div');
+  const toggle = document.createElement('label');
+  toggle.className = 'sec-cta-toggle';
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.checked = sec.ctaLabel !== undefined;
+  toggle.appendChild(input);
+  toggle.appendChild(document.createTextNode(' 在這個段落放一顆按鈕（記得按儲存）'));
+  control.appendChild(toggle);
+  row.appendChild(control);
+  box.appendChild(row);
+
+  const fields = document.createElement('div');
+  const renderFields = () => {
+    fields.innerHTML = '';
+    if (sec.ctaLabel === undefined) return;
+    renderMonoNode(sec.ctaLabel, ['sections', index, 'ctaLabel'], fields, data);
+    renderMonoNode(sec.ctaHref, ['sections', index, 'ctaHref'], fields, data);
+  };
+
+  input.addEventListener('change', () => {
+    if (input.checked) {
+      sec.ctaLabel = ctaDefault.ctaLabel;
+      sec.ctaHref = ctaDefault.ctaHref;
+    } else {
+      delete sec.ctaLabel;
+      delete sec.ctaHref;
+    }
+    renderFields();
+  });
+
+  renderFields();
+  box.appendChild(fields);
+  return box;
 }
 
 // 一個段落的圖片格：有圖顯示縮圖，沒有就是可點的空位，都直接上傳到指定版位
@@ -1660,16 +1805,16 @@ fileInputEl.addEventListener('change', async () => {
       if (!res.ok) throw new Error(await res.text());
       const { filename } = await res.json();
       showToast(`已新增 ${filename}`);
-      await loadHome();
-    } else if (pending.kind === 'home') {
-      const res = await fetch(`${API}/api/home/${pending.name}?filename=${encodeURIComponent(file.name)}`, {
+      await loadPageImages();
+    } else if (pending.kind === 'page-image') {
+      const res = await fetch(`${API}/api/page-images/${pending.page}/${pending.name}?filename=${encodeURIComponent(file.name)}`, {
         method: 'POST',
         headers: { 'Content-Type': file.type || 'application/octet-stream' },
         body: file,
       });
       if (!res.ok) throw new Error(await res.text());
       showToast('已更新');
-      await loadHome();
+      await loadPageImages();
     }
   } catch (err) {
     showToast(`上傳失敗：${err.message}`, true);
@@ -1688,7 +1833,7 @@ function openInitialPage() {
     btn.click();
     return;
   }
-  loadHome().catch((err) => showToast(`載入失敗：${err.message}`, true));
+  loadPageImages().catch((err) => showToast(`載入失敗：${err.message}`, true));
 }
 
 openInitialPage();

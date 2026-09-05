@@ -99,12 +99,19 @@ export function getHomeImage(name: string): ImageMetadata | undefined {
   return match?.[1];
 }
 
-/** 依檔名前綴取一組首頁圖片（例如 getHomeImageSet('hobby') 對應 hobby-01.png, hobby-02.png...），依檔名排序；找不到時回傳空陣列。 */
+/**
+ * 依檔名前綴取一組首頁圖片（例如 getHomeImageSet('hobby') 對應 hobby-00.png, hobby-01.png...），
+ * 依檔名排序；找不到時回傳空陣列。
+ *
+ * 只收「前綴 + 數字」的檔名，跟後台列出圖組的規則完全一致。用 startsWith 的話，
+ * 手動丟進資料夾的 hobby-old.png 會出現在網站上、後台卻看不到也刪不掉。
+ */
 export function getHomeImageSet(prefix: string): ImageMetadata[] {
+  const pattern = new RegExp(`^${prefix}-\\d+$`);
   return sortedByFilename(homeImageModules)
     .filter(([path]) => {
       const filename = path.split('/').pop() ?? '';
-      return filename.startsWith(`${prefix}-`);
+      return pattern.test(filename.replace(/\.[^.]+$/, ''));
     })
     .map(([, image]) => image);
 }

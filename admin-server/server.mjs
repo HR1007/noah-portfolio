@@ -2,7 +2,7 @@
 // 管三種素材：
 //   /api/collections/gallery/:slug   Gallery 三個相簿（編號序列）
 //   /api/collections/projects/:slug  Portfolio 五個 case study（編號序列，對應 content.config.ts 的 sections）
-//   /api/home                        Home 頁面的固定命名圖片（hero / avatar / about）
+//   /api/page-images                 Home／Gallery／Portfolio 的固定命名圖片（hero / avatar / about…）
 //   /api/home/sets/:set              Home 上數量可變的圖組（hobby = Beyond the Grid 生活照）
 //   /api/projects/:slug/sections     案例頁的段落結構（新增／刪除段落、段落內加減項目）
 import express from 'express';
@@ -14,7 +14,7 @@ import { imageSize } from 'image-size';
 import matter from 'gray-matter';
 import {
   getImageSlots, SECTION_META, SECTION_OPTIONS, describeSection, sectionItemCount,
-  createSection, addSectionItem, removeSectionItem, sectionTypeOptions,
+  createSection, addSectionItem, removeSectionItem, sectionTypeOptions, CTA_DEFAULT,
 } from '../src/lib/image-slots.mjs';
 import { HERO_GRADIENTS } from '../src/lib/hero-gradients.mjs';
 import {
@@ -28,13 +28,48 @@ const GALLERY_DIR = path.join(ROOT, 'src/assets/gallery');
 const PROJECTS_ASSET_DIR = path.join(ROOT, 'src/assets/projects');
 const PROJECTS_CONTENT_DIR = path.join(ROOT, 'src/content/projects');
 const HOME_DIR = path.join(ROOT, 'src/assets/home');
+const PORTFOLIO_DIR = path.join(ROOT, 'src/assets/portfolio');
 const ADMIN_UI_DIR = path.join(ROOT, 'admin-ui');
 const SITE_CONTENT_DIR = path.join(ROOT, 'src/content/site');
 const SITE_EN = path.join(SITE_CONTENT_DIR, 'main-en.json');
 const SITE_ZH = path.join(SITE_CONTENT_DIR, 'main-zh.json');
 
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif']);
-const HOME_SLOTS = ['hero', 'avatar', 'about'];
+/*
+  頁面上「位置固定、用語意檔名」的圖片：一個蘿蔔一個坑，換圖就是覆蓋同一個檔名，
+  跟相簿／案例頁那種編號序列不同（那些靠檔名編號決定順序與版位）。
+
+  以前這份清單只有 Home 一組，Gallery 與 Portfolio 的頁面大圖只能手動把檔案丟進
+  資料夾，後台看不到也換不了——同樣是「頁面上的一張固定圖」，卻有兩套規則。
+  集中成一份之後，新增頁面圖片只要在這裡加一行。
+*/
+const PAGE_IMAGES = {
+  home: {
+    label: 'Home 首頁',
+    dir: HOME_DIR,
+    urlBase: '/home-src',
+    slots: [
+      { name: 'hero', label: 'Hero（首頁最上方全身照）' },
+      { name: 'avatar', label: 'Avatar（引言旁的圓形頭像）' },
+      { name: 'about', label: 'About（About me 區塊照片）' },
+    ],
+  },
+  gallery: {
+    label: 'Gallery 相片集',
+    dir: GALLERY_DIR,
+    urlBase: '/gallery-src',
+    slots: [
+      { name: 'hero', label: 'Hero（相片集大圖）', note: '相簿內頁也用同一張，換了兩邊會一起變' },
+      { name: 'cta-avatar', label: 'CTA 頭像（頁尾聯絡區）' },
+    ],
+  },
+  portfolio: {
+    label: 'Portfolio 作品集',
+    dir: PORTFOLIO_DIR,
+    urlBase: '/portfolio-src',
+    slots: [{ name: 'hero', label: 'Hero（作品集大圖）' }],
+  },
+};
 // Home 上數量可變的圖組：網站端用 getHomeImageSet(prefix) 依檔名排序取用，
 // 所以檔名一律是 <prefix>-NN，可以隨時追加。
 const HOME_SETS = { hobby: 'Beyond the Grid（生活照）' };
@@ -395,6 +430,9 @@ app.put('/api/projects/:slug/content', async (req, res) => {
 
 app.get('/api/section-types', (req, res) => res.json(sectionTypeOptions()));
 
+// 後台把段落的 CTA 打開時要填什麼，由 image-slots.mjs 決定，後台不自己寫一份
+app.get('/api/cta-default', (req, res) => res.json(CTA_DEFAULT));
+
 /**
  * 算出「新版位 → 舊版位」的對照表，用來決定哪個檔案要改成哪個編號。
  * null 代表這一格沒有對應的舊圖（新加的段落／新加的項目），維持空著。
@@ -718,56 +756,82 @@ app.put('/api/projects/:slug/images/swap', async (req, res) => {
   }
 });
 
-// ---------- Home：固定命名圖片（不是編號序列，不用排序） ----------
+// ---------- 頁面固定圖片（語意檔名，不是編號序列，不用排序） ----------
 
-app.get('/api/home', async (req, res) => {
+function pageImageGroup(page) {
+  const group = PAGE_IMAGES[page];
+  if (!group) throw new Error(`未知的頁面：${page}`);
+  return group;
+}
+
+function pageImageSlot(page, name) {
+  const group = pageImageGroup(page);
+  const slot = group.slots.find((s) => s.name === name);
+  if (!slot) throw new Error(`${group.label} 沒有「${name}」這個位置`);
+  return { group, slot };
+}
+
+/*
+  找「檔名剛好等於這個語意名」的圖，副檔名不限——同一個位置可以從 png 換成 webp，
+  網站端也是用同一條規則（media.ts 的 getHomeImage/getGalleryImage/getPortfolioImage）。
+  Gallery 目錄底下還有相簿子資料夾，靠副檔名過濾自然會略過。
+*/
+async function findPageImage(dir, name) {
+  const files = await fs.readdir(dir);
+  return files.find(
+    (f) => IMAGE_EXT.has(path.extname(f).toLowerCase()) && path.basename(f, path.extname(f)) === name
+  );
+}
+
+app.get('/api/page-images', async (req, res) => {
   try {
-    const files = await fs.readdir(HOME_DIR);
-    const slots = await Promise.all(
-      HOME_SLOTS.map(async (name) => {
-        const match = files.find((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()) && path.basename(f, path.extname(f)) === name);
-        if (!match) return { name, filename: null };
-        const info = await describeFile(path.join(HOME_DIR, match), `/home-src/${match}`);
-        return { name, ...info };
+    const groups = await Promise.all(
+      Object.entries(PAGE_IMAGES).map(async ([page, group]) => {
+        const slots = await Promise.all(
+          group.slots.map(async (slot) => {
+            const match = await findPageImage(group.dir, slot.name);
+            if (!match) return { ...slot, page, filename: null };
+            const info = await describeFile(path.join(group.dir, match), `${group.urlBase}/${match}`);
+            return { ...slot, page, ...info };
+          })
+        );
+        return { page, label: group.label, slots };
       })
     );
-    res.json(slots);
+    res.json(groups);
   } catch (err) {
     res.status(500).json({ error: String(err) });
   }
 });
 
-app.post('/api/home/:name', express.raw({ type: '*/*', limit: '25mb' }), async (req, res) => {
+app.post('/api/page-images/:page/:name', express.raw({ type: '*/*', limit: '25mb' }), async (req, res) => {
   try {
-    const { name } = req.params;
-    if (!HOME_SLOTS.includes(name)) return res.status(400).json({ error: 'unknown home slot' });
+    const { page, name } = req.params;
+    const { group } = pageImageSlot(page, name);
     const ext = path.extname(String(req.query.filename || '')).toLowerCase();
     if (!IMAGE_EXT.has(ext)) return res.status(400).json({ error: 'unsupported extension' });
 
-    const files = await fs.readdir(HOME_DIR);
-    await Promise.all(
-      files
-        .filter((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()) && path.basename(f, path.extname(f)) === name)
-        .map((f) => fs.unlink(path.join(HOME_DIR, f)))
-    );
+    // 同一個位置可能已經有別種副檔名的舊圖，先清掉再寫，否則兩個檔案會搶同一個位置
+    const old = await findPageImage(group.dir, name);
+    if (old) await fs.unlink(path.join(group.dir, old));
+
     const filename = `${name}${ext}`;
-    await fs.writeFile(path.join(HOME_DIR, filename), req.body);
+    await fs.writeFile(path.join(group.dir, filename), req.body);
     res.json({ filename });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    res.status(400).json({ error: String(err.message || err) });
   }
 });
 
-app.delete('/api/home/:name', async (req, res) => {
+app.delete('/api/page-images/:page/:name', async (req, res) => {
   try {
-    const { name } = req.params;
-    if (!HOME_SLOTS.includes(name)) return res.status(400).json({ error: 'unknown home slot' });
-    const files = await fs.readdir(HOME_DIR);
-    const match = files.find((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()) && path.basename(f, path.extname(f)) === name);
-    if (match) await fs.unlink(path.join(HOME_DIR, match));
+    const { page, name } = req.params;
+    const { group } = pageImageSlot(page, name);
+    const match = await findPageImage(group.dir, name);
+    if (match) await fs.unlink(path.join(group.dir, match));
     res.json({ ok: true });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    res.status(400).json({ error: String(err.message || err) });
   }
 });
 
@@ -806,7 +870,8 @@ app.post('/api/home/sets/:set', express.raw({ type: '*/*', limit: '25mb' }), asy
     const maxIndex = homeSetFiles(files, set).reduce((max, f) => {
       const n = parseInt(path.basename(f, path.extname(f)).slice(set.length + 1), 10);
       return Number.isNaN(n) ? max : Math.max(max, n);
-    }, 0);
+      // 起始 -1 讓空圖組的第一張是 00，跟相簿與案例頁的編號起點一致
+    }, -1);
 
     const filename = `${set}-${String(maxIndex + 1).padStart(2, '0')}${ext}`;
     await fs.writeFile(path.join(HOME_DIR, filename), req.body);
@@ -905,6 +970,7 @@ app.use(express.static(ADMIN_UI_DIR));
 app.use('/gallery-src', express.static(GALLERY_DIR));
 app.use('/projects-src', express.static(PROJECTS_ASSET_DIR));
 app.use('/home-src', express.static(HOME_DIR));
+app.use('/portfolio-src', express.static(PORTFOLIO_DIR));
 
 const PORT = 5174;
 app.listen(PORT, () => {

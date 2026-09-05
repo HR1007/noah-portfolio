@@ -25,6 +25,12 @@
  * @property {string} [ratio]        內容裡定義的長寬比
  */
 
+/**
+ * 後台把 CTA 開起來時填入的預設值。每種段落都支援 CTA，這裡是唯一的預設來源，
+ * 免得後台自己寫一份、跟內容裡既有的寫法（Let's Try Out）不一致。
+ */
+export const CTA_DEFAULT = { ctaLabel: "Let's Try Out", ctaHref: '#' };
+
 /** 後台新增的項目一律先填佔位文字，實際文案在後台 Content 頁補。 */
 const TBD = '[需確認]';
 
