@@ -44,6 +44,10 @@ sections:
     themes:
       - title: '[需確認] 主題一'
         description: '[需確認] 說明文字，待設計師提供實際內容。'
+      - title: '[需確認] 主題標題'
+        description: '[需確認] 主題說明，待補'
+      - title: '[需確認] 主題標題'
+        description: '[需確認] 主題說明，待補'
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
     heading: See Talk German in Action
