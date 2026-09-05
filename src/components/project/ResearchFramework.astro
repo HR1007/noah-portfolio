@@ -9,12 +9,13 @@ interface Props {
   image: ImageMetadata | undefined;
   ratio: string;
   alt: string;
+  layout?: 'stacked' | 'split';
 }
 
-const { eyebrow, heading, paragraphs, image, ratio, alt } = Astro.props;
+const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked' } = Astro.props;
 ---
 
-<section class="research-framework">
+<section class="research-framework" data-layout={layout}>
   <div class="research-framework__intro">
     {eyebrow && <p class="research-framework__eyebrow">{eyebrow}</p>}
     <h2 class="research-framework__heading">{heading}</h2>
@@ -26,6 +27,20 @@ const { eyebrow, heading, paragraphs, image, ratio, alt } = Astro.props;
 </section>
 
 <style>
+  /* split：文字在左、圖片在右；768 以下落回單欄 */
+  .research-framework[data-layout='split'] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: var(--sp-5);
+  }
+
+  @media (max-width: 767px) {
+    .research-framework[data-layout='split'] {
+      grid-template-columns: 1fr;
+    }
+  }
+
   .research-framework {
     max-width: 1000px;
     margin: 0 auto;

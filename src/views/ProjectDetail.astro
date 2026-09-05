@@ -81,6 +81,7 @@ const { Content } = await render(project);
                   alt={section.alt}
                   ctaLabel={section.ctaLabel}
                   ctaHref={section.ctaHref}
+                  layout={section.layout}
                 />
               );
             case 'featureSplit':
@@ -128,6 +129,7 @@ const { Content } = await render(project);
                   image={imagesFor(sectionIndex)[0]}
                   ratio={section.ratio}
                   alt={section.alt}
+                  layout={section.layout}
                 />
               );
             case 'persona':
@@ -141,7 +143,7 @@ const { Content } = await render(project);
               );
             case 'designThemes':
               return (
-                <DesignThemes eyebrow={section.eyebrow} heading={section.heading} themes={section.themes} />
+                <DesignThemes eyebrow={section.eyebrow} heading={section.heading} themes={section.themes} images={imagesFor(sectionIndex)} />
               );
             case 'flow':
               return (

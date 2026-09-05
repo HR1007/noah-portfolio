@@ -163,6 +163,79 @@ app.get('/api/projects/:slug/slots', async (req, res) => {
   }
 });
 
+/*
+  調整段落順序。段落一移動，版位編號就跟著變，如果圖檔留在原編號，
+  圖片就會跑到別的段落去——所以這裡必須把圖檔一起搬，讓每個段落
+  帶著自己的圖走。先全部改成暫存檔名再落位，避免搬移過程互相覆蓋。
+*/
+app.put('/api/projects/:slug/sections/reorder', async (req, res) => {
+  try {
+    const { from, to } = req.body || {};
+    const file = projectFilePath(req.params.slug);
+    const raw = await fs.readFile(file, 'utf-8');
+    const { data, content } = matter(raw);
+    const sections = data.sections || [];
+    if (![from, to].every((n) => Number.isInteger(n) && n >= 0 && n < sections.length)) {
+      return res.status(400).json({ error: 'invalid index' });
+    }
+
+    // 每個版位在「所屬段落內是第幾張」，是搬移前後唯一穩定的對應鍵
+    const seqOf = (slots) => {
+      const seen = {};
+      return slots.map((sl) => {
+        seen[sl.sectionIndex] = (seen[sl.sectionIndex] ?? -1) + 1;
+        return { ...sl, nth: seen[sl.sectionIndex] };
+      });
+    };
+
+    const oldSeq = seqOf(getImageSlots(data));
+
+    const next = sections.slice();
+    next.splice(to, 0, next.splice(from, 1)[0]);
+    data.sections = next;
+    const newSeq = seqOf(getImageSlots(data));
+
+    // 舊的第 i 個段落，搬移後會落在哪個位置
+    const movedTo = (i) => {
+      if (i === from) return to;
+      if (from < i && i <= to) return i - 1;
+      if (to <= i && i < from) return i + 1;
+      return i;
+    };
+
+    const dir = slugDir('projects', req.params.slug);
+    const files = (await fs.readdir(dir)).filter((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()));
+    const byIndex = new Map();
+    for (const f of files) {
+      const base = path.basename(f, path.extname(f));
+      if (/^\d+$/.test(base)) byIndex.set(Number(base), f);
+    }
+
+    const moves = [];
+    for (const o of oldSeq) {
+      const src = byIndex.get(o.index);
+      if (!src) continue;
+      const targetSection = o.sectionIndex === -1 ? -1 : movedTo(o.sectionIndex);
+      const dest = newSeq.find((n) => n.sectionIndex === targetSection && n.nth === o.nth);
+      if (!dest || dest.index === o.index) continue;
+      const ext = path.extname(src);
+      moves.push({
+        src,
+        tmp: `__tmp_${dest.index}${ext}`,
+        final: `${String(dest.index).padStart(2, '0')}${ext}`,
+      });
+    }
+
+    for (const m of moves) await fs.rename(path.join(dir, m.src), path.join(dir, m.tmp));
+    for (const m of moves) await fs.rename(path.join(dir, m.tmp), path.join(dir, m.final));
+
+    await fs.writeFile(file, matter.stringify(content, data), 'utf-8');
+    res.json({ ok: true, moved: moves.length });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
 app.get('/api/hero-gradients', (req, res) => res.json(HERO_GRADIENTS));
 
 app.get('/api/collections/gallery', async (req, res) => {

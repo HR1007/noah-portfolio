@@ -43,6 +43,11 @@ function showToast(message, isError = false) {
   toast._timer = setTimeout(() => toast.classList.remove('toast--show'), 2200);
 }
 
+/* innerHTML 會吃到內容裡的文字（段落標題、Persona 名稱、檔名），先跳脫再塞。 */
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+}
+
 function formatBytes(bytes) {
   if (bytes == null) return '—';
   if (bytes < 1024) return `${bytes}B`;
@@ -185,16 +190,46 @@ sidebarItems.forEach((btn) => {
   });
 });
 
-// ---------- Gallery / Portfolio（編號序列相簿，共用同一套邏輯） ----------
+// ---------- Gallery（相片牆）／ Portfolio（案例頁版位，依段落分組） ----------
+//
+// 兩者的圖片意義不同，呈現方式也就不同：
+//   Gallery   一整片相片牆，順序就是全部，拖拉即排序。
+//   Portfolio 每張圖都對應頁面上某個段落的某一格「版位」，檔名編號＝版位編號。
+//             所以改成一段落一張卡片，並且可以直接在這裡增減段落與版位——
+//             這種改動會連帶把圖片檔重新編號，由 server 一次做完（見 admin-server/server.mjs）。
+
+let currentRequiredSlots = null;
+let currentSlotLabels = [];
+let currentSlots = []; // 案例頁的版位清單（每一格屬於哪個段落）
+let currentSections = []; // 案例頁的段落摘要（標題、能不能再加一項）
+let sectionTypes = []; // [{ type, label }]，段落型別的中文名稱
+
+/*
+  段落型別的名稱由 src/lib/image-slots.mjs 提供（後台 API 轉出），前端不自己維護
+  一份對照表：段落卡片標題、版位標籤、新增段落的選單三處才會一直是同一組叫法。
+*/
+async function ensureSectionTypes() {
+  if (sectionTypes.length > 0) return;
+  sectionTypes = await fetch(`${API}/api/section-types`).then((r) => r.json()).catch(() => []);
+}
+
+function sectionTypeLabel(type) {
+  return sectionTypes.find((t) => t.type === type)?.label ?? type;
+}
+let selectedSlot = null; // 案例頁：目前點選的版位編號（點兩格互換用）
 
 async function loadCollectionList() {
   pageTitleEl.textContent = currentType === 'gallery' ? 'Gallery 相簿' : 'Portfolio 案例圖片';
   pageMetaEl.textContent = '載入中…';
   pageTabsEl.innerHTML = '';
-  contentEl.innerHTML = '<div class="grid" id="grid"></div>';
+  contentEl.innerHTML =
+    currentType === 'projects'
+      ? '<div class="sections" id="sections"></div>'
+      : '<div class="grid" id="grid"></div>';
+
+  if (currentType === 'projects') await ensureSectionTypes();
 
   const list = await fetch(`${API}/api/collections/${currentType}`).then((r) => r.json());
-  pageTabsEl.innerHTML = '';
   list.forEach((item, i) => {
     const btn = document.createElement('button');
     btn.className = 'tab' + (i === 0 ? ' tab--active' : '');
@@ -211,108 +246,114 @@ async function loadCollectionList() {
 async function selectSlug(slug, btn) {
   currentSlug = slug;
   selectedIndex = null;
+  selectedSlot = null;
   [...pageTabsEl.children].forEach((b) => b.classList.toggle('tab--active', b === btn));
   await loadImages();
 }
 
-let currentRequiredSlots = null;
-let currentSlotLabels = [];
-
 async function loadImages() {
   pageMetaEl.textContent = '載入中…';
-  const { images, requiredSlots, slotLabels } = await fetch(
-    `${API}/api/collections/${currentType}/${currentSlug}/images`
-  ).then((r) => r.json());
-  currentImages = images;
-  currentRequiredSlots = requiredSlots;
-  currentSlotLabels = slotLabels || [];
-  pageMetaEl.textContent =
-    requiredSlots != null
-      ? `已上傳 ${currentImages.length} / 需要 ${requiredSlots} 張圖片 · 拖拉調順序，或點兩張快速互換位置`
-      : `${currentImages.length} 張圖片 · 拖拉調順序，或點兩張快速互換位置`;
-  renderCollectionGrid();
+  const data = await fetch(`${API}/api/collections/${currentType}/${currentSlug}/images`).then((r) => r.json());
+  currentImages = data.images;
+  currentRequiredSlots = data.requiredSlots;
+  currentSlotLabels = data.slotLabels || [];
+  currentSlots = data.slots || [];
+  currentSections = data.sections || [];
+
+  if (currentType === 'projects') {
+    const filled = currentImages.filter((im) => im.slotIndex != null && im.slotIndex < currentSlots.length).length;
+    pageMetaEl.textContent =
+      `${currentSections.length} 個段落 · 已上傳 ${filled} / ${currentSlots.length} 格 · ` +
+      '點空位就是上傳到那一格；拖拉或點兩格互換';
+    renderProjectSections();
+  } else {
+    pageMetaEl.textContent = `${currentImages.length} 張圖片 · 拖拉調順序，或點兩張快速互換位置`;
+    renderCollectionGrid();
+  }
   syncPreview();
 }
+
+// ---- 共用的磚塊 ----
+
+/** 圖片磚的外觀，Gallery 與 Portfolio 共用；點擊／拖拉行為由呼叫端各自綁。 */
+function buildTile(img, badge) {
+  const tile = document.createElement('div');
+  tile.className = 'tile';
+  tile.draggable = true;
+  tile.innerHTML = `
+    <div class="tile__image-wrap">
+      ${badge ? `<span class="tile__badge">${escapeHtml(badge)}</span>` : ''}
+      <img src="${imgUrl(img)}" alt="${escapeHtml(img.filename)}" loading="lazy" />
+      <button class="tile__expand" title="放大查看">
+        <svg viewBox="0 0 24 24"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg>
+      </button>
+      <button class="tile__delete" title="刪除圖片（版位保留，變成待上傳）">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
+      </button>
+    </div>
+    <div class="tile__meta">
+      <strong>${escapeHtml(img.filename)}</strong>
+      <span>${img.width && img.height ? `${img.width}×${img.height}` : '—'} · ${formatBytes(img.sizeBytes)}</span>
+    </div>
+  `;
+
+  tile.querySelector('.tile__expand').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openLightbox(img, badge || img.filename);
+  });
+  tile.querySelector('.tile__delete').addEventListener('click', (e) => {
+    e.stopPropagation();
+    handleDelete(img.filename);
+  });
+  return tile;
+}
+
+function buildAddTile(pending) {
+  const el = document.createElement('div');
+  el.className = 'tile tile--add';
+  el.innerHTML = '<span class="plus">+</span>';
+  el.draggable = false;
+  el.addEventListener('click', () => {
+    pendingUpload = pending;
+    fileInputEl.click();
+  });
+  return el;
+}
+
+/** 拖拉的共用綁定：key 是「拖的是哪一個」，Gallery 傳陣列位置，案例頁傳版位編號。 */
+function bindDrag(tile, key, container, onDrop) {
+  tile.addEventListener('dragstart', () => {
+    dragFromIndex = key;
+    tile.classList.add('dragging');
+  });
+  tile.addEventListener('dragend', () => {
+    tile.classList.remove('dragging');
+    container.querySelectorAll('.tile').forEach((t) => t.classList.remove('drop-target'));
+  });
+  tile.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    tile.classList.add('drop-target');
+  });
+  tile.addEventListener('dragleave', () => tile.classList.remove('drop-target'));
+  tile.addEventListener('drop', (e) => {
+    e.preventDefault();
+    tile.classList.remove('drop-target');
+    if (dragFromIndex === null || dragFromIndex === key) return;
+    onDrop(dragFromIndex, key);
+  });
+}
+
+// ---- Gallery：一整片相片牆 ----
 
 function renderCollectionGrid() {
   const gridEl = document.getElementById('grid');
   if (!gridEl) return;
   gridEl.innerHTML = '';
-  const showSlotLabels = currentType === 'projects';
 
-  /*
-    案例頁依「版位編號」渲染，不是依陣列順序：檔名 02.png 永遠落在第 3 格。
-    用陣列順序的話，刪掉中間某張圖後陣列塌陷，後面的圖會全部往前遞補一格，
-    看起來就像圖片自己跑掉了。缺號的位置改放「待上傳」空位。
-  */
-  let renderList = currentImages;
-  if (showSlotLabels && currentRequiredSlots != null) {
-    const bySlot = new Map(
-      currentImages.filter((im) => im.slotIndex != null).map((im) => [im.slotIndex, im])
-    );
-    renderList = [];
-    for (let i = 0; i < currentRequiredSlots; i++) {
-      renderList.push(bySlot.get(i) ?? { __emptySlot: i });
-    }
-    // 編號超出版位數、或檔名不是純數字的圖片，附在最後不讓它們消失
-    currentImages
-      .filter((im) => im.slotIndex == null || im.slotIndex >= currentRequiredSlots)
-      .forEach((im) => renderList.push(im));
-  }
-
-  renderList.forEach((img) => {
-    if (img.__emptySlot != null) {
-      const i = img.__emptySlot;
-      const empty = document.createElement('div');
-      empty.className = 'tile tile--empty-slot';
-      empty.innerHTML = `
-        <div class="tile__image-wrap">
-          <span class="tile__badge tile__badge--pending">待上傳</span>
-          <span class="tile__empty-label">${currentSlotLabels[i] ?? `#${i + 1}`}</span>
-        </div>
-      `;
-      empty.addEventListener('click', () => {
-        pendingUpload = { kind: 'collection' };
-        fileInputEl.click();
-      });
-      gridEl.appendChild(empty);
-      return;
-    }
-
-    const index = currentImages.indexOf(img);
-    const tile = document.createElement('div');
-    tile.className = 'tile' + (index === selectedIndex ? ' tile--selected' : '');
-    tile.draggable = true;
+  currentImages.forEach((img, index) => {
+    const tile = buildTile(img, index === 0 ? 'Cover' : null);
+    if (index === selectedIndex) tile.classList.add('tile--selected');
     tile.dataset.index = String(index);
-
-    const badge = showSlotLabels ? img.slotLabel : index === 0 ? 'Cover' : null;
-
-    tile.innerHTML = `
-      <div class="tile__image-wrap">
-        ${badge ? `<span class="tile__badge">${badge}</span>` : ''}
-        <img src="${imgUrl(img)}" alt="${img.filename}" loading="lazy" />
-        <button class="tile__expand" title="放大查看">
-          <svg viewBox="0 0 24 24"><path d="M15 3h6v6" /><path d="M9 21H3v-6" /><path d="M21 3l-7 7" /><path d="M3 21l7-7" /></svg>
-        </button>
-        <button class="tile__delete" title="刪除">
-          <svg viewBox="0 0 24 24"><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /></svg>
-        </button>
-      </div>
-      <div class="tile__meta">
-        <strong>${img.filename}</strong>
-        <span>${img.width && img.height ? `${img.width}×${img.height}` : '—'} · ${formatBytes(img.sizeBytes)}</span>
-      </div>
-    `;
-
-    tile.querySelector('.tile__delete').addEventListener('click', (e) => {
-      e.stopPropagation();
-      handleDelete(img.filename);
-    });
-
-    tile.querySelector('.tile__expand').addEventListener('click', (e) => {
-      e.stopPropagation();
-      openLightbox(img, badge || `第 ${index + 1} 張`);
-    });
 
     // 點兩張圖快速互換位置：不用拖著整張圖跨越整個 grid，適合離很遠的兩張圖交換。
     tile.addEventListener('click', () => {
@@ -329,40 +370,258 @@ function renderCollectionGrid() {
       }
     });
 
-    tile.addEventListener('dragstart', () => {
-      dragFromIndex = index;
-      tile.classList.add('dragging');
-    });
-    tile.addEventListener('dragend', () => {
-      tile.classList.remove('dragging');
-      gridEl.querySelectorAll('.tile').forEach((t) => t.classList.remove('drop-target'));
-    });
-    tile.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      tile.classList.add('drop-target');
-    });
-    tile.addEventListener('dragleave', () => tile.classList.remove('drop-target'));
-    tile.addEventListener('drop', (e) => {
-      e.preventDefault();
-      tile.classList.remove('drop-target');
-      const toIndex = index;
-      if (dragFromIndex === null || dragFromIndex === toIndex) return;
-      handleReorder(dragFromIndex, toIndex);
-    });
-
+    bindDrag(tile, index, gridEl, handleReorder);
     gridEl.appendChild(tile);
   });
 
-  const addTile = document.createElement('div');
-  addTile.className = 'tile tile--add';
-  addTile.innerHTML = '<span class="plus">+</span>';
-  addTile.draggable = false;
-  addTile.addEventListener('click', () => {
-    pendingUpload = { kind: 'collection' };
+  gridEl.appendChild(buildAddTile({ kind: 'collection' }));
+}
+
+// ---- Portfolio：一個段落一張卡片 ----
+
+function renderProjectSections() {
+  const host = document.getElementById('sections');
+  if (!host) return;
+  host.innerHTML = '';
+
+  const slotsBySection = new Map();
+  currentSlots.forEach((slot) => {
+    if (!slotsBySection.has(slot.sectionIndex)) slotsBySection.set(slot.sectionIndex, []);
+    slotsBySection.get(slot.sectionIndex).push(slot);
+  });
+
+  // Hero 不屬於任何段落，但一樣是一格版位，要能上傳／替換
+  host.appendChild(
+    buildSectionCard({ index: -1, title: 'Hero（案例頁最上方大圖）', list: null }, slotsBySection.get(-1) || [], host)
+  );
+
+  currentSections.forEach((section) => {
+    host.appendChild(buildSectionCard(section, slotsBySection.get(section.index) || [], host));
+  });
+
+  // 編號超出版位範圍、或檔名不是數字的圖片：頁面用不到，但也不該讓它們默默消失
+  const extras = currentImages.filter((im) => im.slotIndex == null || im.slotIndex >= currentSlots.length);
+  if (extras.length) host.appendChild(buildExtrasCard(extras));
+
+  host.appendChild(buildAddSectionBar());
+}
+
+function buildSectionCard(section, slots, host) {
+  const card = document.createElement('div');
+  card.className = 'sec-card';
+  const list = section.list;
+
+  const head = document.createElement('div');
+  head.className = 'sec-card__head';
+  const title = document.createElement('strong');
+  title.className = 'sec-card__title';
+  title.textContent = section.title;
+  head.appendChild(title);
+
+  const actions = document.createElement('div');
+  actions.className = 'sec-card__actions';
+
+  if (list) {
+    const addBtn = document.createElement('button');
+    addBtn.className = 'sec-btn';
+    addBtn.textContent = list.kind === 'image' ? `＋ ${list.label}（多一格圖）` : `＋ ${list.label}`;
+    addBtn.disabled = !list.canAdd;
+    if (!list.canAdd) addBtn.title = '這個版型已經到數量上限';
+    addBtn.addEventListener('click', () => handleAddItem(section, list));
+    actions.appendChild(addBtn);
+  }
+
+  if (section.index >= 0) {
+    const delBtn = document.createElement('button');
+    delBtn.className = 'sec-btn sec-btn--danger';
+    delBtn.textContent = '刪除段落';
+    delBtn.addEventListener('click', () => handleDeleteSection(section, slots));
+    actions.appendChild(delBtn);
+  }
+
+  head.appendChild(actions);
+  card.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'sec-card__body';
+
+  if (slots.length > 0) {
+    const bySlot = new Map(currentImages.filter((im) => im.slotIndex != null).map((im) => [im.slotIndex, im]));
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    slots.forEach((slot) => grid.appendChild(buildSlotTile(slot, bySlot.get(slot.index), section, host)));
+    body.appendChild(grid);
+  }
+
+  if (list && list.kind === 'text') {
+    body.appendChild(buildTextItemList(section, list));
+  } else if (slots.length === 0) {
+    const note = document.createElement('p');
+    note.className = 'sec-card__note';
+    note.textContent = '這個段落沒有圖片版位。';
+    body.appendChild(note);
+  }
+
+  card.appendChild(body);
+  return card;
+}
+
+/**
+ * 一格版位：有圖就是圖片磚，沒圖就是「待上傳」空位。
+ * 空位點下去＝上傳到「這一格」，不是接在最後面——版位是靠檔名編號綁的，
+ * 接在最後面的話，前面還沒上傳時，這張圖會落到別的段落去。
+ */
+function buildSlotTile(slot, img, section, host) {
+  const tile = img ? buildTile(img, slot.label) : buildEmptySlot(slot);
+  if (slot.index === selectedSlot) tile.classList.add('tile--selected');
+
+  const canRemoveSlot = !!(section.list && section.list.kind === 'image' && section.list.canRemove);
+  if (canRemoveSlot) {
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'tile__slot-remove';
+    remove.textContent = '−';
+    remove.title = `移除這一格版位（${section.list.label}少一個，圖片一併刪除）`;
+    remove.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleRemoveItem(section, slot.slotInSection, slot.label);
+    });
+    tile.querySelector('.tile__image-wrap').appendChild(remove);
+  }
+
+  tile.addEventListener('click', () => {
+    // 已經選了一格時，點另一格＝互換（點空位就是把圖搬過去）
+    if (selectedSlot !== null && selectedSlot !== slot.index) {
+      const a = selectedSlot;
+      selectedSlot = null;
+      handleSlotSwap(a, slot.index);
+      return;
+    }
+    if (selectedSlot === slot.index) {
+      selectedSlot = null;
+      renderProjectSections();
+      return;
+    }
+    if (img) {
+      selectedSlot = slot.index;
+      renderProjectSections();
+      return;
+    }
+    pendingUpload = { kind: 'collection', slot: slot.index };
     fileInputEl.click();
   });
-  gridEl.appendChild(addTile);
+
+  bindDrag(tile, slot.index, host, handleSlotSwap);
+  return tile;
 }
+
+function buildEmptySlot(slot) {
+  const el = document.createElement('div');
+  el.className = 'tile tile--empty-slot';
+  el.draggable = false;
+  el.innerHTML = `
+    <div class="tile__image-wrap">
+      <span class="tile__badge tile__badge--pending">待上傳</span>
+      <span class="tile__empty-label">${escapeHtml(slot.label)}</span>
+    </div>
+  `;
+  return el;
+}
+
+/** 純文字段落：這裡只列出「有哪幾項」與移除鈕，文字本身在 Content 頁編輯。 */
+function buildTextItemList(section, list) {
+  const wrap = document.createElement('div');
+  wrap.className = 'text-items';
+
+  (list.items || []).forEach((text, i) => {
+    const row = document.createElement('div');
+    row.className = 'text-item';
+    const label = document.createElement('span');
+    label.className = 'text-item__label';
+    label.textContent = `${i + 1}. ${text || '（空白）'}`;
+    row.appendChild(label);
+
+    if (list.canRemove) {
+      const btn = document.createElement('button');
+      btn.className = 'sec-btn sec-btn--danger';
+      btn.textContent = '移除';
+      btn.addEventListener('click', () => handleRemoveItem(section, i, text));
+      row.appendChild(btn);
+    }
+    wrap.appendChild(row);
+  });
+
+  const hint = document.createElement('p');
+  hint.className = 'sec-card__note';
+  hint.textContent = '文字內容請到左側「Content 文案」頁編輯。';
+  wrap.appendChild(hint);
+  return wrap;
+}
+
+function buildExtrasCard(extras) {
+  const card = document.createElement('div');
+  card.className = 'sec-card sec-card--extras';
+
+  const head = document.createElement('div');
+  head.className = 'sec-card__head';
+  const title = document.createElement('strong');
+  title.className = 'sec-card__title';
+  title.textContent = '沒有版位的圖片';
+  head.appendChild(title);
+  card.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'sec-card__body';
+  const note = document.createElement('p');
+  note.className = 'sec-card__note';
+  note.textContent = '這些圖片的編號超出目前版位數（或檔名不是數字），頁面上不會用到。可以刪掉，或往上替某個段落多加一格版位讓它們有地方放。';
+  body.appendChild(note);
+
+  const grid = document.createElement('div');
+  grid.className = 'grid';
+  extras.forEach((img) => grid.appendChild(buildTile(img, null)));
+  body.appendChild(grid);
+
+  card.appendChild(body);
+  return card;
+}
+
+function buildAddSectionBar() {
+  const bar = document.createElement('div');
+  bar.className = 'sec-add';
+
+  const typeSel = document.createElement('select');
+  sectionTypes.forEach(({ type, label }) => {
+    const o = document.createElement('option');
+    o.value = type;
+    o.textContent = label;
+    typeSel.appendChild(o);
+  });
+
+  const posSel = document.createElement('select');
+  const lastOpt = document.createElement('option');
+  lastOpt.value = '';
+  lastOpt.textContent = '放在最後面';
+  posSel.appendChild(lastOpt);
+  currentSections.forEach((s) => {
+    const o = document.createElement('option');
+    o.value = String(s.index);
+    o.textContent = `插在「${s.title}」之前`;
+    posSel.appendChild(o);
+  });
+
+  const btn = document.createElement('button');
+  btn.className = 'sec-btn sec-btn--primary';
+  btn.textContent = '＋ 新增段落';
+  btn.addEventListener('click', () =>
+    handleAddSection(typeSel.value, posSel.value === '' ? null : Number(posSel.value))
+  );
+
+  bar.append(typeSel, posSel, btn);
+  return bar;
+}
+
+// ---- 動作 ----
 
 async function handleDelete(filename) {
   if (!confirm(`確定要刪除 ${filename}？`)) return;
@@ -376,6 +635,89 @@ async function handleDelete(filename) {
   }
 }
 
+/**
+ * 段落結構的四個動作共用：這些改動會同時改 md 與圖片檔名（server 一次做完），
+ * 所以成功後一律整頁重讀，不在前端自己推算新狀態。
+ */
+async function structureRequest(url, options, okMessage, reload) {
+  try {
+    const res = await fetch(url, options);
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || res.statusText);
+    const renamed = body.renamed ? `，${body.renamed} 張圖片重新編號` : '';
+    const deleted = body.deleted ? `，一併刪除 ${body.deleted} 張圖片` : '';
+    showToast(`${okMessage}${renamed}${deleted}`);
+    selectedSlot = null;
+    await reload();
+  } catch (err) {
+    showToast(err.message, true);
+  }
+}
+
+function handleAddItem(section, list) {
+  return structureRequest(
+    `${API}/api/projects/${currentSlug}/sections/${section.index}/items`,
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' },
+    list.kind === 'image' ? `已多加一格「${list.label}」版位` : `已多加一項「${list.label}」（文字先填 [需確認]）`,
+    loadImages
+  );
+}
+
+function handleRemoveItem(section, itemIndex, label) {
+  const list = section.list;
+  const extra = list.kind === 'image' ? '（若這一格有圖，圖片會一併刪除）' : '';
+  if (!confirm(`確定要移除「${label}」這個${list.label}？${extra}`)) return;
+  return structureRequest(
+    `${API}/api/projects/${currentSlug}/sections/${section.index}/items/${itemIndex}`,
+    { method: 'DELETE' },
+    `已移除一個${list.label}`,
+    loadImages
+  );
+}
+
+function handleDeleteSection(section, slots) {
+  const withImages = slots.filter((s) => currentImages.some((im) => im.slotIndex === s.index)).length;
+  const warn = withImages ? `\n\n這個段落有 ${withImages} 張圖片，會一起刪除。` : '';
+  if (!confirm(`確定要刪除「${section.title}」這個段落？${warn}`)) return;
+  return structureRequest(
+    `${API}/api/projects/${currentSlug}/sections/${section.index}`,
+    { method: 'DELETE' },
+    '已刪除段落',
+    loadImages
+  );
+}
+
+function handleAddSection(type, at) {
+  return structureRequest(
+    `${API}/api/projects/${currentSlug}/sections`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(at == null ? { type } : { type, at }),
+    },
+    '已新增段落，文字先填入 [需確認] 佔位，請到 Content 頁補上',
+    loadImages
+  );
+}
+
+/** 案例頁的互換：只動這兩格的編號，其他格與空版位都留在原地。 */
+async function handleSlotSwap(a, b) {
+  try {
+    const res = await fetch(`${API}/api/projects/${currentSlug}/images/swap`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ a, b }),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || res.statusText);
+    showToast(`已互換第 ${a + 1} 格與第 ${b + 1} 格`);
+    await loadImages();
+  } catch (err) {
+    showToast(`互換失敗：${err.message}`, true);
+  }
+}
+
+// Gallery 專用的重排：整串壓成 00..N-1。案例頁不能用這個（會把空版位吃掉）。
 async function submitOrder(order) {
   const res = await fetch(`${API}/api/collections/${currentType}/${currentSlug}/order`, {
     method: 'PUT',
@@ -424,6 +766,8 @@ let currentHomeSets = [];
 let heroGradients = ['slate'];
 let projectSlots = {};   // slug -> 版位清單（含所屬段落）
 let projectImages = {};  // slug -> 已上傳的圖片
+let contentSlug = null;  // Content 分頁目前正在編輯的案例
+let sectionDragFrom = null;
 
 async function loadHome() {
   pageTitleEl.textContent = 'Home 首頁圖片';
@@ -580,6 +924,8 @@ async function handleHomeDelete(name) {
 let siteEn = null;
 let siteZh = null;
 const CONTENT_EXPANDED_BY_DEFAULT = new Set(['home', 'portfolio', 'gallery']);
+const CONTENT_META = '網站文案為中英對照；案例頁以段落分組，文字與圖片在同一張卡片內編輯';
+let contentQuery = ''; // 上方搜尋框的內容，換分頁重繪後仍要保留
 
 function humanize(key) {
   return String(key).replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
@@ -757,6 +1103,12 @@ function renderMonoNode(val, keyPath, container, dataObj) {
     );
     return;
   }
+  if (key === 'layout') {
+    container.appendChild(
+      renderMonoRow('版面', keyPath, dataObj, { select: ['stacked', 'split'] })
+    );
+    return;
+  }
   if (key === 'imagePosition') {
     container.appendChild(renderMonoRow('Image Position', keyPath, dataObj, { select: ['left', 'right'] }));
     return;
@@ -804,13 +1156,15 @@ function renderContentForm() {
   const form = document.getElementById('contentForm');
 
   Object.keys(siteEn).forEach((sectionKey) => {
+    const expanded = CONTENT_EXPANDED_BY_DEFAULT.has(sectionKey);
     const section = document.createElement('div');
-    section.className = 'content-section' + (CONTENT_EXPANDED_BY_DEFAULT.has(sectionKey) ? '' : ' collapsed');
+    section.className = 'content-section' + (expanded ? '' : ' collapsed');
+    section.dataset.collapsed = expanded ? '0' : '1';
 
     const header = document.createElement('div');
     header.className = 'content-section__header';
     header.innerHTML = `<span>${humanize(sectionKey)}</span><span class="chev">▾</span>`;
-    header.addEventListener('click', () => section.classList.toggle('collapsed'));
+    bindSectionToggle(section, header);
 
     const body = document.createElement('div');
     body.className = 'content-section__body';
@@ -830,7 +1184,15 @@ function renderContentForm() {
   projectsHint.style.cssText = 'color:var(--muted);font-size:13px;margin-bottom:12px';
   form.appendChild(projectsHint);
 
-  projectSlugs.forEach(({ slug, title }) => renderProjectCard(slug, title, form));
+  // 一次只渲染一個案例：五個案例、六十幾個段落全部攤開會變成一面牆
+  if (!contentSlug || !projectSlugs.some((p) => p.slug === contentSlug)) {
+    contentSlug = projectSlugs[0]?.slug ?? null;
+  }
+  renderContentTabs();
+  const cur = projectSlugs.find((p) => p.slug === contentSlug);
+  if (cur) renderProjectCard(cur.slug, cur.title, form);
+
+  applyContentFilter();
 
   const savebar = document.createElement('div');
   savebar.className = 'content-savebar';
@@ -850,6 +1212,7 @@ async function loadContentPage() {
     fetch(`${API}/api/site`).then((r) => r.json()),
     fetch(`${API}/api/collections/projects`).then((r) => r.json()),
     fetch(`${API}/api/hero-gradients`).then((r) => r.json()).catch(() => ['slate']),
+    ensureSectionTypes(),
   ]);
   heroGradients = gradients;
   siteEn = en;
@@ -869,7 +1232,7 @@ async function loadContentPage() {
     })
   );
 
-  pageMetaEl.textContent = '網站文案為中英對照；案例頁以段落分組，文字與圖片在同一張卡片內編輯';
+  pageMetaEl.textContent = CONTENT_META;
   renderContentForm();
   syncPreview();
 }
@@ -879,24 +1242,94 @@ async function loadContentPage() {
   heading（而不是 sections #3 這種泛型標籤），卡片內同時放這個區塊的文字欄位
   與圖片格，改一個段落不必在兩個分頁之間來回。
 */
-const SECTION_TYPES = {
-  textSection: '純文字段落',
-  deviceShowcase: '裝置展示圖',
-  experienceDemo: '體驗展示',
-  featureSplit: '圖文並排',
-  featureGrid: '功能格線',
-  imageRow: '並排圖片',
-  illustrationGrid: '插畫格線',
-  researchFramework: '研究架構',
-  persona: 'Persona',
-  designThemes: '設計主軸',
-  flow: '流程步驟',
-};
-
 // 段落卡片標題優先用 heading，其次 eyebrow，都沒有才退回型別名稱
 function sectionTitle(sec, i) {
-  const name = sec.heading || sec.eyebrow || SECTION_TYPES[sec.type] || sec.type;
+  const name = sec.heading || sec.eyebrow || sectionTypeLabel(sec.type);
   return `${i + 1}. ${name}`;
+}
+
+function renderContentTabs() {
+  pageTabsEl.innerHTML = '';
+  projectSlugs.forEach(({ slug, title }) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (slug === contentSlug ? ' tab--active' : '');
+    btn.textContent = title;
+    btn.addEventListener('click', () => {
+      contentSlug = slug;
+      renderContentForm();
+      syncPreview();
+    });
+    pageTabsEl.appendChild(btn);
+  });
+
+  const search = document.createElement('input');
+  search.type = 'search';
+  search.className = 'content-search';
+  search.placeholder = '搜尋文案（欄位名稱或內容）…';
+  search.value = contentQuery;
+  search.addEventListener('input', () => {
+    contentQuery = search.value.trim();
+    applyContentFilter();
+  });
+  pageTabsEl.appendChild(search);
+
+  [['展開全部', false], ['收合全部', true]].forEach(([label, collapsed]) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab';
+    btn.textContent = label;
+    btn.addEventListener('click', () => setAllContentSections(collapsed));
+    pageTabsEl.appendChild(btn);
+  });
+}
+
+/*
+  文案欄位很多，一層層點開找太慢。搜尋直接比對「欄位名稱」與「目前填的內容」，
+  沒命中的列先藏起來，含有結果的段落自動展開；清空搜尋就回到原本的展開狀態
+  （所以每個段落把自己的預設狀態記在 dataset.collapsed，不是靠當下的 class 推回去）。
+*/
+function applyContentFilter() {
+  const form = document.getElementById('contentForm');
+  if (!form) return;
+  const q = contentQuery.toLowerCase();
+
+  form.querySelectorAll('.content-row').forEach((row) => {
+    if (!q) {
+      row.hidden = false;
+      return;
+    }
+    const label = row.querySelector('.content-row__label')?.textContent ?? '';
+    const values = [...row.querySelectorAll('input, textarea, select')].map((el) => el.value).join(' ');
+    row.hidden = !`${label} ${values}`.toLowerCase().includes(q);
+  });
+
+  // 整個群組／段落卡片裡都沒有命中的列，就連容器一起收掉，畫面才不會剩一堆空殼
+  form.querySelectorAll('.content-group, .sec-card').forEach((box) => {
+    box.hidden = !!q && !box.querySelector('.content-row:not([hidden])');
+  });
+
+  form.querySelectorAll('.content-section').forEach((section) => {
+    const hit = !!section.querySelector('.content-row:not([hidden])');
+    section.hidden = !!q && !hit;
+    section.classList.toggle('collapsed', q ? false : section.dataset.collapsed === '1');
+  });
+
+  const hits = form.querySelectorAll('.content-row:not([hidden])').length;
+  pageMetaEl.textContent = q ? `搜尋「${contentQuery}」：找到 ${hits} 個欄位` : CONTENT_META;
+}
+
+function setAllContentSections(collapsed) {
+  document.querySelectorAll('#contentForm .content-section').forEach((section) => {
+    section.dataset.collapsed = collapsed ? '1' : '0';
+    section.classList.toggle('collapsed', collapsed);
+  });
+}
+
+/** 展開／收合的切換：同時把「預設狀態」記下來，清空搜尋後才回得到這個狀態。 */
+function bindSectionToggle(section, header) {
+  header.addEventListener('click', () => {
+    section.classList.toggle('collapsed');
+    section.dataset.collapsed = section.classList.contains('collapsed') ? '1' : '0';
+  });
 }
 
 function renderProjectCard(slug, title, form) {
@@ -906,12 +1339,14 @@ function renderProjectCard(slug, title, form) {
   const images = projectImages[slug] || [];
   const bySlot = new Map(images.filter((im) => im.slotIndex != null).map((im) => [im.slotIndex, im]));
 
+  // 分頁一次只顯示一個案例，所以預設就攤開；再要求點一下才看得到內容只是多一步
   const wrap = document.createElement('div');
-  wrap.className = 'content-section collapsed';
+  wrap.className = 'content-section';
+  wrap.dataset.collapsed = '0';
   const header = document.createElement('div');
   header.className = 'content-section__header';
   header.innerHTML = `<span>${title}</span><span class="chev">▾</span>`;
-  header.addEventListener('click', () => wrap.classList.toggle('collapsed'));
+  bindSectionToggle(wrap, header);
   const body = document.createElement('div');
   body.className = 'content-section__body';
 
@@ -930,11 +1365,38 @@ function renderProjectCard(slug, title, form) {
   (data.sections || []).forEach((sec, i) => {
     const card = document.createElement('div');
     card.className = 'sec-card';
+    card.draggable = true;
+    card.dataset.idx = String(i);
+
+    card.addEventListener('dragstart', (e) => {
+      sectionDragFrom = i;
+      card.classList.add('sec-card--dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => {
+      sectionDragFrom = null;
+      document.querySelectorAll('.sec-card').forEach((c) =>
+        c.classList.remove('sec-card--dragging', 'sec-card--over')
+      );
+    });
+    card.addEventListener('dragover', (e) => {
+      if (sectionDragFrom === null || sectionDragFrom === i) return;
+      e.preventDefault();
+      card.classList.add('sec-card--over');
+    });
+    card.addEventListener('dragleave', () => card.classList.remove('sec-card--over'));
+    card.addEventListener('drop', (e) => {
+      e.preventDefault();
+      card.classList.remove('sec-card--over');
+      if (sectionDragFrom === null || sectionDragFrom === i) return;
+      reorderSection(slug, sectionDragFrom, i);
+    });
 
     const head = document.createElement('div');
     head.className = 'sec-card__head';
-    head.innerHTML = `<strong>${sectionTitle(sec, i)}</strong>
-      <span class="sec-card__type">${SECTION_TYPES[sec.type] || sec.type}</span>`;
+    head.innerHTML = `<span class="sec-card__grip" title="拖拉調整順序">⠿</span>
+      <strong>${sectionTitle(sec, i)}</strong>
+      <span class="sec-card__type">${sectionTypeLabel(sec.type)}</span>`;
     const del = document.createElement('button');
     del.className = 'sec-card__del';
     del.textContent = '刪除段落';
@@ -944,7 +1406,22 @@ function renderProjectCard(slug, title, form) {
 
     const cardBody = document.createElement('div');
     cardBody.className = 'sec-card__body';
-    Object.keys(sec).forEach((k) => renderMonoNode(sec[k], ['sections', i, k], cardBody, data));
+
+    // 文案欄位直接顯示；type/ratio/alt 這類技術欄位收進「進階」，
+    // 平常編輯文字時不需要看到，但仍然改得到。
+    const TECHNICAL = new Set(['type', 'ratio', 'alt', 'imagePosition', 'count']);
+    const plain = Object.keys(sec).filter((k) => !TECHNICAL.has(k));
+    const tech = Object.keys(sec).filter((k) => TECHNICAL.has(k));
+
+    plain.forEach((k) => renderMonoNode(sec[k], ['sections', i, k], cardBody, data));
+
+    if (tech.length) {
+      const adv = document.createElement('details');
+      adv.className = 'sec-adv';
+      adv.innerHTML = `<summary>進階設定（${tech.length}）</summary>`;
+      tech.forEach((k) => renderMonoNode(sec[k], ['sections', i, k], adv, data));
+      cardBody.appendChild(adv);
+    }
 
     const mine = slots.filter((sl) => sl.sectionIndex === i);
     if (mine.length) cardBody.appendChild(slotStrip(slug, mine, bySlot));
@@ -957,9 +1434,9 @@ function renderProjectCard(slug, title, form) {
   const add = document.createElement('div');
   add.className = 'sec-add';
   const sel = document.createElement('select');
-  Object.entries(SECTION_TYPES).forEach(([v, label]) => {
+  sectionTypes.forEach(({ type, label }) => {
     const o = document.createElement('option');
-    o.value = v; o.textContent = label; sel.appendChild(o);
+    o.value = type; o.textContent = label; sel.appendChild(o);
   });
   const addBtn = document.createElement('button');
   addBtn.textContent = '＋ 新增段落';
@@ -994,43 +1471,45 @@ function slotStrip(slug, slotList, bySlot) {
   return strip;
 }
 
+/*
+  新增／刪除段落一律交給 server 的段落 API：那邊用 content schema 的樣板建立新段落，
+  並且連帶把圖片檔重新編號。先前這裡是自己拼一個 blank 物件、只改 md 不動檔名，
+  所以刪掉中間的段落後，後面的圖片會整串落到別的區塊去（當時只能跳警告要你自己收拾）。
+*/
 async function addSection(slug, type) {
-  const data = projectsData[slug];
-  const blank = { type };
-  if (type === 'featureGrid') blank.columns = [];
-  if (type === 'imageRow') blank.images = [];
-  if (type === 'persona') blank.personas = [];
-  if (type === 'flow') blank.steps = [];
-  if (type === 'designThemes') blank.themes = [];
-  if (type === 'illustrationGrid') { blank.count = 1; blank.alt = ''; }
-  if (type === 'textSection') blank.paragraphs = [''];
-  if (['deviceShowcase','experienceDemo','featureSplit','researchFramework'].includes(type)) {
-    blank.ratio = '4/3'; blank.alt = '';
-  }
-  if (['experienceDemo','featureSplit','researchFramework','textSection'].includes(type)) blank.heading = '新段落';
-  if (type === 'featureSplit') { blank.body = ''; blank.imagePosition = 'right'; }
-  data.sections = data.sections || [];
-  data.sections.push(blank);
-  await persistProject(slug, '已新增段落，記得按儲存');
+  if (!(await saveProjectData(slug))) return;
+  await structureRequest(
+    `${API}/api/projects/${slug}/sections`,
+    { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type }) },
+    '已新增段落，文字先填入 [需確認] 佔位',
+    loadContentPage
+  );
 }
 
 async function deleteSection(slug, i) {
   const data = projectsData[slug];
-  const sec = data.sections[i];
+  const images = projectImages[slug] || [];
   const slots = (projectSlots[slug] || []).filter((sl) => sl.sectionIndex === i);
-  const later = (projectSlots[slug] || []).filter((sl) => sl.sectionIndex > i).length;
+  const withImages = slots.filter((sl) => images.some((im) => im.slotIndex === sl.index)).length;
 
-  let msg = `確定刪除段落「${sectionTitle(sec, i)}」？`;
-  if (slots.length) msg += `\n\n這個段落有 ${slots.length} 個圖片版位，圖檔會保留在資料夾裡不刪除。`;
-  if (later) msg += `\n⚠️ 後面還有 ${later} 個版位，刪除後版位編號會往前移，那些圖片會落到別的段落，需要你手動調整。`;
+  let msg = `確定刪除段落「${sectionTitle(data.sections[i], i)}」？`;
+  if (withImages) msg += `\n\n這個段落有 ${withImages} 張圖片，會一起刪除。`;
   if (!confirm(msg)) return;
 
-  data.sections.splice(i, 1);
-  await persistProject(slug, '已刪除段落，記得檢查後面的圖片是否錯位');
+  if (!(await saveProjectData(slug))) return;
+  await structureRequest(
+    `${API}/api/projects/${slug}/sections/${i}`,
+    { method: 'DELETE' },
+    '已刪除段落',
+    loadContentPage
+  );
 }
 
-// 結構改動（新增／刪除段落）立即寫回檔案，否則版位計算會跟畫面對不上
-async function persistProject(slug, toast) {
+/**
+ * 動結構之前，先把畫面上還沒儲存的文字寫回檔案。
+ * 段落 API 是直接讀檔改檔，不先存的話，未儲存的編輯會在重新載入時默默消失。
+ */
+async function saveProjectData(slug) {
   try {
     const res = await fetch(`${API}/api/projects/${slug}/content`, {
       method: 'PUT',
@@ -1038,10 +1517,10 @@ async function persistProject(slug, toast) {
       body: JSON.stringify(projectsData[slug]),
     });
     if (!res.ok) throw new Error(await res.text());
-    showToast(toast);
-    await loadContentPage();
+    return true;
   } catch (err) {
     showToast(`儲存失敗：${err.message}`, true);
+    return false;
   }
 }
 
@@ -1079,8 +1558,10 @@ fileInputEl.addEventListener('change', async () => {
 
   try {
     if (pending.kind === 'collection') {
+      // 帶 slot 時就是「上傳到這一格」；沒帶（Gallery、右下角的 + 磚）才接在最後
+      const slotParam = pending.slot != null ? `&slot=${pending.slot}` : '';
       const res = await fetch(
-        `${API}/api/collections/${currentType}/${currentSlug}/images?filename=${encodeURIComponent(file.name)}`,
+        `${API}/api/collections/${currentType}/${currentSlug}/images?filename=${encodeURIComponent(file.name)}${slotParam}`,
         { method: 'POST', headers: { 'Content-Type': file.type || 'application/octet-stream' }, body: file }
       );
       if (!res.ok) throw new Error(await res.text());

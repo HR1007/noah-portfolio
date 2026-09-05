@@ -12,12 +12,13 @@ interface Props {
   alt: string;
   ctaLabel?: string;
   ctaHref?: string;
+  layout?: 'stacked' | 'split';
 }
 
-const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref } = Astro.props;
+const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = 'stacked' } = Astro.props;
 ---
 
-<section class="experience-demo">
+<section class="experience-demo" data-layout={layout}>
   <div class="experience-demo__intro">
     {eyebrow && <p class="experience-demo__eyebrow">{eyebrow}</p>}
     <h2 class="experience-demo__heading">{heading}</h2>
@@ -37,6 +38,23 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref } = Astro.p
     display: flex;
     flex-direction: column;
     gap: var(--sp-4);
+  }
+
+  /*
+    split：文字在左、圖片在右。用 grid 而非 flex-direction: row，
+    兩欄才能各自等分且在 768 以下乾淨地落回單欄。
+  */
+  .experience-demo[data-layout='split'] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: var(--sp-5);
+  }
+
+  @media (max-width: 767px) {
+    .experience-demo[data-layout='split'] {
+      grid-template-columns: 1fr;
+    }
   }
 
   .experience-demo__intro {

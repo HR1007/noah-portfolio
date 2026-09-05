@@ -934,3 +934,170 @@ svg {
   font-size: 13px;
 }
 .sec-add button:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ---------- Portfolio：案例圖片依段落分組 ---------- */
+/*
+  沿用上面 Content 頁的 .sec-card 外觀，這裡只補「圖片管理」需要的部分：
+  段落標題列右側的動作按鈕、版位移除鈕、純文字段落的項目列表。
+*/
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.sec-card__title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sec-card__actions {
+  margin-left: auto;
+  display: flex;
+  gap: var(--sp-1);
+  flex-shrink: 0;
+}
+
+.sec-btn {
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sec-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.sec-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sec-btn--danger {
+  color: var(--danger);
+}
+
+.sec-btn--danger:hover:not(:disabled) {
+  border-color: var(--danger);
+  color: var(--danger);
+  background: rgba(214, 69, 69, 0.08);
+}
+
+.sec-btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.sec-btn--primary:hover:not(:disabled) {
+  color: var(--accent-ink);
+  opacity: 0.9;
+}
+
+.sec-card__note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* 純文字段落：只列出有哪幾項與移除鈕，文字本身在 Content 頁編輯 */
+.text-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.text-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font-size: 13px;
+}
+
+.text-item__label {
+  flex: 1;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+  移除「版位」與刪除「圖片」是兩件事，所以放在磚塊的兩個角落，圖示也不同：
+  右上角垃圾桶＝只清掉圖片，版位留著；左下角減號＝這一格從段落裡整個拿掉。
+*/
+.tile__slot-remove {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--danger);
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.tile:hover .tile__slot-remove {
+  opacity: 1;
+}
+
+.sec-card--extras .sec-card__head {
+  color: var(--danger);
+}
+
+/* 段落拖拉排序 */
+.sec-card__grip { cursor: grab; color: var(--muted); font-size: 14px; letter-spacing: -2px; }
+.sec-card--dragging { opacity: 0.4; }
+.sec-card--over { border-color: var(--accent); box-shadow: 0 -2px 0 var(--accent) inset; }
+
+/* 技術欄位的折疊區 */
+.sec-adv { margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 8px; }
+.sec-adv > summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 4px 0;
+  list-style: none;
+}
+.sec-adv > summary::before { content: '▸ '; }
+.sec-adv[open] > summary::before { content: '▾ '; }
+
+/* Content 文案頁：上方分頁列裡的搜尋框 */
+.content-search {
+  flex: 1;
+  min-width: 180px;
+  max-width: 320px;
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.content-search:focus {
+  outline: none;
+  border-color: var(--accent);
+}

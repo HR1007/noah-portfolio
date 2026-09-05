@@ -26,6 +26,8 @@ const experienceDemoBlock = z.object({
   alt: z.string(),
   ctaLabel: z.string().optional(),
   ctaHref: z.string().optional(),
+  // stacked：文字在上、圖片在下（預設）；split：文字在左、圖片在右
+  layout: z.enum(['stacked', 'split']).default('stacked'),
 });
 
 const featureSplitBlock = z.object({
@@ -75,6 +77,8 @@ const researchFrameworkBlock = z.object({
   paragraphs: z.array(z.string()),
   ratio: z.string(),
   alt: z.string(),
+  // stacked：文字在上、圖片在下（預設）；split：文字在左、圖片在右
+  layout: z.enum(['stacked', 'split']).default('stacked'),
 });
 
 const personaBlock = z.object({
