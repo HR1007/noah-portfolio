@@ -36,8 +36,6 @@ sections:
     heading: '[需確認] Persona 標題，待設計師提供'
     personas:
       - name: '[需確認] Persona 名稱'
-        role: '[需確認] 角色／身分'
-        description: '[需確認] Persona 描述，待設計師提供實際內容。'
         ratio: 3/4
         alt: '[需確認] Persona portrait'
   - type: designThemes

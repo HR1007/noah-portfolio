@@ -30,11 +30,9 @@ const { eyebrow, heading, body, steps, images, direction = 'horizontal' } = Astr
     {
       steps.map((step, index) => (
         <div class="flow__step">
+          {/* 只放圖：步驟編號與名稱不在頁面上呈現，圖本身已經說明了這一步。
+              label 仍保留在資料裡，供後台的版位標籤辨識「這格是哪一步」。 */}
           <Media fit="natural" image={images[index]} ratio={step.ratio} alt={step.alt} />
-          <p class="flow__step-label">
-            <span class="flow__step-index">{index + 1}</span>
-            {step.label}
-          </p>
         </div>
       ))
     }
@@ -91,28 +89,6 @@ const { eyebrow, heading, body, steps, images, direction = 'horizontal' } = Astr
     display: flex;
     flex-direction: column;
     gap: var(--sp-2);
-  }
-
-  .flow__step-label {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-1);
-    font-size: var(--font-size-label);
-    color: var(--color-muted);
-  }
-
-  .flow__step-index {
-    flex: none;
-    width: 22px;
-    height: 22px;
-    border-radius: 999px;
-    background: var(--color-ink);
-    color: var(--color-bg);
-    font-size: var(--font-size-meta);
-    font-weight: var(--font-weight-semibold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   @media (max-width: 767px) {

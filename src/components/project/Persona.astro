@@ -4,14 +4,6 @@ import Media from '../Media.astro';
 
 interface PersonaCard {
   name: string;
-  role: string;
-  description: string;
-  quote?: string;
-  about?: string[];
-  goals?: string[];
-  needs?: string[];
-  painPoints?: string[];
-  skills?: { label: string; level: string }[];
   ratio: string;
   alt: string;
 }
@@ -33,41 +25,14 @@ const { eyebrow, heading, personas, images } = Astro.props;
   </div>
   <div class="persona__grid">
     {
+      /*
+        只放圖，不再把 persona 的資料用文字重列一次：那張圖本身就是完整的人物看板
+        （姓名、角色、Goals、Needs、Personality 都印在圖上），旁邊再寫一次是重複的。
+        內容裡的 name 不輸出到頁面，只用來讓後台版位標籤認得「這格是誰」。
+      */
       personas.map((persona, index) => (
         <div class="persona__card">
           <Media fit="natural" image={images[index]} ratio={persona.ratio} alt={persona.alt} />
-          <p class="persona__name">{persona.name}</p>
-          <p class="persona__role">{persona.role}</p>
-          <p class="persona__description">{persona.description}</p>
-          {persona.quote && <blockquote class="persona__quote">{persona.quote}</blockquote>}
-
-          {/* 四組分項清單結構相同，沒填的組別整組不渲染，避免留下空標題 */}
-          <div class="persona__lists">
-            {[
-              { title: 'About', items: persona.about },
-              { title: 'Goals', items: persona.goals },
-              { title: 'Needs', items: persona.needs },
-              { title: 'Pain Points', items: persona.painPoints },
-            ].map(({ title, items }) =>
-              items && items.length > 0 ? (
-                <div class="persona__list">
-                  <h4 class="persona__list-title">{title}</h4>
-                  <ul>{items.map((item) => <li>{item}</li>)}</ul>
-                </div>
-              ) : null
-            )}
-          </div>
-
-          {persona.skills && persona.skills.length > 0 && (
-            <div class="persona__skills">
-              {persona.skills.map((skill) => (
-                <div class="persona__skill">
-                  <span>{skill.label}</span>
-                  <strong>{skill.level}</strong>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       ))
     }
@@ -75,63 +40,6 @@ const { eyebrow, heading, personas, images } = Astro.props;
 </section>
 
 <style>
-  .persona__quote {
-    margin: var(--sp-2) 0 0;
-    padding-left: var(--sp-2);
-    border-left: 2px solid var(--color-border);
-    font-size: var(--font-size-body);
-    line-height: 1.7;
-    color: var(--color-ink);
-  }
-
-  .persona__lists {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--sp-3);
-    margin-top: var(--sp-3);
-  }
-
-  .persona__list-title {
-    font-size: var(--font-size-label);
-    font-weight: var(--font-weight-semibold);
-    margin-bottom: var(--sp-1);
-  }
-
-  .persona__list ul {
-    margin: 0;
-    padding-left: var(--sp-2);
-    color: var(--color-muted);
-    font-size: var(--font-size-body);
-    line-height: 1.7;
-  }
-
-  .persona__skills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-2);
-    margin-top: var(--sp-3);
-    padding-top: var(--sp-2);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .persona__skill {
-    display: flex;
-    align-items: baseline;
-    gap: var(--sp-1);
-    font-size: var(--font-size-label);
-    color: var(--color-muted);
-  }
-
-  .persona__skill strong {
-    color: var(--color-ink);
-  }
-
-  @media (max-width: 767px) {
-    .persona__lists {
-      grid-template-columns: 1fr;
-    }
-  }
-
   .persona {
     max-width: 1120px;
     margin: 0 auto;
@@ -158,30 +66,5 @@ const { eyebrow, heading, personas, images } = Astro.props;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: var(--sp-4);
-  }
-
-  .persona__card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-1);
-  }
-
-  .persona__name {
-    font-size: var(--font-size-h3);
-    font-weight: var(--font-weight-semibold);
-    margin-top: var(--sp-2);
-  }
-
-  .persona__role {
-    font-size: var(--font-size-label);
-    color: var(--color-muted);
-  }
-
-  .persona__description {
-    font-size: var(--font-size-body);
-    line-height: 1.7;
-    color: var(--color-muted);
-    text-align: left;
-    margin-top: var(--sp-1);
   }
 </style>

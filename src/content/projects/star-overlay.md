@@ -42,35 +42,6 @@ sections:
     heading: Star Overlay — Persona
     personas:
       - name: Mia Wang
-        role: Superfan & Digital Creator
-        description: >-
-          Designed to understand fans better, Star Overlay is built for the real
-          people behind the support.
-        quote: >-
-          I love creating birthday projects and support campaigns for my bias.
-          Star Overlay makes everything easier!
-        about:
-          - 'Age: 24'
-          - 'Occupation: Content Creator'
-          - 'Location: Taipei, Taiwan'
-          - 'Tech-savvy, detail-oriented, and passionate about her idol'
-        goals:
-          - Create beautiful overlays quickly
-          - Customize styles that match her idol
-          - Share and support within the fandom
-        needs:
-          - Easy-to-use tools
-          - Flexible customization
-          - High-quality output
-        painPoints:
-          - Complicated editors
-          - Limited templates
-          - Time-consuming process
-        skills:
-          - label: Tech Skill
-            level: High
-          - label: Design Skill
-            level: High
         ratio: 3/4
         alt: Mia Wang persona portrait
   - type: designThemes
@@ -106,6 +77,11 @@ sections:
       one focused, obvious tool — pick a shape, scatter it, export.
     ratio: 16/10
     alt: Two phone mockups showing the Star Overlay app screens
+  - type: textSection
+    eyebrow: '[需確認] EYEBROW'
+    heading: '[需確認] 標題'
+    paragraphs:
+      - '[需確認] 段落內文，待補'
   - type: featureSplit
     heading: Experience the Intuitive Flow
     body: >-
