@@ -107,7 +107,13 @@ const designThemesBlock = z.object({
   type: z.literal('designThemes'),
   eyebrow: z.string().optional(),
   heading: z.string(),
-  themes: z.array(z.object({ title: z.string(), description: z.string() })),
+  themes: z.array(
+    z.object({
+      title: z.string(),
+      // 不在頁面上呈現，只作為後台版位標籤與 alt 文字，因此選填
+      description: z.string().optional(),
+    })
+  ),
 });
 
 const flowBlock = z.object({

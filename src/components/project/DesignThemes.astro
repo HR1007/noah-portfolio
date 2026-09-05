@@ -26,6 +26,8 @@ const { eyebrow, heading, themes, images = [] } = Astro.props;
     {
       themes.map((theme, i) => (
         <div class="design-themes__card">
+          {/* 只放圖：標題與說明文字不在頁面上呈現，title 仍保留在資料裡
+              供 alt 文字與後台的版位標籤使用 */}
           <div class="design-themes__media">
             <Media
               image={images[i]}
@@ -35,8 +37,6 @@ const { eyebrow, heading, themes, images = [] } = Astro.props;
               label={theme.title}
             />
           </div>
-          <h3 class="design-themes__title">{theme.title}</h3>
-          <p class="design-themes__description">{theme.description}</p>
         </div>
       ))
     }
@@ -81,10 +81,4 @@ const { eyebrow, heading, themes, images = [] } = Astro.props;
     border-radius: var(--radius);
   }
 
-  .design-themes__description {
-    font-size: var(--font-size-body);
-    line-height: 1.7;
-    color: var(--color-muted);
-    text-align: left;
-  }
 </style>

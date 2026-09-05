@@ -33,8 +33,8 @@ sections:
         effortless editing experience designed especially for every fan to
         create and support their favorite stars in the most beautiful way.
       - >-
-        This is more than an editor — it's a system, a style, and a language
-        for connection.
+        This is more than an editor — it's a system, a style, and a language for
+        connection.
     ratio: 4/3
     alt: Star Overlay design language overview
   - type: persona
@@ -53,7 +53,7 @@ sections:
           - 'Age: 24'
           - 'Occupation: Content Creator'
           - 'Location: Taipei, Taiwan'
-          - Tech-savvy, detail-oriented, and passionate about her idol
+          - 'Tech-savvy, detail-oriented, and passionate about her idol'
         goals:
           - Create beautiful overlays quickly
           - Customize styles that match her idol
@@ -80,13 +80,8 @@ sections:
       from colors to typography, everything works together.
     themes:
       - title: Display
-        description: '[需確認] 卡片說明文字，原稿只提供標題，待補'
       - title: Space Grotesk
-        description: '[需確認] 卡片說明文字，原稿只提供標題，待補'
-      - title: The control kit
-        description: '[需確認] 卡片說明文字，原稿只提供標題，待補'
-      - title: From photo to PNG
-        description: '[需確認] 卡片說明文字，原稿只提供標題，待補'
+      - title: '[需確認] 主題標題'
   - type: flow
     eyebrow: FLOW
     heading: Experience the Intuitive Flow
@@ -97,12 +92,6 @@ sections:
       - label: Upload
         ratio: 3/4
         alt: Upload step
-      - label: Punch
-        ratio: 3/4
-        alt: Punch step
-      - label: Export
-        ratio: 3/4
-        alt: Export step
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
     heading: Star Overlay editor in Action
