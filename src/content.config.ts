@@ -90,6 +90,13 @@ const personaBlock = z.object({
       name: z.string(),
       role: z.string(),
       description: z.string(),
+      // 以下為 persona 卡片的分項欄位，沒填就不會在頁面上渲染該區塊
+      quote: z.string().optional(),
+      about: z.array(z.string()).default([]),
+      goals: z.array(z.string()).default([]),
+      needs: z.array(z.string()).default([]),
+      painPoints: z.array(z.string()).default([]),
+      skills: z.array(z.object({ label: z.string(), level: z.string() })).default([]),
       ratio: z.string(),
       alt: z.string(),
     })

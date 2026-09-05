@@ -25,39 +25,84 @@ sections:
       canvas
   - type: researchFramework
     eyebrow: RESEARCH FRAMEWORK
-    heading: '[需確認] 研究框架標題，待設計師提供'
+    heading: A design language for the Star Overlay editor
+    layout: stacked
     paragraphs:
-      - '[需確認] 這裡放研究方法／框架說明，待設計師提供實際內容。'
+      - >-
+        Star Overlay aims to provide a more comprehensive, intuitive, and
+        effortless editing experience designed especially for every fan to
+        create and support their favorite stars in the most beautiful way.
+      - >-
+        This is more than an editor — it's a system, a style, and a language
+        for connection.
     ratio: 4/3
-    alt: '[需確認] Research framework diagram'
+    alt: Star Overlay design language overview
   - type: persona
     eyebrow: PERSONA
-    heading: '[需確認] Persona 標題，待設計師提供'
+    heading: Star Overlay — Persona
     personas:
-      - name: '[需確認] Persona 名稱'
-        role: '[需確認] 角色／身分'
-        description: '[需確認] Persona 描述，待設計師提供實際內容。'
+      - name: Mia Wang
+        role: Superfan & Digital Creator
+        description: >-
+          Designed to understand fans better, Star Overlay is built for the real
+          people behind the support.
+        quote: >-
+          I love creating birthday projects and support campaigns for my bias.
+          Star Overlay makes everything easier!
+        about:
+          - 'Age: 24'
+          - 'Occupation: Content Creator'
+          - 'Location: Taipei, Taiwan'
+          - Tech-savvy, detail-oriented, and passionate about her idol
+        goals:
+          - Create beautiful overlays quickly
+          - Customize styles that match her idol
+          - Share and support within the fandom
+        needs:
+          - Easy-to-use tools
+          - Flexible customization
+          - High-quality output
+        painPoints:
+          - Complicated editors
+          - Limited templates
+          - Time-consuming process
+        skills:
+          - label: Tech Skill
+            level: High
+          - label: Design Skill
+            level: High
         ratio: 3/4
-        alt: '[需確認] Persona portrait'
+        alt: Mia Wang persona portrait
   - type: designThemes
-    eyebrow: DESIGN THEMES
-    heading: '[需確認] Design Themes 標題，待設計師提供'
+    eyebrow: DESIGN SYSTEM
+    heading: >-
+      A unified design system built for consistency, clarity, and creativity —
+      from colors to typography, everything works together.
     themes:
-      - title: '[需確認] 主題一'
-        description: '[需確認] 說明文字，待設計師提供實際內容。'
-      - title: '[需確認] 主題二'
-        description: '[需確認] 說明文字，待設計師提供實際內容。'
+      - title: Display
+        description: '[需確認] 卡片說明文字，原稿只提供標題，待補'
+      - title: Space Grotesk
+        description: '[需確認] 卡片說明文字，原稿只提供標題，待補'
+      - title: The control kit
+        description: '[需確認] 卡片說明文字，原稿只提供標題，待補'
+      - title: From photo to PNG
+        description: '[需確認] 卡片說明文字，原稿只提供標題，待補'
   - type: flow
     eyebrow: FLOW
-    heading: '[需確認] Flow 標題，待設計師提供'
-    body: '[需確認] Flow 說明文字，待設計師提供實際內容。'
+    heading: Experience the Intuitive Flow
+    body: >-
+      We believe great tools don't get in your way. Star Overlay makes the
+      process simple, fast, and natural — so you can focus on what matters.
     steps:
-      - label: '[需確認] Step 1'
+      - label: Upload
         ratio: 3/4
-        alt: '[需確認] Flow step 1'
-      - label: '[需確認] Step 2'
+        alt: Upload step
+      - label: Punch
         ratio: 3/4
-        alt: '[需確認] Flow step 2'
+        alt: Punch step
+      - label: Export
+        ratio: 3/4
+        alt: Export step
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
     heading: Star Overlay editor in Action
