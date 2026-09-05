@@ -69,7 +69,13 @@ export const SECTION_META = {
     label: '裝置展示圖',
     images: 1,
     list: null,
-    create: () => ({ type: 'deviceShowcase', ratio: '16/10', alt: `${TBD} Device showcase` }),
+    create: () => ({
+      type: 'deviceShowcase',
+      eyebrow: `${TBD} EYEBROW`,
+      heading: `${TBD} 標題`,
+      ratio: '16/10',
+      alt: `${TBD} Device showcase`,
+    }),
   },
 
   experienceDemo: {
@@ -93,6 +99,7 @@ export const SECTION_META = {
     list: null,
     create: () => ({
       type: 'featureSplit',
+      eyebrow: `${TBD} EYEBROW`,
       heading: `${TBD} 標題`,
       body: `${TBD} 說明文字，待補`,
       imagePosition: 'right',
@@ -143,7 +150,12 @@ export const SECTION_META = {
       max: 3, // content.config.ts 限制一列最多三張
       create: () => ({ ratio: '4/3', alt: `${TBD} Image row` }),
     },
-    create: () => ({ type: 'imageRow', images: [{ ratio: '4/3', alt: `${TBD} Image row` }] }),
+    create: () => ({
+      type: 'imageRow',
+      eyebrow: `${TBD} EYEBROW`,
+      heading: `${TBD} 標題`,
+      images: [{ ratio: '4/3', alt: `${TBD} Image row` }],
+    }),
   },
 
   illustrationGrid: {

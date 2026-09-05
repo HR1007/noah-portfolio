@@ -69,7 +69,13 @@ const { Content } = await render(project);
                 />
               );
             case 'deviceShowcase':
-              return <DeviceShowcase image={imagesFor(sectionIndex)[0]} ratio={section.ratio} alt={section.alt} />;
+              return <DeviceShowcase
+                  image={imagesFor(sectionIndex)[0]}
+                  ratio={section.ratio}
+                  alt={section.alt}
+                  eyebrow={section.eyebrow}
+                  heading={section.heading}
+                />;
             case 'experienceDemo':
               return (
                 <ExperienceDemo
@@ -87,6 +93,7 @@ const { Content } = await render(project);
             case 'featureSplit':
               return (
                 <FeatureSplit
+                  eyebrow={section.eyebrow}
                   heading={section.heading}
                   body={section.body}
                   imagePosition={section.imagePosition}
@@ -108,7 +115,12 @@ const { Content } = await render(project);
               );
             case 'imageRow':
               return (
-                <ImageRow rows={section.images} images={imagesFor(sectionIndex)} />
+                <ImageRow
+                  rows={section.images}
+                  images={imagesFor(sectionIndex)}
+                  eyebrow={section.eyebrow}
+                  heading={section.heading}
+                />
               );
             case 'illustrationGrid':
               return (

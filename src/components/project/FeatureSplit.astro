@@ -12,9 +12,10 @@ interface Props {
   alt: string;
   ctaLabel?: string;
   ctaHref?: string;
+  eyebrow?: string;
 }
 
-const { heading, body, imagePosition, image, ratio, alt, ctaLabel, ctaHref } = Astro.props;
+const { heading, body, imagePosition, image, ratio, alt, ctaLabel, ctaHref, eyebrow } = Astro.props;
 ---
 
 <section class:list={['feature-split', `feature-split--${imagePosition}`]}>
@@ -22,13 +23,22 @@ const { heading, body, imagePosition, image, ratio, alt, ctaLabel, ctaHref } = A
     <Media fit="natural" image={image} ratio={ratio} alt={alt} />
   </div>
   <div class="feature-split__body">
-    <h2 class="feature-split__heading">{heading}</h2>
+    {eyebrow && <p class="feature-split__eyebrow">{eyebrow}</p>}
+      <h2 class="feature-split__heading">{heading}</h2>
     <p class="feature-split__text">{body}</p>
     {ctaLabel && ctaHref && <Button label={ctaLabel} href={ctaHref} variant="primary" />}
   </div>
 </section>
 
 <style>
+  .feature-split__eyebrow {
+    font-size: var(--font-size-label);
+    color: var(--color-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: var(--sp-1);
+  }
+
   .feature-split {
     max-width: 1000px;
     margin: 0 auto;

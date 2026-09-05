@@ -6,16 +6,45 @@ interface Props {
   image: ImageMetadata | undefined;
   ratio: string;
   alt: string;
+  eyebrow?: string;
+  heading?: string;
 }
 
-const { image, ratio, alt } = Astro.props;
+const { image, ratio, alt, eyebrow, heading } = Astro.props;
 ---
 
 <section class="device-showcase">
+  {
+    (eyebrow || heading) && (
+      <div class="section-intro-block">
+        {eyebrow && <p class="section-intro-block__eyebrow">{eyebrow}</p>}
+        {heading && <h2 class="section-intro-block__heading">{heading}</h2>}
+      </div>
+    )
+  }
   <Media fit="natural" image={image} ratio={ratio} alt={alt} />
 </section>
 
 <style>
+  /* 區塊小標與標題：與其他段落型別共用同一組樣式，新增作品頁時外觀才會一致 */
+  .section-intro-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    margin-bottom: var(--sp-3);
+  }
+
+  .section-intro-block__eyebrow {
+    font-size: var(--font-size-label);
+    color: var(--color-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .section-intro-block__heading {
+    font-size: var(--font-size-h2);
+  }
+
   .device-showcase {
     max-width: 1000px;
     margin: 0 auto;

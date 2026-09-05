@@ -13,6 +13,8 @@ const textSectionBlock = z.object({
 
 const deviceShowcaseBlock = z.object({
   type: z.literal('deviceShowcase'),
+  eyebrow: z.string().optional(),
+  heading: z.string().optional(),
   ratio: z.string(),
   alt: z.string(),
 });
@@ -32,6 +34,7 @@ const experienceDemoBlock = z.object({
 
 const featureSplitBlock = z.object({
   type: z.literal('featureSplit'),
+  eyebrow: z.string().optional(),
   heading: z.string(),
   body: z.string(),
   imagePosition: z.enum(['left', 'right']),
@@ -57,6 +60,8 @@ const featureGridBlock = z.object({
 
 const imageRowBlock = z.object({
   type: z.literal('imageRow'),
+  eyebrow: z.string().optional(),
+  heading: z.string().optional(),
   images: z.array(z.object({ ratio: z.string(), alt: z.string() })).min(1).max(3),
 });
 
