@@ -53,6 +53,7 @@ sections:
       - title: Display
       - title: Space Grotesk
       - title: Component
+    direction: vertical
   - type: flow
     eyebrow: FLOW
     heading: Experience the Intuitive Flow
@@ -63,6 +64,7 @@ sections:
       - label: Upload
         ratio: 3/4
         alt: Upload step
+    direction: horizontal
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
     heading: Star Overlay editor in Action
@@ -77,6 +79,7 @@ sections:
       one focused, obvious tool — pick a shape, scatter it, export.
     ratio: 16/10
     alt: Two phone mockups showing the Star Overlay app screens
+    layout: stacked
   - type: featureSplit
     heading: Experience the Intuitive Flow
     body: >-
@@ -113,6 +116,7 @@ sections:
           upload or sign-up — so you can post straight to Instagram.
         ratio: 3/4
         alt: Export PNG screen
+    direction: horizontal
   - type: featureSplit
     heading: 'Everything the trend needs, nothing it doesn''t'
     body: >-

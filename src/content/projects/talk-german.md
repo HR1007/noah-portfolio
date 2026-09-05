@@ -31,6 +31,7 @@ sections:
       - '[需確認] 這裡放研究方法／框架說明，待設計師提供實際內容。'
     ratio: 4/3
     alt: '[需確認] Research framework diagram'
+    layout: stacked
   - type: persona
     eyebrow: PERSONA
     heading: '[需確認] Persona 標題，待設計師提供'
@@ -48,6 +49,9 @@ sections:
         description: '[需確認] 主題說明，待補'
       - title: '[需確認] 主題標題'
         description: '[需確認] 主題說明，待補'
+      - title: '[需確認] 主題標題'
+        description: '[需確認] 主題說明，待補'
+    direction: vertical
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
     heading: See Talk German in Action
@@ -61,6 +65,7 @@ sections:
       in real-world environments.
     ratio: 9/16
     alt: Talk German translation screen demo on a single phone
+    layout: stacked
   - type: featureSplit
     heading: Experience the Intuitive Flow
     body: >-
@@ -83,18 +88,15 @@ sections:
           a low-friction experience.
         ratio: 3/4
         alt: Intuitive Authentication screen
-      - heading: Seamless Audio Capture
-        body: >-
-          This screen features a streamlined, dual-mode information architecture
-          for input selection.
+      - heading: '[需確認] 欄位標題'
+        body: '[需確認] 欄位說明，待補'
         ratio: 3/4
-        alt: Seamless Audio Capture screen
-      - heading: Parallel Insight
-        body: >-
-          Once the complex audio recognition is complete, the resulting layout
-          focuses on context retention and immediate verification.
+        alt: '[需確認] Feature column'
+      - heading: '[需確認] 欄位標題'
+        body: '[需確認] 欄位說明，待補'
         ratio: 3/4
-        alt: Parallel Insight screen
+        alt: '[需確認] Feature column'
+    direction: horizontal
   - type: featureSplit
     heading: Daylight Accessibility
     body: >-
@@ -113,5 +115,7 @@ sections:
     imagePosition: left
     ratio: 3/4
     alt: Dark mode screen of Talk German
+    ctaLabel: Let's Try Out
+    ctaHref: '#'
 ---
 
