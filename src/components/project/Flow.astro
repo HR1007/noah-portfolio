@@ -14,12 +14,13 @@ interface Props {
   body?: string;
   steps: Step[];
   images: (ImageMetadata | undefined)[];
+  direction?: 'horizontal' | 'vertical';
 }
 
-const { eyebrow, heading, body, steps, images } = Astro.props;
+const { eyebrow, heading, body, steps, images, direction = 'horizontal' } = Astro.props;
 ---
 
-<section class="flow">
+<section class="flow" data-direction={direction}>
   <div class="flow__intro">
     {eyebrow && <p class="flow__eyebrow">{eyebrow}</p>}
     <h2 class="flow__heading">{heading}</h2>
@@ -71,10 +72,19 @@ const { eyebrow, heading, body, steps, images } = Astro.props;
     text-align: left;
   }
 
+  /*
+    horizontal：步驟並排成一列，欄數等於步驟數。
+    vertical：一步一列往下排，適合步驟多或每步的圖較寬的情況。
+  */
   .flow__steps {
     display: grid;
     grid-template-columns: repeat(var(--columns), 1fr);
     gap: var(--sp-3);
+  }
+
+  .flow[data-direction='vertical'] .flow__steps {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
   }
 
   .flow__step {

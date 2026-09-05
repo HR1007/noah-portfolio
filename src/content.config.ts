@@ -81,6 +81,9 @@ const researchFrameworkBlock = z.object({
   layout: z.enum(['stacked', 'split']).default('stacked'),
 });
 
+// Persona 圖本身就是完整的人物看板（姓名、角色、Goals、Needs… 都印在圖上），
+// 頁面不再用文字把同樣內容重複一次，所以每個 persona 只需要「一格圖」該有的資訊。
+// name 不會輸出到頁面，是後台版位標籤用來辨識「這格是誰」的依據。
 const personaBlock = z.object({
   type: z.literal('persona'),
   eyebrow: z.string().optional(),
@@ -88,15 +91,6 @@ const personaBlock = z.object({
   personas: z.array(
     z.object({
       name: z.string(),
-      role: z.string(),
-      description: z.string(),
-      // 以下為 persona 卡片的分項欄位，沒填就不會在頁面上渲染該區塊
-      quote: z.string().optional(),
-      about: z.array(z.string()).default([]),
-      goals: z.array(z.string()).default([]),
-      needs: z.array(z.string()).default([]),
-      painPoints: z.array(z.string()).default([]),
-      skills: z.array(z.object({ label: z.string(), level: z.string() })).default([]),
       ratio: z.string(),
       alt: z.string(),
     })
@@ -121,6 +115,8 @@ const flowBlock = z.object({
   eyebrow: z.string().optional(),
   heading: z.string(),
   body: z.string().optional(),
+  // horizontal：步驟並排成一列（預設）；vertical：一步一列往下排
+  direction: z.enum(['horizontal', 'vertical']).default('horizontal'),
   steps: z.array(z.object({ label: z.string(), ratio: z.string(), alt: z.string() })),
 });
 

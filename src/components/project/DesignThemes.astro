@@ -26,16 +26,10 @@ const { eyebrow, heading, themes, images = [] } = Astro.props;
     {
       themes.map((theme, i) => (
         <div class="design-themes__card">
-          {/* 只放圖：標題與說明文字不在頁面上呈現，title 仍保留在資料裡
-              供 alt 文字與後台的版位標籤使用 */}
+          {/* 只放圖：標題與說明文字都不在頁面上呈現，連還沒上傳時的佔位框也不標字
+              （這些圖本身就帶著自己的標題）。title 仍保留在資料裡，供 alt 與後台版位標籤使用。 */}
           <div class="design-themes__media">
-            <Media
-              image={images[i]}
-              ratio="4/3"
-              alt={theme.title}
-              fit="natural"
-              label={theme.title}
-            />
+            <Media image={images[i]} ratio="4/3" alt={theme.title} fit="natural" label="" />
           </div>
         </div>
       ))
@@ -66,9 +60,14 @@ const { eyebrow, heading, themes, images = [] } = Astro.props;
     color: var(--color-muted);
   }
 
+  /*
+    卡片格線改為單欄直向堆疊：這個區塊的內容只有圖片（設計系統的截圖、
+    色票、字體規格），擠成多欄後每張都太小看不清細節。改成一張一列、
+    佔滿容器寬度，圖片仍由 Media 的 natural 模式維持原始比例不裁切。
+  */
   .design-themes__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: var(--sp-4);
   }
 

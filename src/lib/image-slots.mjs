@@ -191,27 +191,13 @@ export const SECTION_META = {
       label: '人物',
       min: 1,
       max: null,
-      create: () => ({
-        name: `${TBD} Persona 名稱`,
-        role: `${TBD} 角色／身分`,
-        description: `${TBD} Persona 描述，待補`,
-        ratio: '3/4',
-        alt: `${TBD} Persona portrait`,
-      }),
+      create: () => ({ name: `${TBD} Persona 名稱`, ratio: '3/4', alt: `${TBD} Persona portrait` }),
     },
     create: () => ({
       type: 'persona',
       eyebrow: 'PERSONA',
       heading: `${TBD} 標題`,
-      personas: [
-        {
-          name: `${TBD} Persona 名稱`,
-          role: `${TBD} 角色／身分`,
-          description: `${TBD} Persona 描述，待補`,
-          ratio: '3/4',
-          alt: `${TBD} Persona portrait`,
-        },
-      ],
+      personas: [{ name: `${TBD} Persona 名稱`, ratio: '3/4', alt: `${TBD} Persona portrait` }],
     }),
   },
 
@@ -248,6 +234,7 @@ export const SECTION_META = {
     },
     create: () => ({
       type: 'flow',
+      direction: 'horizontal',
       eyebrow: 'FLOW',
       heading: `${TBD} 標題`,
       body: `${TBD} 說明文字，待補`,

@@ -481,7 +481,7 @@ function buildSlotTile(slot, img, section, host) {
     remove.type = 'button';
     remove.className = 'tile__slot-remove';
     remove.textContent = '−';
-    remove.title = `移除這一格版位（${section.list.label}少一個，圖片一併刪除）`;
+    remove.title = `移除這一格版位：${section.list.label}少一個（這格若有圖，圖片一併刪除）`;
     remove.addEventListener('click', (e) => {
       e.stopPropagation();
       handleRemoveItem(section, slot.slotInSection, slot.label);
@@ -611,7 +611,6 @@ function buildAddSectionBar() {
   });
 
   const btn = document.createElement('button');
-  btn.className = 'sec-btn sec-btn--primary';
   btn.textContent = '＋ 新增段落';
   btn.addEventListener('click', () =>
     handleAddSection(typeSel.value, posSel.value === '' ? null : Number(posSel.value))
@@ -1100,6 +1099,12 @@ function renderMonoNode(val, keyPath, container, dataObj) {
   if (key === 'gradient') {
     container.appendChild(
       renderMonoRow('Hero 漸層底色', keyPath, dataObj, { select: heroGradients })
+    );
+    return;
+  }
+  if (key === 'direction') {
+    container.appendChild(
+      renderMonoRow('排列方向', keyPath, dataObj, { select: ['horizontal', 'vertical'] })
     );
     return;
   }
