@@ -26,7 +26,7 @@ sections:
   - type: researchFramework
     eyebrow: RESEARCH FRAMEWORK
     heading: A design language for the Star Overlay editor
-    layout: stacked
+    layout: split
     paragraphs:
       - >-
         Star Overlay aims to provide a more comprehensive, intuitive, and
@@ -52,7 +52,7 @@ sections:
     themes:
       - title: Display
       - title: Space Grotesk
-      - title: '[需確認] 主題標題'
+      - title: Component
   - type: flow
     eyebrow: FLOW
     heading: Experience the Intuitive Flow
