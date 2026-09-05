@@ -240,7 +240,46 @@ function renderCollectionGrid() {
   gridEl.innerHTML = '';
   const showSlotLabels = currentType === 'projects';
 
-  currentImages.forEach((img, index) => {
+  /*
+    案例頁依「版位編號」渲染，不是依陣列順序：檔名 02.png 永遠落在第 3 格。
+    用陣列順序的話，刪掉中間某張圖後陣列塌陷，後面的圖會全部往前遞補一格，
+    看起來就像圖片自己跑掉了。缺號的位置改放「待上傳」空位。
+  */
+  let renderList = currentImages;
+  if (showSlotLabels && currentRequiredSlots != null) {
+    const bySlot = new Map(
+      currentImages.filter((im) => im.slotIndex != null).map((im) => [im.slotIndex, im])
+    );
+    renderList = [];
+    for (let i = 0; i < currentRequiredSlots; i++) {
+      renderList.push(bySlot.get(i) ?? { __emptySlot: i });
+    }
+    // 編號超出版位數、或檔名不是純數字的圖片，附在最後不讓它們消失
+    currentImages
+      .filter((im) => im.slotIndex == null || im.slotIndex >= currentRequiredSlots)
+      .forEach((im) => renderList.push(im));
+  }
+
+  renderList.forEach((img) => {
+    if (img.__emptySlot != null) {
+      const i = img.__emptySlot;
+      const empty = document.createElement('div');
+      empty.className = 'tile tile--empty-slot';
+      empty.innerHTML = `
+        <div class="tile__image-wrap">
+          <span class="tile__badge tile__badge--pending">待上傳</span>
+          <span class="tile__empty-label">${currentSlotLabels[i] ?? `#${i + 1}`}</span>
+        </div>
+      `;
+      empty.addEventListener('click', () => {
+        pendingUpload = { kind: 'collection' };
+        fileInputEl.click();
+      });
+      gridEl.appendChild(empty);
+      return;
+    }
+
+    const index = currentImages.indexOf(img);
     const tile = document.createElement('div');
     tile.className = 'tile' + (index === selectedIndex ? ' tile--selected' : '');
     tile.draggable = true;
@@ -313,26 +352,6 @@ function renderCollectionGrid() {
 
     gridEl.appendChild(tile);
   });
-
-  // 案例頁：把還沒上傳、但頁面 sections 需要用到的空位也列出來，
-  // 讓你一眼看出「這格對應哪個區塊」，點了直接上傳到那一格（永遠是下一個編號，順序不會亂）。
-  if (showSlotLabels && currentRequiredSlots != null) {
-    for (let i = currentImages.length; i < currentRequiredSlots; i++) {
-      const empty = document.createElement('div');
-      empty.className = 'tile tile--empty-slot';
-      empty.innerHTML = `
-        <div class="tile__image-wrap">
-          <span class="tile__badge tile__badge--pending">待上傳</span>
-          <span class="tile__empty-label">${currentSlotLabels[i] ?? `#${i + 1}`}</span>
-        </div>
-      `;
-      empty.addEventListener('click', () => {
-        pendingUpload = { kind: 'collection' };
-        fileInputEl.click();
-      });
-      gridEl.appendChild(empty);
-    }
-  }
 
   const addTile = document.createElement('div');
   addTile.className = 'tile tile--add';

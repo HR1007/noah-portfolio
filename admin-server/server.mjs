@@ -88,8 +88,13 @@ async function listSlugImages(type, slug) {
 
   if (type === 'projects') {
     const labels = await computeProjectSlotLabels(slug).catch(() => []);
-    images.forEach((img, i) => {
-      img.slotLabel = labels[i] ?? null;
+    // 版位以「檔名編號」對應，不是陣列位置：刪掉中間某張圖後陣列會塌陷，
+    // 用位置配對會讓後面的圖全部套到前一格的標籤，看起來就像圖片往前遞補。
+    images.forEach((img) => {
+      const base = path.basename(img.filename, path.extname(img.filename));
+      const idx = /^\d+$/.test(base) ? Number(base) : null;
+      img.slotIndex = idx;
+      img.slotLabel = idx === null ? null : labels[idx] ?? null;
     });
     return { images, requiredSlots: labels.length, slotLabels: labels };
   }
