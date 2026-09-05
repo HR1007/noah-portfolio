@@ -85,12 +85,8 @@
   --color-border: rgba(242, 242, 242, 0.14);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --color-bg: #18181a;
-    --color-surface: #222225;
-    --color-ink: #f2f2f2;
-    --color-muted: rgba(242, 242, 242, 0.6);
-    --color-border: rgba(242, 242, 242, 0.14);
-  }
-}
+/*
+  預設一律淺色，不跟隨作業系統。深色只在使用者按下切換鈕（寫入
+  data-theme='dark'）時套用——站台的色彩是以淺色為基準設計的，
+  深色是後來加的選項，不該在訪客沒有選擇時就自動生效。
+*/

@@ -57,15 +57,6 @@
     display: block;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme='light']) .theme-toggle__icon--sun {
-      display: none;
-    }
-
-    :root:not([data-theme='light']) .theme-toggle__icon--moon {
-      display: block;
-    }
-  }
 </style>
 
 <script>
@@ -74,8 +65,8 @@
 
   button?.addEventListener('click', () => {
     const root = document.documentElement;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const current = root.dataset.theme ?? (prefersDark ? 'dark' : 'light');
+    // 沒有 data-theme 就代表還在預設狀態，而預設一律是淺色
+    const current = root.dataset.theme ?? 'light';
     const next = current === 'dark' ? 'light' : 'dark';
     root.dataset.theme = next;
     localStorage.setItem(STORAGE_KEY, next);
