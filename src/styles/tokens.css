@@ -63,6 +63,13 @@
   --gradient-mint: linear-gradient(135deg, #a9dcc8, #5aa78c);
   --gradient-slate: linear-gradient(135deg, #c9ccd1, #7b828c);
 
+  /*
+    案例頁所有段落共用的容器寬度。各段落原本散落 767／800／1000／1120px
+    五種值，容器都置中，寬度不同左緣就各自跑掉，捲動時文字看起來忽左忽右。
+    數值取自設計稿的 hero 寬度。
+  */
+  --project-width: 1040px;
+
   /* 圓角 */
   --radius: 16px;
   --radius-pill: 999px; /* [需確認] 目前站上沒有藥丸形元件，先保留備用 */

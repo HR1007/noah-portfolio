@@ -41,7 +41,7 @@ const { eyebrow, heading, body, steps, images, direction = 'horizontal' } = Astr
 
 <style>
   .flow {
-    max-width: 1120px;
+    max-width: var(--project-width);
     margin: 0 auto;
     padding: var(--sp-6) var(--sp-3);
     display: flex;
@@ -53,7 +53,7 @@ const { eyebrow, heading, body, steps, images, direction = 'horizontal' } = Astr
     display: flex;
     flex-direction: column;
     gap: var(--sp-2);
-    max-width: 800px;
+    max-width: var(--project-width);
   }
 
   .flow__eyebrow {

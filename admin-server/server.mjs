@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { imageSize } from 'image-size';
 import matter from 'gray-matter';
 import {
-  getImageSlots, SECTION_META, describeSection, sectionItemCount,
+  getImageSlots, SECTION_META, SECTION_OPTIONS, describeSection, sectionItemCount,
   createSection, addSectionItem, removeSectionItem, sectionTypeOptions,
 } from '../src/lib/image-slots.mjs';
 import { HERO_GRADIENTS } from '../src/lib/hero-gradients.mjs';
@@ -153,6 +153,94 @@ function textItemPreviews(section, list) {
 // 後台不自行維護一份選項，避免兩邊選項不一致。
 // 完整版位資訊（含所屬段落），供 Content 分頁以段落為單位分組顯示圖片。
 // 一樣讀 src/lib/image-slots.mjs，不另外算一套。
+/*
+  新增案例頁。可以指定一個既有案例當模板：沿用它的段落組成（有哪些區塊、
+  每個區塊有幾欄／幾步／幾個主題），但所有文字重設為待填佔位字。
+
+  刻意不複製文案：模板的用途是「版面骨架一致」，把別的作品的描述整段搬過來，
+  很容易在還沒改完的情況下就發布出去。圖片同理不複製，新案例從空的開始。
+*/
+app.post('/api/projects', async (req, res) => {
+  try {
+    const { slug, title, template } = req.body || {};
+
+    if (!/^[a-z0-9][a-z0-9-]*$/.test(String(slug || ''))) {
+      return res.status(400).json({ error: 'slug 只能用小寫英數與連字號，且不可用連字號開頭' });
+    }
+    if (!String(title || '').trim()) {
+      return res.status(400).json({ error: '請填標題' });
+    }
+
+    const file = projectFilePath(slug);
+    if (await fs.access(file).then(() => true).catch(() => false)) {
+      return res.status(409).json({ error: `${slug} 已經存在` });
+    }
+
+    // order 接在現有案例之後
+    const existing = (await fs.readdir(PROJECTS_CONTENT_DIR)).filter((f) => f.endsWith('.md'));
+    let maxOrder = 0;
+    for (const f of existing) {
+      const { data } = matter(await fs.readFile(path.join(PROJECTS_CONTENT_DIR, f), 'utf-8'));
+      maxOrder = Math.max(maxOrder, Number(data.order) || 0);
+    }
+
+    let sections = [];
+    if (template && template !== 'blank') {
+      const tplFile = projectFilePath(template);
+      const { data: tpl } = matter(await fs.readFile(tplFile, 'utf-8'));
+      sections = (tpl.sections || []).map((sec) => cloneSectionAsTemplate(sec));
+    }
+
+    const data = {
+      title: String(title).trim(),
+      order: maxOrder + 1,
+      summary: '[需確認] 案例摘要，待補',
+      ctaLabel: 'More Details',
+      tags: [],
+      hero: { ctaLabel: 'Try it out', ctaHref: '#', gradient: 'slate' },
+      sections,
+    };
+
+    await fs.writeFile(file, matter.stringify('', data), 'utf-8');
+    await fs.mkdir(path.join(PROJECTS_ASSET_DIR, slug), { recursive: true });
+    await fs.writeFile(path.join(PROJECTS_ASSET_DIR, slug, '.gitkeep'), '');
+
+    res.json({ ok: true, slug, sections: sections.length });
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+/**
+ * 依模板複製單一段落：保留型別與清單長度（幾欄、幾步、幾個主題），
+ * 文字一律換成待填佔位字，ratio 這類版型設定則沿用。
+ */
+function cloneSectionAsTemplate(sec) {
+  const meta = SECTION_META[sec.type];
+  if (!meta) return { ...sec };
+
+  const fresh = meta.create();
+  const list = meta.list;
+
+  // 清單型區塊：把項目數補到跟模板一樣多，內容用該型別自己的空白項目
+  if (list && Array.isArray(sec[list.key])) {
+    if (list.counter) {
+      fresh[list.key] = sec[list.key];
+    } else {
+      fresh[list.key] = sec[list.key].map(() => (list.create ? list.create() : {}));
+    }
+  } else if (list && list.counter && sec[list.key] != null) {
+    fresh[list.key] = sec[list.key];
+  }
+
+  // 版型設定沿用模板，這些不是文案
+  for (const k of ['ratio', 'imagePosition', 'layout', 'direction', 'count']) {
+    if (sec[k] !== undefined) fresh[k] = sec[k];
+  }
+
+  return fresh;
+}
+
 app.get('/api/projects/:slug/slots', async (req, res) => {
   try {
     const raw = await fs.readFile(projectFilePath(req.params.slug), 'utf-8');
@@ -235,6 +323,9 @@ app.put('/api/projects/:slug/sections/reorder', async (req, res) => {
     res.status(500).json({ error: String(err) });
   }
 });
+
+// 各段落型別支援的版型選項，後台據此渲染下拉選單（即使 .md 裡還沒有該欄位）
+app.get('/api/section-options', (req, res) => res.json(SECTION_OPTIONS));
 
 app.get('/api/hero-gradients', (req, res) => res.json(HERO_GRADIENTS));
 

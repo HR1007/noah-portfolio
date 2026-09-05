@@ -77,11 +77,6 @@ sections:
       one focused, obvious tool — pick a shape, scatter it, export.
     ratio: 16/10
     alt: Two phone mockups showing the Star Overlay app screens
-  - type: textSection
-    eyebrow: '[需確認] EYEBROW'
-    heading: '[需確認] 標題'
-    paragraphs:
-      - '[需確認] 段落內文，待補'
   - type: featureSplit
     heading: Experience the Intuitive Flow
     body: >-

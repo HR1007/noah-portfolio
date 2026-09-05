@@ -1111,3 +1111,13 @@ svg {
 [hidden] {
   display: none !important;
 }
+
+/* 分頁列上的「新增案例」，與案例分頁區隔開來 */
+.tab--add {
+  border-style: dashed;
+  color: var(--muted);
+}
+.tab--add:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}

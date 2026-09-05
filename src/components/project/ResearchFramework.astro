@@ -27,6 +27,15 @@ const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked' } = 
 </section>
 
 <style>
+  /*
+    容器已統一寬度讓左緣對齊，但整段跑到 1040px 寬一行會太長不好讀。
+    這裡只收窄「文字本身」且靠左，不用 margin auto 置中——置中會讓左緣
+    又跑掉，等於白對齊。
+  */
+  .reading-measure {
+    max-width: 65ch;
+  }
+
   /* split：文字在左、圖片在右；768 以下落回單欄 */
   .research-framework[data-layout='split'] {
     display: grid;
@@ -42,7 +51,7 @@ const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked' } = 
   }
 
   .research-framework {
-    max-width: 1000px;
+    max-width: var(--project-width);
     margin: 0 auto;
     padding: var(--sp-6) var(--sp-3);
     display: flex;
@@ -54,7 +63,7 @@ const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked' } = 
     display: flex;
     flex-direction: column;
     gap: var(--sp-2);
-    max-width: 800px;
+    max-width: var(--project-width);
   }
 
   .research-framework__eyebrow {

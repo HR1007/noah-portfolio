@@ -763,6 +763,7 @@ let currentHomeSlots = [];
 let currentHomeSets = [];
 // 漸層選項向後端拿，與 content schema 同一份清單
 let heroGradients = ['slate'];
+let sectionOptions = {};  // 型別 -> { 欄位: [可選值] }
 let projectSlots = {};   // slug -> 版位清單（含所屬段落）
 let projectImages = {};  // slug -> 已上傳的圖片
 let contentSlug = null;  // Content 分頁目前正在編輯的案例
@@ -1213,13 +1214,15 @@ async function loadContentPage() {
   document.querySelector('.content-savebar')?.remove();
   contentEl.innerHTML = '<p style="padding:16px;color:var(--muted)">載入中…</p>';
 
-  const [{ en, zh }, slugs, gradients] = await Promise.all([
+  const [{ en, zh }, slugs, gradients, opts] = await Promise.all([
     fetch(`${API}/api/site`).then((r) => r.json()),
     fetch(`${API}/api/collections/projects`).then((r) => r.json()),
     fetch(`${API}/api/hero-gradients`).then((r) => r.json()).catch(() => ['slate']),
+    fetch(`${API}/api/section-options`).then((r) => r.json()).catch(() => ({})),
     ensureSectionTypes(),
   ]);
   heroGradients = gradients;
+  sectionOptions = opts;
   siteEn = en;
   siteZh = zh;
   projectSlugs = slugs;
@@ -1266,6 +1269,12 @@ function renderContentTabs() {
     });
     pageTabsEl.appendChild(btn);
   });
+
+  const addProject = document.createElement('button');
+  addProject.className = 'tab tab--add';
+  addProject.textContent = '＋ 新增案例';
+  addProject.addEventListener('click', openNewProjectDialog);
+  pageTabsEl.appendChild(addProject);
 
   const search = document.createElement('input');
   search.type = 'search';
@@ -1335,6 +1344,45 @@ function bindSectionToggle(section, header) {
     section.classList.toggle('collapsed');
     section.dataset.collapsed = section.classList.contains('collapsed') ? '1' : '0';
   });
+}
+
+/*
+  新增案例：可以挑一個既有案例當模板，沿用它的段落組成，但文字全部重設為
+  待填佔位字。刻意不複製文案——模板的用途是版面骨架一致，把別的作品的
+  描述整段搬過來，很容易在還沒改完就發布出去。
+*/
+async function openNewProjectDialog() {
+  const title = prompt('新案例的標題：');
+  if (!title) return;
+
+  const suggested = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const slug = prompt('網址代稱（只能小寫英數與連字號，會成為 /projects/xxx）：', suggested);
+  if (!slug) return;
+
+  const choices = projectSlugs.map((p, i) => `${i + 1}. ${p.title}`).join('\n');
+  const pick = prompt(
+    `要用哪個案例當模板？（沿用段落組成，文字重設為待填）\n\n0. 不用模板，建立空白案例\n${choices}`,
+    '0'
+  );
+  if (pick === null) return;
+
+  const n = Number(pick);
+  const template = n > 0 && projectSlugs[n - 1] ? projectSlugs[n - 1].slug : 'blank';
+
+  try {
+    const res = await fetch(`${API}/api/projects`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, title, template }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || '建立失敗');
+    showToast(`已建立 ${slug}，含 ${data.sections} 個段落`);
+    contentSlug = slug;
+    await loadContentPage();
+  } catch (err) {
+    showToast(`建立失敗：${err.message}`, true);
+  }
 }
 
 function renderProjectCard(slug, title, form) {
@@ -1419,6 +1467,14 @@ function renderProjectCard(slug, title, form) {
     const tech = Object.keys(sec).filter((k) => TECHNICAL.has(k));
 
     plain.forEach((k) => renderMonoNode(sec[k], ['sections', i, k], cardBody, data));
+
+    // 版型選項：即使 .md 裡還沒有這個欄位也要顯示，否則等於功能不存在
+    const secOpts = sectionOptions[sec.type] || {};
+    Object.entries(secOpts).forEach(([field, values]) => {
+      if (sec[field] === undefined) sec[field] = values[0];
+      const label = { layout: '版面', direction: '排列方向', imagePosition: '圖片位置' }[field] || field;
+      cardBody.appendChild(renderMonoRow(label, ['sections', i, field], data, { select: values }));
+    });
 
     if (tech.length) {
       const adv = document.createElement('details');

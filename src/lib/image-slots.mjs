@@ -45,6 +45,23 @@ const TBD = '[需確認]';
  * 注意：目前沒有任何區塊同時擁有 images > 0 與 kind:'image' 的清單。
  * describeSlot 依此假設把 slot 的序號直接當成清單索引，若之後出現這種區塊要一併改。
  */
+/**
+ * 各段落型別支援的版型選項（下拉可選值，第一個是預設）。
+ *
+ * 這些欄位在 content schema 裡有 default，不填也能通過驗證——但也因此不會
+ * 出現在 .md 裡，後台若只讀原始 frontmatter 就永遠看不到、等於功能不存在。
+ * 集中宣告在這裡，後台照著渲染選單，選了才寫進檔案。
+ */
+export const SECTION_OPTIONS = {
+  experienceDemo: { layout: ['stacked', 'split'] },
+  researchFramework: { layout: ['stacked', 'split'] },
+  featureSplit: { imagePosition: ['right', 'left'] },
+  flow: { direction: ['horizontal', 'vertical'] },
+  featureGrid: { direction: ['horizontal', 'vertical'] },
+  imageRow: { direction: ['horizontal', 'vertical'] },
+  designThemes: { direction: ['vertical', 'horizontal'] },
+};
+
 export const SECTION_META = {
   textSection: {
     label: '純文字段落',
