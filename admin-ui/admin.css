@@ -989,18 +989,6 @@ svg {
   background: rgba(214, 69, 69, 0.08);
 }
 
-.sec-btn--primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
-  font-weight: 600;
-}
-
-.sec-btn--primary:hover:not(:disabled) {
-  color: var(--accent-ink);
-  opacity: 0.9;
-}
-
 .sec-card__note {
   margin: 0;
   font-size: 12px;
@@ -1035,17 +1023,19 @@ svg {
 }
 
 /*
-  移除「版位」與刪除「圖片」是兩件事，所以放在磚塊的兩個角落，圖示也不同：
-  右上角垃圾桶＝只清掉圖片，版位留著；左下角減號＝這一格從段落裡整個拿掉。
+  移除「版位」與刪除「圖片」是兩件事：
+    右上角垃圾桶 ＝ 只清掉圖片，版位留著（變回待上傳）
+    右下角減號   ＝ 這一格從段落裡整個拿掉（段落少一格）
+  放右下角是因為左下角是空版位的說明文字，疊在一起會兩邊都看不清楚。
 */
 .tile__slot-remove {
   position: absolute;
-  left: 8px;
+  right: 8px;
   bottom: 8px;
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  border: none;
+  border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.92);
   color: var(--danger);
   font-size: 18px;
@@ -1060,6 +1050,18 @@ svg {
 
 .tile:hover .tile__slot-remove {
   opacity: 1;
+}
+
+/*
+  空版位沒有圖可以遮，就一直顯示——多加出來的版位要能一眼看到怎麼拿掉，
+  藏在 hover 底下等於沒有。標籤同時讓出右邊的空間，不跟按鈕重疊。
+*/
+.tile--empty-slot .tile__slot-remove {
+  opacity: 1;
+}
+
+.tile--empty-slot .tile__empty-label {
+  padding-right: 30px;
 }
 
 .sec-card--extras .sec-card__head {
@@ -1100,4 +1102,12 @@ svg {
 .content-search:focus {
   outline: none;
   border-color: var(--accent);
+}
+
+/*
+  搜尋過濾是用 el.hidden 藏東西，但 .content-row / .content-group 這些都自己設了
+  display，會蓋掉瀏覽器預設的 [hidden]{display:none}，藏了等於沒藏。這裡補一條總規則。
+*/
+[hidden] {
+  display: none !important;
 }
