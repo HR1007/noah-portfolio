@@ -1,7 +1,8 @@
 ---
 interface Props {
   ratio: string;
-  label: string;
+  /** 空字串代表這個佔位框刻意不標文字（例如 Design System 卡片，圖本身就帶標題） */
+  label?: string;
 }
 
 const { ratio, label } = Astro.props;
@@ -9,7 +10,7 @@ const showLabel = import.meta.env.SHOW_PLACEHOLDER_LABEL !== 'false';
 ---
 
 <div class="placeholder" style={`aspect-ratio: ${ratio}`}>
-  {showLabel && <span class="placeholder__label">{label}</span>}
+  {showLabel && label && <span class="placeholder__label">{label}</span>}
 </div>
 
 <style>
