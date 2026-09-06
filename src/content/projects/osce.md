@@ -43,6 +43,14 @@ sections:
         simple: keep the efficiency and error-prevention UCD cares about,
         without flattening the lived experience of turning an exam into a
         handful of numbers.
+  - type: researchFramework
+    layout: stacked
+    eyebrow: RESEARCH FRAMEWORK
+    heading: '[需確認] 標題'
+    paragraphs:
+      - '[需確認] 段落內文，待補'
+    ratio: 4/3
+    alt: '[需確認] Research framework'
   - type: imageRow
     images:
       - ratio: 4/3
@@ -84,9 +92,6 @@ sections:
       - label: Set up the station
         ratio: 3/4
         alt: OSCE flow — configuring a station and its rubric
-      - label: Place and confirm seats
-        ratio: 3/4
-        alt: OSCE flow — placing exam seats and confirming the arrangement
     direction: horizontal
   - type: featureSplit
     heading: Unified Task Surface
@@ -128,19 +133,12 @@ sections:
     alt: Intuitive flow demo illustration
     ctaLabel: Let's Try Out
     ctaHref: '#'
-  - type: experienceDemo
-    eyebrow: OUTCOMES
-    heading: Verification and results
-    body: >-
-      The redesigned backend was evaluated with 21 participants, combining task
-      performance, SUS, UEQ, eye-tracking and semi-structured interviews.
-      Triangulating three kinds of data was deliberate: I wanted to know not
-      just whether tasks got faster, but whether running an exam actually felt
-      easier — those two turn out to be correlated but not the same thing.
-    ratio: 16/9
-    alt: >-
-      Study session photos showing eye-tracking, simulated exam stations, and
-      semi-structured interviews
-    layout: stacked
+  - type: featureSplit
+    eyebrow: '[需確認] EYEBROW'
+    heading: '[需確認] 標題'
+    body: '[需確認] 說明文字，待補'
+    imagePosition: right
+    ratio: 3/4
+    alt: '[需確認] Feature split'
 ---
 
