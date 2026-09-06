@@ -29,37 +29,57 @@ sections:
     alt: Foodlet website homepage screenshot on laptop
   - type: researchFramework
     eyebrow: RESEARCH FRAMEWORK
-    heading: '[需確認] 研究框架標題，待設計師提供'
+    heading: 'Three tracks, then one question'
     paragraphs:
-      - '[需確認] 這裡放研究方法／框架說明，待設計師提供實際內容。'
+      - >-
+        A literature review from fintech through embedded finance to PayFi, a
+        pure-UX teardown of MetaMask, Coinbase Wallet and Trust Wallet, and a
+        survey of people already carrying a crypto wallet — run in parallel
+        rather than in sequence, so each one could correct the others.
+      - >-
+        The literature said what embedded finance was supposed to enable. The
+        teardowns said what wallets actually make you do. The survey said which
+        of those gaps anyone had noticed. Narrowing three answers into one
+        problem statement was the whole job.
     ratio: 4/3
-    alt: '[需確認] Research framework diagram'
+    alt: >-
+      Foodlet research framework — literature review, wallet teardown and user
+      survey converging on one problem statement
   - type: persona
     eyebrow: PERSONA
-    heading: '[需確認] Persona 標題，待設計師提供'
+    heading: Foodlet — Persona
     personas:
-      - name: '[需確認] Persona 名稱'
+      - name: Everyday diner
         ratio: 3/4
-        alt: '[需確認] Persona portrait'
+        alt: Foodlet persona board
   - type: designThemes
     eyebrow: DESIGN THEMES
-    heading: '[需確認] Design Themes 標題，待設計師提供'
+    heading: >-
+      A warm system for a cold category — colour, type and a cast of characters
+      that keep a crypto wallet from feeling like a trading terminal.
     themes:
-      - title: '[需確認] 主題一'
-        description: '[需確認] 說明文字，待設計師提供實際內容。'
-      - title: '[需確認] 主題二'
-        description: '[需確認] 說明文字，待設計師提供實際內容。'
+      - title: Colour & Typography
+        description: >-
+          Tones borrowed from the dining table rather than the trading
+          dashboard, with type sized for reading a total at arm's length.
+      - title: Illustration
+        description: >-
+          Rounded, slightly clumsy 3D characters — deliberately the opposite of
+          the cold technical visuals Web3 usually arrives in.
   - type: flow
     eyebrow: FLOW
-    heading: '[需確認] Flow 標題，待設計師提供'
-    body: '[需確認] Flow 說明文字，待設計師提供實際內容。'
+    heading: From beep to keepsake
+    body: >-
+      The interesting part starts after the payment clears. Connect once, pay
+      for the meal, and the transaction hands something back instead of ending
+      in a beep.
     steps:
-      - label: '[需確認] Step 1'
+      - label: Connect wallet
         ratio: 3/4
-        alt: '[需確認] Flow step 1'
-      - label: '[需確認] Step 2'
+        alt: Foodlet flow — connecting a wallet in one tap
+      - label: Pay & collect
         ratio: 3/4
-        alt: '[需確認] Flow step 2'
+        alt: Foodlet flow — paying for a meal and receiving the collectible
   - type: experienceDemo
     eyebrow: RESEARCH FOUNDATION
     heading: Research Foundation
@@ -77,7 +97,7 @@ sections:
     ctaHref: '#'
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
-    heading: '[需確認] 這裡的標題截圖辨識度不足，待設計師提供正確文案（推測跟其他案例一樣是「See ... in Action」句型）'
+    heading: See Foodlet in Action
     body: >-
       The demo follows one arc: land on the brand story, connect a wallet with a
       single tap instead of filling out a form, pay for a meal, and get the
@@ -91,16 +111,21 @@ sections:
     columns:
       - heading: Where Payment Starts Paying Back
         body: >-
-          [需確認]
-          這段內文截圖字級太小、辨識度不足，待設計師提供正確文案。大致主題：把點餐、付款、集點整合進單一錢包流程，讓每一筆交易都變得值得保留。
+          Ordering, payment and rewards fold into a single wallet flow, so a
+          transaction stops being the end of the meal and starts being worth
+          keeping.
         ratio: 4/3
         alt: Where Payment Starts Paying Back screen
       - heading: From Transaction to Collectible
-        body: '[需確認] 這段內文截圖字級太小、辨識度不足，待設計師提供正確文案。大致主題：說明付款完成後如何轉換成可收藏的數位獎勵。'
+        body: >-
+          The moment a payment clears it returns a digital collectible — the
+          receipt becomes something you would actually look at again.
         ratio: 4/3
         alt: From Transaction to Collectible screen
       - heading: 'An Ecosystem, Not an App'
-        body: '[需確認] 這段內文截圖字級太小、辨識度不足，待設計師提供正確文案。大致主題：強調這是連結在地商家的生態系，而不只是一個 App。'
+        body: >-
+          Local restaurants join the same rewards layer, so value accrues across
+          the neighbourhood instead of inside one storefront.
         ratio: 4/3
         alt: 'An Ecosystem, Not an App screen'
   - type: textSection
@@ -121,16 +146,19 @@ sections:
   - type: illustrationGrid
     heading: Illustrations
     body: >-
-      [需確認] 這段內文截圖字級太小、辨識度不足，待設計師提供正確文案。大致主題：說明為什麼選擇圓潤、略帶笨拙感的 3D 角色風格，用來對比 Web3
-      常見的冷調視覺。
+      Rounded, slightly clumsy 3D characters, chosen deliberately against the
+      cold technical register Web3 usually arrives in. If a wallet is going to
+      sit next to a bowl of noodles, it should look like it belongs there.
     count: 8
     alt: Foodlet illustration
   - type: textSection
     heading: Color Scheme / Typography
     paragraphs:
       - >-
-        [需確認]
-        這段內文截圖字級太小、辨識度不足，待設計師提供正確文案。大致主題：說明色彩／字體系統的選擇理由（偏向溫暖、貼近真實用餐情境，而非交易儀表板式的冷色調）。
+        Warm tones taken from real dining situations rather than a trading
+        dashboard, with a type scale that stays legible on a receipt-sized
+        screen. The system had to hold its personality across a light checkout
+        form, a dark wallet connect and a black QR screen.
   - type: imageRow
     images:
       - ratio: 4/3

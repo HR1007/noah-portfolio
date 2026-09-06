@@ -24,39 +24,42 @@ sections:
   - type: deviceShowcase
     ratio: 16/10
     alt: New Formosa Sport website homepage screenshot
-  - type: researchFramework
-    eyebrow: RESEARCH FRAMEWORK
-    heading: '[需確認] 研究框架標題，待設計師提供'
-    paragraphs:
-      - '[需確認] 這裡放研究方法／框架說明，待設計師提供實際內容。'
-    ratio: 4/3
-    alt: '[需確認] Research framework diagram'
   - type: persona
     eyebrow: PERSONA
-    heading: '[需確認] Persona 標題，待設計師提供'
+    heading: New Formosa Sport — Persona
     personas:
-      - name: '[需確認] Persona 名稱'
+      - name: School equipment buyer
         ratio: 3/4
-        alt: '[需確認] Persona portrait'
+        alt: New Formosa Sport persona board
   - type: designThemes
     eyebrow: DESIGN THEMES
-    heading: '[需確認] Design Themes 標題，待設計師提供'
+    heading: >-
+      One design language across five business lines — so the site reads as one
+      shop, not five.
     themes:
-      - title: '[需確認] 主題一'
-        description: '[需確認] 說明文字，待設計師提供實際內容。'
-      - title: '[需確認] 主題二'
-        description: '[需確認] 說明文字，待設計師提供實際內容。'
+      - title: Colour
+        description: >-
+          The existing Formosa Red carried over as the brand anchor, paired with
+          a deep navy that keeps long product listings calm.
+      - title: Typography
+        description: >-
+          A type scale that survives both a spec sheet on a desktop and a phone
+          held one-handed in a school corridor.
+      - title: '[需確認] 主題標題'
+        description: '[需確認] 主題說明，待補'
+      - title: '[需確認] 主題標題'
+        description: '[需確認] 主題說明，待補'
   - type: flow
     eyebrow: FLOW
-    heading: '[需確認] Flow 標題，待設計師提供'
-    body: '[需確認] Flow 說明文字，待設計師提供實際內容。'
+    heading: The inquiry path
+    body: >-
+      Most visits end in a question, not a checkout. The flow gets someone from
+      landing to a sent inquiry without asking them to understand the company's
+      internal structure first.
     steps:
-      - label: '[需確認] Step 1'
+      - label: Pick a store or service
         ratio: 3/4
-        alt: '[需確認] Flow step 1'
-      - label: '[需確認] Step 2'
-        ratio: 3/4
-        alt: '[需確認] Flow step 2'
+        alt: New Formosa Sport flow — choosing a store or service line
   - type: featureSplit
     heading: Automated Lead Pipeline
     body: >-
@@ -69,9 +72,9 @@ sections:
   - type: featureSplit
     heading: Zero-Build Deployment
     body: >-
-      [需確認]
-      這段內文截圖字級太小、辨識度不足（原文似乎有重複片段，判斷是我截圖誤讀而非設計稿本身重複），待設計師提供正確文案。大致主題：靜態架構、無需
-      build command，適合沒有工程團隊的客戶。
+      A static site with no build command, deployed straight from the
+      repository. The client has no engineering team, so the site had to stay
+      updatable without anyone standing by to run a pipeline.
     imagePosition: left
     ratio: 4/3
     alt: Deployment configuration screenshot
@@ -83,27 +86,37 @@ sections:
     alt: Overview of the five business lines sharing one site
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
-    heading: '[需確認] 這裡的標題截圖辨識度不足，待設計師提供正確文案（推測跟其他案例一樣是「See ... in Action」句型）'
+    heading: See New Formosa Sport in Action
     body: >-
-      [需確認]
-      這段內文截圖字級太小、辨識度不足，待設計師提供正確文案。大致主題：示範完整的詢價路徑——訪客進入首頁、選擇門市或瀏覽服務項目、送出在地化的詢價表單。
+      The full lead path, start to finish: land on the homepage, pick a store or
+      browse the service lines, and send a localized inquiry. No account, no
+      cart — the shortest distance between a visitor and a conversation.
     ratio: 16/10
     alt: Full lead inquiry path demo on New Formosa Sport
   - type: featureSplit
     heading: Single Source of Truth
-    body: '[需確認] 這段內文截圖字級太小、辨識度不足，待設計師提供正確文案。大致主題：既有品牌紅（Formosa Red）與深藍搭配的色彩／字體系統決策。'
+    body: >-
+      Formosa Red and a deep navy were already the brand's colours; the work was
+      turning them into a token set with fixed roles, so a new page cannot
+      quietly invent a seventh shade of red.
     imagePosition: left
     ratio: 4/3
     alt: Color and typography system screenshot
   - type: featureSplit
     heading: 'Built for the Corridor, Not the Desk'
-    body: '[需確認] 這段內文截圖字級太小、辨識度不足，待設計師提供正確文案。大致主題：行動版路徑是為了在校園走廊、雙手忙碌的情境下設計的。'
+    body: >-
+      The mobile path assumes someone standing in a school corridor with one
+      hand full — larger targets, fewer steps, and a form that never asks for
+      anything the person would not already know.
     imagePosition: right
     ratio: 3/4
     alt: Mobile inquiry flow screenshot
   - type: featureSplit
     heading: The System Holds at 375px
-    body: '[需確認] 這段內文截圖字級太小、辨識度不足，待設計師提供正確文案。大致主題：整套系統在最小支援寬度 375px 下依然完整可用。'
+    body: >-
+      375px is the floor, not an afterthought. Every layout, form and product
+      listing is checked at that width, so the smallest supported screen gets
+      the whole site rather than a reduced one.
     imagePosition: left
     ratio: 3/4
     alt: Mobile layout at 375px viewport

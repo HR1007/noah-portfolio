@@ -2,8 +2,9 @@
 title: OSCE Medical Assessment Platform
 order: 3
 summary: >-
-  [需確認] live 網站上這裡的說明文字目前跟 New Formosa Sport 卡片一字不差（複製貼上沒改到的內容錯誤），需要設計師提供 OSCE
-  專案正確的一句話摘要，這裡先不沿用錯誤內容。
+  My master's thesis: redesigning the information system behind an AR + OSCE
+  assessment platform, so the structure of an exam lives in the interface
+  instead of the coordinator's head.
 hero:
   ctaLabel: Try it out
   ctaHref: 'https://osce-medical-assessment-platform.figma.site'
@@ -50,30 +51,40 @@ sections:
         alt: Double Diamond design process diagram
   - type: persona
     eyebrow: PERSONA
-    heading: '[需確認] Persona 標題，待設計師提供'
+    heading: OSCE — Persona
     personas:
-      - name: '[需確認] Persona 名稱'
+      - name: Exam coordinator
         ratio: 3/4
-        alt: '[需確認] Persona portrait'
+        alt: OSCE persona board — the coordinator who sets up and runs the stations
   - type: designThemes
     eyebrow: DESIGN THEMES
-    heading: '[需確認] Design Themes 標題，待設計師提供'
+    heading: >-
+      A system built for long shifts in dim rooms — colour that carries status,
+      and a dark theme that is not an afterthought.
     themes:
-      - title: '[需確認] 主題一'
-        description: '[需確認] 說明文字，待設計師提供實際內容。'
-      - title: '[需確認] 主題二'
-        description: '[需確認] 說明文字，待設計師提供實際內容。'
+      - title: Semantic colour
+        description: >-
+          Status is read from colour before it is read as text, so a coordinator
+          scanning a full station list does not have to parse every row.
+      - title: Dark theme
+        description: >-
+          Exams run for hours in dimmed simulation rooms, so the dark surface is
+          specified alongside the light one rather than derived from it
+          afterwards.
   - type: flow
     eyebrow: FLOW
-    heading: '[需確認] Flow 標題，待設計師提供'
-    body: '[需確認] Flow 說明文字，待設計師提供實際內容。'
+    heading: 'One seat, one place'
+    body: >-
+      The original workflow scattered a single action across ten tabs. The
+      redesigned flow keeps a whole exam setup on one surface, so the structure
+      of the exam lives in the interface instead of in someone's memory.
     steps:
-      - label: '[需確認] Step 1'
+      - label: Set up the station
         ratio: 3/4
-        alt: '[需確認] Flow step 1'
-      - label: '[需確認] Step 2'
+        alt: OSCE flow — configuring a station and its rubric
+      - label: Place and confirm seats
         ratio: 3/4
-        alt: '[需確認] Flow step 2'
+        alt: OSCE flow — placing exam seats and confirming the arrangement
   - type: featureSplit
     heading: Unified Task Surface
     body: >-
@@ -94,8 +105,12 @@ sections:
     alt: Dark mode dashboard screenshot
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
-    heading: '[需確認] 這裡的標題截圖辨識度不足，待設計師提供正確文案（推測跟其他案例一樣是「See ... in Action」句型）'
-    body: '[需確認] 這段內文截圖字級太小、辨識度不足，待設計師提供正確文案。'
+    heading: See the OSCE platform in Action
+    body: >-
+      A walk through the redesigned backend: advanced filters that expand in
+      place, status read through semantic colour, and bulk actions that stay
+      where the selection happens. The same tasks that once needed ten tabs,
+      done on one screen.
     ratio: 16/10
     alt: OSCE Medical Assessment Platform demo on laptop
   - type: featureSplit

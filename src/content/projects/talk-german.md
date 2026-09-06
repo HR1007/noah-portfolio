@@ -26,31 +26,51 @@ sections:
     alt: Talk German app screens shown across three phone mockups
   - type: researchFramework
     eyebrow: RESEARCH FRAMEWORK
-    heading: '[需確認] 研究框架標題，待設計師提供'
+    heading: 'From speech to understanding, mapped end to end'
     paragraphs:
-      - '[需確認] 這裡放研究方法／框架說明，待設計師提供實際內容。'
+      - >-
+        The whole product is four moments: land, choose an input, wait for
+        recognition, read the result. This wireflow settles that path before any
+        visual design — upload a file or record live, both converge on the same
+        recognition step, and both land on the same side-by-side result.
+      - >-
+        Light and dark were drawn together from the start rather than
+        retrofitted, so neither theme inherits a layout built for the other.
     ratio: 4/3
-    alt: '[需確認] Research framework diagram'
+    alt: >-
+      Talk German wireflow — entry, audio input, recognition and the bilingual
+      result, drawn in both light and dark
     layout: stacked
   - type: persona
     eyebrow: PERSONA
-    heading: '[需確認] Persona 標題，待設計師提供'
+    heading: Talk German — Persona
     personas:
-      - name: '[需確認] Persona 名稱'
+      - name: Emma Chen
         ratio: 3/4
-        alt: '[需確認] Persona portrait'
+        alt: Emma Chen persona board — a 22-year-old exchange student in Würzburg
   - type: designThemes
     eyebrow: DESIGN THEMES
-    heading: '[需確認] Design Themes 標題，待設計師提供'
+    heading: >-
+      A compact design system — colour, type, spacing and redlines that keep
+      every screen consistent across both themes.
     themes:
-      - title: '[需確認] 主題一'
-        description: '[需確認] 說明文字，待設計師提供實際內容。'
-      - title: '[需確認] 主題標題'
-        description: '[需確認] 主題說明，待補'
-      - title: '[需確認] 主題標題'
-        description: '[需確認] 主題說明，待補'
-      - title: '[需確認] 主題標題'
-        description: '[需確認] 主題說明，待補'
+      - title: Colour
+        description: >-
+          Brand violet with an amber pretzel mark. Dark and light canvases share
+          one set of ink and status tokens, so a screen switches theme without
+          redrawing.
+      - title: Typography
+        description: >-
+          Space Grotesk for display and titles, Inter for body and caption,
+          JetBrains Mono for the recording timer and labels.
+      - title: Spacing & Radius
+        description: >-
+          A 4pt base scale from 4 to 48, with four radii mapped to chips, cards,
+          panels and the CTA.
+      - title: Redlines
+        description: >-
+          Every screen specced with measurements, so the build matches the
+          design without guesswork.
     direction: vertical
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
@@ -88,14 +108,18 @@ sections:
           a low-friction experience.
         ratio: 3/4
         alt: Intuitive Authentication screen
-      - heading: '[需確認] 欄位標題'
-        body: '[需確認] 欄位說明，待補'
+      - heading: Seamless Audio Capture
+        body: >-
+          This screen features a streamlined, dual-mode information architecture
+          for input selection.
         ratio: 3/4
-        alt: '[需確認] Feature column'
-      - heading: '[需確認] 欄位標題'
-        body: '[需確認] 欄位說明，待補'
+        alt: Seamless Audio Capture screen
+      - heading: Parallel Insight
+        body: >-
+          Once the complex audio recognition is complete, the resulting layout
+          focuses on context retention and immediate verification.
         ratio: 3/4
-        alt: '[需確認] Feature column'
+        alt: Parallel Insight screen
     direction: horizontal
   - type: featureSplit
     heading: Daylight Accessibility
