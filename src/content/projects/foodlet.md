@@ -27,24 +27,6 @@ sections:
   - type: deviceShowcase
     ratio: 16/10
     alt: Foodlet website homepage screenshot on laptop
-  - type: researchFramework
-    eyebrow: RESEARCH FRAMEWORK
-    heading: 'Three tracks, then one question'
-    paragraphs:
-      - >-
-        A literature review from fintech through embedded finance to PayFi, a
-        pure-UX teardown of MetaMask, Coinbase Wallet and Trust Wallet, and a
-        survey of people already carrying a crypto wallet — run in parallel
-        rather than in sequence, so each one could correct the others.
-      - >-
-        The literature said what embedded finance was supposed to enable. The
-        teardowns said what wallets actually make you do. The survey said which
-        of those gaps anyone had noticed. Narrowing three answers into one
-        problem statement was the whole job.
-    ratio: 4/3
-    alt: >-
-      Foodlet research framework — literature review, wallet teardown and user
-      survey converging on one problem statement
   - type: persona
     eyebrow: PERSONA
     heading: Foodlet — Persona
@@ -66,6 +48,7 @@ sections:
         description: >-
           Rounded, slightly clumsy 3D characters — deliberately the opposite of
           the cold technical visuals Web3 usually arrives in.
+    direction: vertical
   - type: flow
     eyebrow: FLOW
     heading: From beep to keepsake
@@ -80,21 +63,7 @@ sections:
       - label: Pay & collect
         ratio: 3/4
         alt: Foodlet flow — paying for a meal and receiving the collectible
-  - type: experienceDemo
-    eyebrow: RESEARCH FOUNDATION
-    heading: Research Foundation
-    body: >-
-      Three tracks ran in parallel: a literature review from fintech through
-      embedded finance to PayFi; a scan of mainstream wallets — MetaMask,
-      Coinbase Wallet, Trust Wallet — from a pure UX standpoint; and a survey of
-      people actually using crypto wallets. My part was testing the motivation
-      and objectives — the least "design-looking" section of the report, and the
-      hardest. You have to decide which problem deserves designing for before
-      anyone gets to argue about how it should look.
-    ratio: 3/4
-    alt: Research foundation mobile mockup
-    ctaLabel: Let's Try Out
-    ctaHref: '#'
+    direction: horizontal
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
     heading: See Foodlet in Action
@@ -107,6 +76,7 @@ sections:
     alt: Foodlet experience demo phone mockup
     ctaLabel: Let's Try Out
     ctaHref: '#'
+    layout: stacked
   - type: featureGrid
     columns:
       - heading: Where Payment Starts Paying Back
@@ -128,6 +98,7 @@ sections:
           the neighbourhood instead of inside one storefront.
         ratio: 4/3
         alt: 'An Ecosystem, Not an App screen'
+    direction: horizontal
   - type: textSection
     heading: Design Concept
     paragraphs:
@@ -135,35 +106,13 @@ sections:
         Wallet login removes the form entirely; a decentralized identity quietly
         carries order history, preferences and delivery details between
         sessions.
-  - type: imageRow
-    images:
-      - ratio: 9/16
-        alt: 'Checkout form screenshot, light theme'
-      - ratio: 9/16
-        alt: 'Wallet connect form screenshot, dark theme'
-      - ratio: 9/16
-        alt: 'QR payment screenshot, black theme'
   - type: illustrationGrid
     heading: Illustrations
     body: >-
       Rounded, slightly clumsy 3D characters, chosen deliberately against the
       cold technical register Web3 usually arrives in. If a wallet is going to
       sit next to a bowl of noodles, it should look like it belongs there.
-    count: 8
+    count: 3
     alt: Foodlet illustration
-  - type: textSection
-    heading: Color Scheme / Typography
-    paragraphs:
-      - >-
-        Warm tones taken from real dining situations rather than a trading
-        dashboard, with a type scale that stays legible on a receipt-sized
-        screen. The system had to hold its personality across a light checkout
-        form, a dark wallet connect and a black QR screen.
-  - type: imageRow
-    images:
-      - ratio: 4/3
-        alt: Color palette swatches
-      - ratio: 4/3
-        alt: Typography specimen
 ---
 
