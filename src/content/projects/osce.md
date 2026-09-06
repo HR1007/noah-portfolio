@@ -57,7 +57,7 @@ sections:
     eyebrow: '[需確認] EYEBROW'
     heading: '[需確認] 標題'
     body: '[需確認] 說明文字，待補'
-    imagePosition: right
+    imagePosition: left
     ratio: 3/4
     alt: '[需確認] Feature split'
   - type: persona
@@ -139,7 +139,7 @@ sections:
     eyebrow: '[需確認] EYEBROW'
     heading: '[需確認] 標題'
     body: '[需確認] 說明文字，待補'
-    imagePosition: right
+    imagePosition: left
     ratio: 3/4
     alt: '[需確認] Feature split'
     ctaLabel: Let's Try Out
