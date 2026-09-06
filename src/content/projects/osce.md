@@ -28,7 +28,8 @@ sections:
   - type: deviceShowcase
     ratio: 16/10
     alt: OSCE Medical Assessment Platform dashboard screenshot
-  - type: textSection
+  - type: researchFramework
+    layout: stacked
     eyebrow: RESEARCH FRAMEWORK
     heading: Research Framework
     paragraphs:
@@ -43,21 +44,22 @@ sections:
         simple: keep the efficiency and error-prevention UCD cares about,
         without flattening the lived experience of turning an exam into a
         handful of numbers.
-  - type: researchFramework
-    layout: stacked
-    eyebrow: RESEARCH FRAMEWORK
-    heading: '[需確認] 標題'
-    paragraphs:
-      - '[需確認] 段落內文，待補'
     ratio: 4/3
     alt: '[需確認] Research framework'
-  - type: imageRow
-    images:
-      - ratio: 4/3
-        alt: Research process flowchart
-      - ratio: 4/3
-        alt: Double Diamond design process diagram
-    direction: horizontal
+  - type: featureSplit
+    eyebrow: '[需確認] EYEBROW'
+    heading: '[需確認] 標題'
+    body: '[需確認] 說明文字，待補'
+    imagePosition: right
+    ratio: 3/4
+    alt: '[需確認] Feature split'
+  - type: featureSplit
+    eyebrow: '[需確認] EYEBROW'
+    heading: '[需確認] 標題'
+    body: '[需確認] 說明文字，待補'
+    imagePosition: right
+    ratio: 3/4
+    alt: '[需確認] Feature split'
   - type: persona
     eyebrow: PERSONA
     heading: OSCE — Persona
@@ -140,5 +142,7 @@ sections:
     imagePosition: right
     ratio: 3/4
     alt: '[需確認] Feature split'
+    ctaLabel: Let's Try Out
+    ctaHref: '#'
 ---
 
