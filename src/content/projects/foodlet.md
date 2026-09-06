@@ -48,6 +48,8 @@ sections:
         description: >-
           Rounded, slightly clumsy 3D characters — deliberately the opposite of
           the cold technical visuals Web3 usually arrives in.
+      - title: '[需確認] 主題標題'
+        description: '[需確認] 主題說明，待補'
     direction: vertical
   - type: flow
     eyebrow: FLOW
@@ -60,9 +62,6 @@ sections:
       - label: Connect wallet
         ratio: 3/4
         alt: Foodlet flow — connecting a wallet in one tap
-      - label: Pay & collect
-        ratio: 3/4
-        alt: Foodlet flow — paying for a meal and receiving the collectible
     direction: horizontal
   - type: experienceDemo
     eyebrow: EXPERIENCE DEMO
@@ -99,13 +98,6 @@ sections:
         ratio: 4/3
         alt: 'An Ecosystem, Not an App screen'
     direction: horizontal
-  - type: textSection
-    heading: Design Concept
-    paragraphs:
-      - >-
-        Wallet login removes the form entirely; a decentralized identity quietly
-        carries order history, preferences and delivery details between
-        sessions.
   - type: illustrationGrid
     heading: Illustrations
     body: >-
