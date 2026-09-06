@@ -49,6 +49,7 @@ sections:
         description: '[需確認] 主題說明，待補'
       - title: '[需確認] 主題標題'
         description: '[需確認] 主題說明，待補'
+    direction: vertical
   - type: flow
     eyebrow: FLOW
     heading: The inquiry path
@@ -60,6 +61,14 @@ sections:
       - label: Pick a store or service
         ratio: 3/4
         alt: New Formosa Sport flow — choosing a store or service line
+    direction: horizontal
+  - type: experienceDemo
+    layout: stacked
+    eyebrow: EXPERIENCE DEMO
+    heading: '[需確認] 標題'
+    body: '[需確認] 說明文字，待補'
+    ratio: 9/16
+    alt: '[需確認] Experience demo'
   - type: featureSplit
     heading: Automated Lead Pipeline
     body: >-
@@ -84,15 +93,6 @@ sections:
     imagePosition: right
     ratio: 4/3
     alt: Overview of the five business lines sharing one site
-  - type: experienceDemo
-    eyebrow: EXPERIENCE DEMO
-    heading: See New Formosa Sport in Action
-    body: >-
-      The full lead path, start to finish: land on the homepage, pick a store or
-      browse the service lines, and send a localized inquiry. No account, no
-      cart — the shortest distance between a visitor and a conversation.
-    ratio: 16/10
-    alt: Full lead inquiry path demo on New Formosa Sport
   - type: featureSplit
     heading: Single Source of Truth
     body: >-

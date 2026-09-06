@@ -49,6 +49,7 @@ sections:
         alt: Research process flowchart
       - ratio: 4/3
         alt: Double Diamond design process diagram
+    direction: horizontal
   - type: persona
     eyebrow: PERSONA
     heading: OSCE — Persona
@@ -71,6 +72,7 @@ sections:
           Exams run for hours in dimmed simulation rooms, so the dark surface is
           specified alongside the light one rather than derived from it
           afterwards.
+    direction: vertical
   - type: flow
     eyebrow: FLOW
     heading: 'One seat, one place'
@@ -85,6 +87,7 @@ sections:
       - label: Place and confirm seats
         ratio: 3/4
         alt: OSCE flow — placing exam seats and confirming the arrangement
+    direction: horizontal
   - type: featureSplit
     heading: Unified Task Surface
     body: >-
@@ -113,6 +116,7 @@ sections:
       done on one screen.
     ratio: 16/10
     alt: OSCE Medical Assessment Platform demo on laptop
+    layout: stacked
   - type: featureSplit
     heading: Experience the Intuitive Flow
     body: >-
@@ -137,5 +141,6 @@ sections:
     alt: >-
       Study session photos showing eye-tracking, simulated exam stations, and
       semi-structured interviews
+    layout: stacked
 ---
 
