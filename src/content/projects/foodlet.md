@@ -58,7 +58,7 @@ sections:
     alt: Foodlet experience demo phone mockup
     ctaLabel: Let's Try Out
     ctaHref: '#'
-    layout: stacked
+    layout: split
   - type: featureGrid
     columns:
       - heading: Where Payment Starts Paying Back
@@ -81,13 +81,6 @@ sections:
         ratio: 4/3
         alt: 'An Ecosystem, Not an App screen'
     direction: horizontal
-  - type: imageRow
-    eyebrow: '[需確認] EYEBROW'
-    heading: '[需確認] 標題'
-    images:
-      - ratio: 4/3
-        alt: '[需確認] Image row'
-    direction: horizontal
   - type: featureSplit
     eyebrow: '[需確認] EYEBROW'
     heading: '[需確認] 標題'
@@ -106,7 +99,7 @@ sections:
     eyebrow: '[需確認] EYEBROW'
     heading: '[需確認] 標題'
     body: '[需確認] 說明文字，待補'
-    imagePosition: right
+    imagePosition: left
     ratio: 3/4
     alt: '[需確認] Feature split'
 ---
