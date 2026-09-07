@@ -34,23 +34,6 @@ sections:
       - name: Everyday diner
         ratio: 3/4
         alt: Foodlet persona board
-  - type: designThemes
-    eyebrow: DESIGN THEMES
-    heading: >-
-      A warm system for a cold category — colour, type and a cast of characters
-      that keep a crypto wallet from feeling like a trading terminal.
-    themes:
-      - title: Colour & Typography
-        description: >-
-          Tones borrowed from the dining table rather than the trading
-          dashboard, with type sized for reading a total at arm's length.
-      - title: Illustration
-        description: >-
-          Rounded, slightly clumsy 3D characters — deliberately the opposite of
-          the cold technical visuals Web3 usually arrives in.
-      - title: '[需確認] 主題標題'
-        description: '[需確認] 主題說明，待補'
-    direction: horizontal
   - type: flow
     eyebrow: FLOW
     heading: From beep to keepsake
@@ -98,13 +81,33 @@ sections:
         ratio: 4/3
         alt: 'An Ecosystem, Not an App screen'
     direction: horizontal
-  - type: illustrationGrid
-    heading: Illustrations
-    body: >-
-      Rounded, slightly clumsy 3D characters, chosen deliberately against the
-      cold technical register Web3 usually arrives in. If a wallet is going to
-      sit next to a bowl of noodles, it should look like it belongs there.
-    count: 3
-    alt: Foodlet illustration
+  - type: imageRow
+    eyebrow: '[需確認] EYEBROW'
+    heading: '[需確認] 標題'
+    images:
+      - ratio: 4/3
+        alt: '[需確認] Image row'
+    direction: horizontal
+  - type: featureSplit
+    eyebrow: '[需確認] EYEBROW'
+    heading: '[需確認] 標題'
+    body: '[需確認] 說明文字，待補'
+    imagePosition: right
+    ratio: 3/4
+    alt: '[需確認] Feature split'
+  - type: featureSplit
+    eyebrow: '[需確認] EYEBROW'
+    heading: '[需確認] 標題'
+    body: '[需確認] 說明文字，待補'
+    imagePosition: right
+    ratio: 3/4
+    alt: '[需確認] Feature split'
+  - type: featureSplit
+    eyebrow: '[需確認] EYEBROW'
+    heading: '[需確認] 標題'
+    body: '[需確認] 說明文字，待補'
+    imagePosition: right
+    ratio: 3/4
+    alt: '[需確認] Feature split'
 ---
 
