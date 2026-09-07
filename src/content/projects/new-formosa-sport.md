@@ -45,10 +45,14 @@ sections:
         description: >-
           A type scale that survives both a spec sheet on a desktop and a phone
           held one-handed in a school corridor.
-      - title: '[需確認] 主題標題'
-        description: '[需確認] 主題說明，待補'
-      - title: '[需確認] 主題標題'
-        description: '[需確認] 主題說明，待補'
+      - title: Spacing & Shape
+        description: >-
+          A 4px spacing scale with fixed radius and elevation steps, so a new
+          page cannot quietly invent its own rhythm.
+      - title: Components
+        description: >-
+          Buttons, inputs, badges and service cards specified with every state,
+          so five business lines build from one kit.
     direction: vertical
   - type: flow
     eyebrow: FLOW
@@ -65,10 +69,12 @@ sections:
   - type: experienceDemo
     layout: stacked
     eyebrow: EXPERIENCE DEMO
-    heading: '[需確認] 標題'
-    body: '[需確認] 說明文字，待補'
+    heading: The Quote Lives on the First Screen
+    body: >-
+      No hunting for a contact page. The inquiry form sits beside the hero, so a
+      visitor can say what they need and send it without scrolling away.
     ratio: 9/16
-    alt: '[需確認] Experience demo'
+    alt: New Formosa Sport homepage with the free-quote form beside the hero
   - type: featureSplit
     heading: Automated Lead Pipeline
     body: >-

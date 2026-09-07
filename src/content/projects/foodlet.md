@@ -82,32 +82,43 @@ sections:
         alt: 'An Ecosystem, Not an App screen'
     direction: horizontal
   - type: featureSplit
-    eyebrow: '[需確認] EYEBROW'
-    heading: '[需確認] 標題'
-    body: '[需確認] 說明文字，待補'
+    eyebrow: COLOUR & TYPE
+    heading: A Palette Borrowed from the Table
+    body: >-
+      Warm amber as the primary, with fixed shades, tints and action colours.
+      Four headline sizes and four body sizes — enough to build every screen,
+      few enough to stay consistent.
     imagePosition: right
     ratio: 3/4
-    alt: '[需確認] Feature split'
+    alt: Foodlet colour palette and type scale
   - type: featureSplit
-    eyebrow: '[需確認] EYEBROW'
-    heading: '[需確認] 標題'
-    body: '[需確認] 說明文字，待補'
+    eyebrow: FORM COMPONENTS
+    heading: 'Every Field State, Drawn Once'
+    body: >-
+      Default, placeholder, focus and error specified up front, in both light
+      and dark. Required fields are marked before the form is sent, not after it
+      fails.
     imagePosition: right
     ratio: 3/4
-    alt: '[需確認] Feature split'
+    alt: 'Form component states in light and dark, with a sign-up form example'
   - type: featureSplit
-    eyebrow: '[需確認] EYEBROW'
-    heading: '[需確認] 標題'
-    body: '[需確認] 說明文字，待補'
+    eyebrow: ILLUSTRATION
+    heading: 'Two Registers, One Cast'
+    body: >-
+      Rounded 3D characters do the explaining; pixel-art food does the
+      rewarding. The collectible has to look like something worth keeping, not a
+      receipt.
     imagePosition: right
     ratio: 3/4
-    alt: '[需確認] Feature split'
+    alt: Illustration set — 3D characters and pixel-art food collectibles
   - type: featureSplit
-    eyebrow: '[需確認] EYEBROW'
-    heading: '[需確認] 標題'
-    body: '[需確認] 說明文字，待補'
+    eyebrow: THE REWARD
+    heading: The Receipt You Actually Keep
+    body: >-
+      Payment clears and the first collectible lands — a pixel cookie, claimed
+      in one tap. The moment that used to be a beep now hands something back.
     imagePosition: left
     ratio: 3/4
-    alt: '[需確認] Feature split'
+    alt: Mobile screen awarding the first Foodlet NFT collectible
 ---
 

@@ -45,21 +45,29 @@ sections:
         without flattening the lived experience of turning an exam into a
         handful of numbers.
     ratio: 4/3
-    alt: '[需確認] Research framework'
+    alt: >-
+      OSCE research framework — core roles, the double diamond process, and the
+      screen flow it produced
   - type: featureSplit
-    eyebrow: '[需確認] EYEBROW'
-    heading: '[需確認] 標題'
-    body: '[需確認] 說明文字，待補'
+    eyebrow: TEST RECORDS
+    heading: Every Exam in One Folder
+    body: >-
+      Sessions are filed by name and date, each card carrying its own completion
+      state — so an examiner sees what is still outstanding without opening
+      anything.
     imagePosition: right
     ratio: 3/4
-    alt: '[需確認] Feature split'
+    alt: 'Exam folder list, searchable by candidate name and date'
   - type: featureSplit
-    eyebrow: '[需確認] EYEBROW'
-    heading: '[需確認] 標題'
-    body: '[需確認] 說明文字，待補'
+    eyebrow: OVERVIEW
+    heading: One Table for the Whole Cohort
+    body: >-
+      Student ID, score, timestamp and examiner in a single filterable row.
+      Advanced filters narrow by year and date range, and the result exports in
+      one click.
     imagePosition: left
     ratio: 3/4
-    alt: '[需確認] Feature split'
+    alt: Exam overview table with advanced filters and export
   - type: persona
     eyebrow: PERSONA
     heading: OSCE — Persona
@@ -136,12 +144,14 @@ sections:
     ctaLabel: Let's Try Out
     ctaHref: '#'
   - type: featureSplit
-    eyebrow: '[需確認] EYEBROW'
-    heading: '[需確認] 標題'
-    body: '[需確認] 說明文字，待補'
+    eyebrow: AUDIT LOG
+    heading: Every Change Leaves a Trace
+    body: >-
+      Logins, edits, deletions and exports are colour-tagged and searchable by
+      account and date. When a score is disputed, the record answers it.
     imagePosition: left
     ratio: 3/4
-    alt: '[需確認] Feature split'
+    alt: System audit log with colour-tagged event types
     ctaLabel: Let's Try Out
     ctaHref: '#'
 ---
