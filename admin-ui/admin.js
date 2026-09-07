@@ -336,7 +336,13 @@ function buildAddTile(pending) {
 
 /** 拖拉的共用綁定：key 是「拖的是哪一個」，Gallery 傳陣列位置，案例頁傳版位編號。 */
 function bindDrag(tile, key, container, onDrop) {
-  tile.addEventListener('dragstart', () => {
+  /*
+    每個事件都要 stopPropagation：Portfolio 分頁的圖片磚外面包著一張同樣可拖的
+    段落卡片，不擋住冒泡的話，拖一張圖會同時被當成「拖整個段落」，兩個 handler
+    互相打架——放開後可能圖沒換、段落卻被搬走了。
+  */
+  tile.addEventListener('dragstart', (e) => {
+    e.stopPropagation();
     dragFromIndex = key;
     tile.classList.add('dragging');
   });
@@ -346,11 +352,13 @@ function bindDrag(tile, key, container, onDrop) {
   });
   tile.addEventListener('dragover', (e) => {
     e.preventDefault();
+    e.stopPropagation();
     tile.classList.add('drop-target');
   });
   tile.addEventListener('dragleave', () => tile.classList.remove('drop-target'));
   tile.addEventListener('drop', (e) => {
     e.preventDefault();
+    e.stopPropagation();
     tile.classList.remove('drop-target');
     if (dragFromIndex === null || dragFromIndex === key) return;
     onDrop(dragFromIndex, key);
@@ -425,8 +433,19 @@ function buildSectionCard(section, slots, host) {
   card.className = 'sec-card';
   const list = section.list;
 
+  // Hero 用的是 index -1，它不是段落、也沒有前後可言，不能拖
+  const canDrag = section.index >= 0;
+  if (canDrag) bindSectionDrag(card, section.index, currentSlug, () => loadImages());
+
   const head = document.createElement('div');
   head.className = 'sec-card__head';
+  if (canDrag) {
+    const grip = document.createElement('span');
+    grip.className = 'sec-card__grip';
+    grip.title = '拖拉調整段落順序';
+    grip.textContent = '⠿';
+    head.appendChild(grip);
+  }
   const title = document.createElement('strong');
   title.className = 'sec-card__title';
   title.textContent = section.title;
@@ -699,8 +718,9 @@ async function structureRequest(url, options, okMessage, reload) {
     const body = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(body.error || res.statusText);
     const renamed = body.renamed ? `，${body.renamed} 張圖片重新編號` : '';
+    const moved = body.moved ? `，${body.moved} 張圖片跟著搬` : '';
     const deleted = body.deleted ? `，一併刪除 ${body.deleted} 張圖片` : '';
-    showToast(`${okMessage}${renamed}${deleted}`);
+    showToast(`${okMessage}${renamed}${moved}${deleted}`);
     selectedSlot = null;
     await reload();
   } catch (err) {
@@ -751,6 +771,64 @@ function handleAddSection(type, at) {
     },
     '已新增段落，文字先填入 [需確認] 佔位，請到 Content 頁補上',
     loadImages
+  );
+}
+
+/*
+  段落卡片的拖放綁定，Content 與 Portfolio 兩個分頁共用。
+  兩邊原本各寫各的（而且 Portfolio 根本沒寫），現在只有這一份。
+*/
+function bindSectionDrag(card, index, slug, reload) {
+  card.draggable = true;
+  card.dataset.idx = String(index);
+
+  card.addEventListener('dragstart', (e) => {
+    sectionDragFrom = index;
+    card.classList.add('sec-card--dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  card.addEventListener('dragend', () => {
+    sectionDragFrom = null;
+    document.querySelectorAll('.sec-card').forEach((c) =>
+      c.classList.remove('sec-card--dragging', 'sec-card--over')
+    );
+  });
+  card.addEventListener('dragover', (e) => {
+    if (sectionDragFrom === null || sectionDragFrom === index) return;
+    e.preventDefault();
+    card.classList.add('sec-card--over');
+  });
+  card.addEventListener('dragleave', () => card.classList.remove('sec-card--over'));
+  card.addEventListener('drop', (e) => {
+    e.preventDefault();
+    card.classList.remove('sec-card--over');
+    if (sectionDragFrom === null || sectionDragFrom === index) return;
+    reorderSection(slug, sectionDragFrom, index, reload);
+  });
+}
+
+/*
+  搬移段落。
+
+  這個函式先前「被呼叫但從來沒有被定義過」——Content 分頁的段落卡片一直綁著拖放，
+  放開時卻是丟 ReferenceError，所以拖了完全沒有反應，也不會跳任何錯誤訊息。
+  後端的 PUT /api/projects/:slug/sections/reorder 一直是好的：它會同時改寫 md 的
+  段落順序並把圖片檔重新編號，讓每張圖跟著自己的段落一起搬，只是沒人叫得動它。
+*/
+async function reorderSection(slug, from, to, reload = loadContentPage) {
+  /*
+    Content 分頁上可能有還沒儲存的文字編輯，而段落 API 是直接讀檔改檔，
+    不先存回去的話那些編輯會在重新載入時默默消失。
+    Portfolio 分頁沒有載入過文案（projectsData 對這個 slug 是空的），
+    既沒有這個問題，也不能拿空資料去覆蓋檔案。
+  */
+  if (projectsData[slug] && !(await saveProjectData(slug))) return;
+
+  await structureRequest(
+    `${API}/api/projects/${slug}/sections/reorder`,
+    { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from, to }) },
+    '已調整段落順序',
+    reload
   );
 }
 
@@ -1527,32 +1605,7 @@ function renderProjectCard(slug, title, form) {
   (data.sections || []).forEach((sec, i) => {
     const card = document.createElement('div');
     card.className = 'sec-card';
-    card.draggable = true;
-    card.dataset.idx = String(i);
-
-    card.addEventListener('dragstart', (e) => {
-      sectionDragFrom = i;
-      card.classList.add('sec-card--dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    card.addEventListener('dragend', () => {
-      sectionDragFrom = null;
-      document.querySelectorAll('.sec-card').forEach((c) =>
-        c.classList.remove('sec-card--dragging', 'sec-card--over')
-      );
-    });
-    card.addEventListener('dragover', (e) => {
-      if (sectionDragFrom === null || sectionDragFrom === i) return;
-      e.preventDefault();
-      card.classList.add('sec-card--over');
-    });
-    card.addEventListener('dragleave', () => card.classList.remove('sec-card--over'));
-    card.addEventListener('drop', (e) => {
-      e.preventDefault();
-      card.classList.remove('sec-card--over');
-      if (sectionDragFrom === null || sectionDragFrom === i) return;
-      reorderSection(slug, sectionDragFrom, i);
-    });
+    bindSectionDrag(card, i, slug, () => loadContentPage());
 
     const head = document.createElement('div');
     head.className = 'sec-card__head';
