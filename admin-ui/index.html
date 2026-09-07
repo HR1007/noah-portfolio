@@ -37,11 +37,18 @@
               <h1 class="topbar__title" id="pageTitle">Gallery 相簿</h1>
               <p class="topbar__meta" id="pageMeta">載入中…</p>
             </div>
-            <button class="publish-btn" id="publishBtn" type="button">
-              <svg viewBox="0 0 24 24"><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></svg>
-              <span id="publishBtnLabel">發布</span>
-              <span class="publish-btn__count" id="publishCount" hidden></span>
-            </button>
+            <div class="topbar__actions">
+              <!-- 復原上一步：標籤直接寫出會還原哪一個動作，按下去之前就知道會發生什麼 -->
+              <button class="undo-btn" id="undoBtn" type="button" disabled>
+                <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /><path d="M4 9h10a6 6 0 0 1 0 12h-3" /></svg>
+                <span id="undoBtnLabel">沒有可復原的操作</span>
+              </button>
+              <button class="publish-btn" id="publishBtn" type="button">
+                <svg viewBox="0 0 24 24"><path d="M12 19V5" /><path d="m5 12 7-7 7 7" /></svg>
+                <span id="publishBtnLabel">發布</span>
+                <span class="publish-btn__count" id="publishCount" hidden></span>
+              </button>
+            </div>
           </div>
           <div class="topbar__tabs" id="pageTabs"></div>
         </header>

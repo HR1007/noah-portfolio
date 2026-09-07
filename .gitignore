@@ -33,3 +33,6 @@ raw-assets/
 # Claude Code 的本機設定與快取，整個目錄都不進版控。
 # 目錄必須留在專案根目錄（Claude Code 從這裡讀取），只是不追蹤內容。
 .claude/
+
+# 後台「復原上一步」的快照，只是本機暫存
+.admin-undo/

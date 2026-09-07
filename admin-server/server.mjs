@@ -18,6 +18,7 @@ import {
   createSection, addSectionItem, removeSectionItem, sectionTypeOptions, CTA_DEFAULT,
 } from '../src/lib/image-slots.mjs';
 import { HERO_GRADIENTS } from '../src/lib/hero-gradients.mjs';
+import { snapshotBefore, pendingUndo, restoreLast, clearUndo } from './undo.mjs';
 import {
   CONTENT_PATHS, changedFiles, outsideFiles, buildMessage,
   validateBuild, remoteBehind, commitAndPush,
@@ -83,6 +84,69 @@ const COLLECTIONS = {
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// ---------- 復原上一步 ----------
+
+/*
+  把每個會寫檔的端點包一層：執行之前先拍快照（見 undo.mjs）。
+
+  快照拍不起來就不執行這一步——寧可讓操作當場失敗，也不要做了一件救不回來的事，
+  那正好是這個功能要防的情況。
+*/
+function undoable(resolve) {
+  return async (req, res, next) => {
+    let plan;
+    try {
+      plan = resolve(req);
+    } catch {
+      // 參數本身就不合法（slug 不存在、locale 打錯之類），交給端點自己回錯誤。
+      // 這種請求不會寫到檔案，沒有東西需要快照。
+      return next();
+    }
+
+    try {
+      await snapshotBefore(plan.label, plan.targets);
+    } catch (err) {
+      await clearUndo().catch(() => {});
+      return res.status(500).json({ error: `無法建立復原快照，這一步沒有執行：${err.message || err}` });
+    }
+    next();
+  };
+}
+
+/*
+  案例頁的一步可能同時動到 md（段落結構、文案）與圖片資料夾（新增／刪除／重新編號），
+  兩邊要一起拍。只拍其中一邊的話，復原後 md 說有五個版位、資料夾裡卻是四張圖，
+  等於還原出一個原本不存在的狀態。
+*/
+const projectTargets = (slug) => [
+  { kind: 'file', path: projectFilePath(slug) },
+  { kind: 'dir', path: path.join(PROJECTS_ASSET_DIR, slug) },
+];
+
+const collectionTargets = (type, slug) => [{ kind: 'dir', path: slugDir(type, slug) }];
+
+const pageImageTargets = (page) => {
+  const group = PAGE_IMAGES[page];
+  if (!group) throw new Error(`unknown page: ${page}`);
+  return [{ kind: 'dir', path: group.dir }];
+};
+
+app.get('/api/history', async (req, res) => {
+  try {
+    res.json(await pendingUndo());
+  } catch (err) {
+    res.status(500).json({ error: String(err) });
+  }
+});
+
+app.post('/api/undo', async (req, res) => {
+  try {
+    res.json({ ok: true, ...(await restoreLast()) });
+  } catch (err) {
+    res.status(400).json({ error: String(err.message || err) });
+  }
+});
 
 function collectionOf(type) {
   const c = COLLECTIONS[type];
@@ -196,7 +260,13 @@ function textItemPreviews(section, list) {
   刻意不複製文案：模板的用途是「版面骨架一致」，把別的作品的描述整段搬過來，
   很容易在還沒改完的情況下就發布出去。圖片同理不複製，新案例從空的開始。
 */
-app.post('/api/projects', async (req, res) => {
+app.post(
+  '/api/projects',
+  undoable((req) => ({
+    label: `新增案例「${req.body?.slug}」`,
+    targets: projectTargets(String(req.body?.slug ?? '')),
+  })),
+  async (req, res) => {
   try {
     const { slug, title, template } = req.body || {};
 
@@ -292,7 +362,10 @@ app.get('/api/projects/:slug/slots', async (req, res) => {
   圖片就會跑到別的段落去——所以這裡必須把圖檔一起搬，讓每個段落
   帶著自己的圖走。先全部改成暫存檔名再落位，避免搬移過程互相覆蓋。
 */
-app.put('/api/projects/:slug/sections/reorder', async (req, res) => {
+app.put(
+  '/api/projects/:slug/sections/reorder',
+  undoable((req) => ({ label: `調整段落順序（${req.params.slug}）`, targets: projectTargets(req.params.slug) })),
+  async (req, res) => {
   try {
     const { from, to } = req.body || {};
     const file = projectFilePath(req.params.slug);
@@ -418,7 +491,10 @@ app.get('/api/projects/:slug/content', async (req, res) => {
 
 // body 是整份 frontmatter 物件，寫回時保留原本的 markdown 內文（目前案例頁都用 sections
 // 版型，內文本身沒有實際顯示在頁面上，但還是原樣保留，不憑空清空）。
-app.put('/api/projects/:slug/content', async (req, res) => {
+app.put(
+  '/api/projects/:slug/content',
+  undoable((req) => ({ label: `編輯案例文案（${req.params.slug}）`, targets: projectTargets(req.params.slug) })),
+  async (req, res) => {
   try {
     const file = projectFilePath(req.params.slug);
     const raw = await fs.readFile(file, 'utf-8');
@@ -564,7 +640,10 @@ function sectionAt(data, raw) {
 }
 
 // body: { type: 'featureGrid', at?: 3 } —— at 省略時加在最後
-app.post('/api/projects/:slug/sections', async (req, res) => {
+app.post(
+  '/api/projects/:slug/sections',
+  undoable((req) => ({ label: `新增段落（${req.params.slug}）`, targets: projectTargets(req.params.slug) })),
+  async (req, res) => {
   try {
     const result = await applySectionChange(req.params.slug, (data) => {
       const sections = [...(data.sections || [])];
@@ -584,7 +663,13 @@ app.post('/api/projects/:slug/sections', async (req, res) => {
 });
 
 // 刪段落會連同該段落的圖片檔一起刪掉：那些圖已經沒有任何版位能放，留著只會變成孤兒檔案。
-app.delete('/api/projects/:slug/sections/:index', async (req, res) => {
+app.delete(
+  '/api/projects/:slug/sections/:index',
+  undoable((req) => ({
+    label: `刪除段落（${req.params.slug} 第 ${Number(req.params.index) + 1} 段）`,
+    targets: projectTargets(req.params.slug),
+  })),
+  async (req, res) => {
   try {
     const result = await applySectionChange(req.params.slug, (data) => {
       const { sections: all, index } = sectionAt(data, req.params.index);
@@ -601,7 +686,10 @@ app.delete('/api/projects/:slug/sections/:index', async (req, res) => {
 });
 
 // 往段落的可重複清單加一項：圖片型清單會多一個空版位，文字型清單只是多一段 [需確認] 文字。
-app.post('/api/projects/:slug/sections/:index/items', async (req, res) => {
+app.post(
+  '/api/projects/:slug/sections/:index/items',
+  undoable((req) => ({ label: `段落內新增一項（${req.params.slug}）`, targets: projectTargets(req.params.slug) })),
+  async (req, res) => {
   try {
     const result = await applySectionChange(req.params.slug, (data) => {
       const { sections: all, index } = sectionAt(data, req.params.index);
@@ -630,7 +718,10 @@ app.post('/api/projects/:slug/sections/:index/items', async (req, res) => {
 });
 
 // 移除段落裡的第 i 項（圖片型清單會連同那一格的圖片檔一起刪）
-app.delete('/api/projects/:slug/sections/:index/items/:item', async (req, res) => {
+app.delete(
+  '/api/projects/:slug/sections/:index/items/:item',
+  undoable((req) => ({ label: `段落內刪除一項（${req.params.slug}）`, targets: projectTargets(req.params.slug) })),
+  async (req, res) => {
   try {
     const result = await applySectionChange(req.params.slug, (data) => {
       const { sections: all, index } = sectionAt(data, req.params.index);
@@ -670,7 +761,14 @@ app.get('/api/collections/:type/:slug/images', async (req, res) => {
   }
 });
 
-app.post('/api/collections/:type/:slug/images', express.raw({ type: '*/*', limit: '25mb' }), async (req, res) => {
+app.post(
+  '/api/collections/:type/:slug/images',
+  express.raw({ type: '*/*', limit: '25mb' }),
+  undoable((req) => ({
+    label: `上傳圖片（${req.params.type}／${req.params.slug}）`,
+    targets: collectionTargets(req.params.type, req.params.slug),
+  })),
+  async (req, res) => {
   try {
     const dir = slugDir(req.params.type, req.params.slug);
     const ext = path.extname(String(req.query.filename || '')).toLowerCase();
@@ -705,7 +803,13 @@ app.post('/api/collections/:type/:slug/images', express.raw({ type: '*/*', limit
   }
 });
 
-app.delete('/api/collections/:type/:slug/images/:filename', async (req, res) => {
+app.delete(
+  '/api/collections/:type/:slug/images/:filename',
+  undoable((req) => ({
+    label: `刪除圖片 ${req.params.filename}（${req.params.type}／${req.params.slug}）`,
+    targets: collectionTargets(req.params.type, req.params.slug),
+  })),
+  async (req, res) => {
   try {
     const dir = slugDir(req.params.type, req.params.slug);
     const target = path.join(dir, req.params.filename);
@@ -719,7 +823,13 @@ app.delete('/api/collections/:type/:slug/images/:filename', async (req, res) => 
 
 // body: { order: ["03.webp", "00.webp", ...] } —— 依新順序把檔案改名成 00, 01, 02...
 // 先全部改成不會撞名的暫存檔名，再改成最終編號，避免排列過程中互相覆蓋。
-app.put('/api/collections/:type/:slug/order', async (req, res) => {
+app.put(
+  '/api/collections/:type/:slug/order',
+  undoable((req) => ({
+    label: `調整圖片順序（${req.params.type}／${req.params.slug}）`,
+    targets: collectionTargets(req.params.type, req.params.slug),
+  })),
+  async (req, res) => {
   try {
     const dir = slugDir(req.params.type, req.params.slug);
     const order = req.body.order;
@@ -745,7 +855,10 @@ app.put('/api/collections/:type/:slug/order', async (req, res) => {
 // 案例頁的「互換兩格」：只改這兩個編號，其他格完全不動。
 // 不能沿用 gallery 的 /order（那是把整串檔名壓成 00..N-1 的重排）——案例頁允許中間有
 // 空版位，壓一次就把空位吃掉、後面的圖全部往前移一格，等於整頁圖片錯位。
-app.put('/api/projects/:slug/images/swap', async (req, res) => {
+app.put(
+  '/api/projects/:slug/images/swap',
+  undoable((req) => ({ label: `互換圖片位置（${req.params.slug}）`, targets: collectionTargets('projects', req.params.slug) })),
+  async (req, res) => {
   try {
     const dir = slugDir('projects', req.params.slug);
     const a = Number(req.body?.a);
@@ -823,7 +936,14 @@ app.get('/api/page-images', async (req, res) => {
   }
 });
 
-app.post('/api/page-images/:page/:name', express.raw({ type: '*/*', limit: '25mb' }), async (req, res) => {
+app.post(
+  '/api/page-images/:page/:name',
+  express.raw({ type: '*/*', limit: '25mb' }),
+  undoable((req) => ({
+    label: `更換「${req.params.page}」的 ${req.params.name} 圖`,
+    targets: pageImageTargets(req.params.page),
+  })),
+  async (req, res) => {
   try {
     const { page, name } = req.params;
     const { group } = pageImageSlot(page, name);
@@ -842,7 +962,13 @@ app.post('/api/page-images/:page/:name', express.raw({ type: '*/*', limit: '25mb
   }
 });
 
-app.delete('/api/page-images/:page/:name', async (req, res) => {
+app.delete(
+  '/api/page-images/:page/:name',
+  undoable((req) => ({
+    label: `刪除「${req.params.page}」的 ${req.params.name} 圖`,
+    targets: pageImageTargets(req.params.page),
+  })),
+  async (req, res) => {
   try {
     const { page, name } = req.params;
     const { group } = pageImageSlot(page, name);
@@ -877,7 +1003,11 @@ app.get('/api/home/sets/:set', async (req, res) => {
   }
 });
 
-app.post('/api/home/sets/:set', express.raw({ type: '*/*', limit: '25mb' }), async (req, res) => {
+app.post(
+  '/api/home/sets/:set',
+  express.raw({ type: '*/*', limit: '25mb' }),
+  undoable((req) => ({ label: `新增 Home 圖組照片（${req.params.set}）`, targets: [{ kind: 'dir', path: HOME_DIR }] })),
+  async (req, res) => {
   try {
     const { set } = req.params;
     if (!HOME_SETS[set]) return res.status(400).json({ error: 'unknown home set' });
@@ -900,7 +1030,10 @@ app.post('/api/home/sets/:set', express.raw({ type: '*/*', limit: '25mb' }), asy
   }
 });
 
-app.delete('/api/home/sets/:set/:filename', async (req, res) => {
+app.delete(
+  '/api/home/sets/:set/:filename',
+  undoable((req) => ({ label: `刪除 Home 圖組照片 ${req.params.filename}`, targets: [{ kind: 'dir', path: HOME_DIR }] })),
+  async (req, res) => {
   try {
     const { set, filename } = req.params;
     if (!HOME_SETS[set]) return res.status(400).json({ error: 'unknown home set' });
@@ -931,7 +1064,14 @@ app.get('/api/site', async (req, res) => {
 // body 是整份 JSON 物件，直接覆寫對應語言的檔案。
 // 前端只送「型別結構跟原檔一致、只有字串值可能被改過」的物件，
 // 這裡不重新驗證 schema —— 內容壞掉的話下次 astro build 會直接報錯，容易發現。
-app.put('/api/site/:locale', async (req, res) => {
+app.put(
+  '/api/site/:locale',
+  undoable((req) => {
+    const { locale } = req.params;
+    if (locale !== 'en' && locale !== 'zh') throw new Error('invalid locale');
+    return { label: `編輯網站文案（${locale}）`, targets: [{ kind: 'file', path: locale === 'en' ? SITE_EN : SITE_ZH }] };
+  }),
+  async (req, res) => {
   try {
     const { locale } = req.params;
     if (locale !== 'en' && locale !== 'zh') return res.status(400).json({ error: 'invalid locale' });

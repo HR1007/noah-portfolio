@@ -758,6 +758,41 @@ svg {
 
 /* ---------- 發布按鈕與確認面板 ---------- */
 
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  flex: none;
+}
+
+/*
+  復原鍵刻意做得比發布鍵安靜：它是保險，不是主要動線。
+  沒有東西可復原時整顆變淡並且不可點，不用去猜按下去會不會有事。
+*/
+.undo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 320px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.undo-btn span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.undo-btn svg { width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; }
+.undo-btn:not(:disabled) { color: var(--ink); background: var(--surface); }
+.undo-btn:not(:disabled):hover { border-color: var(--muted); }
+.undo-btn:disabled { opacity: 0.45; cursor: default; }
+
 .publish-btn {
   display: inline-flex;
   align-items: center;

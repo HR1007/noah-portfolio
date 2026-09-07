@@ -283,6 +283,7 @@ async function loadImages() {
     pageMetaEl.textContent = `${currentImages.length} 張圖片 · 拖拉調順序，或點兩張快速互換位置`;
     renderCollectionGrid();
   }
+  refreshUndoButton();
   syncPreview();
 }
 
@@ -1349,6 +1350,7 @@ async function loadContentPage() {
 
   pageMetaEl.textContent = CONTENT_META;
   renderContentForm();
+  refreshUndoButton();
   syncPreview();
 }
 
@@ -1743,6 +1745,7 @@ async function saveProjectData(slug) {
     if (!res.ok) throw new Error(body.error || res.statusText);
     projectVersions[slug] = body.version;
     projectLoaded[slug] = JSON.stringify(projectsData[slug]);
+    refreshUndoButton();
     return true;
   } catch (err) {
     showToast(`儲存失敗：${err.message}`, true);
@@ -1775,6 +1778,7 @@ async function handleSaveContent() {
     }
 
     showToast(dirty.length ? `文案已儲存（案例：${saved.length} 個）` : '文案已儲存');
+    refreshUndoButton();
     reloadPreview();
   } catch (err) {
     showToast(`儲存失敗：${err.message}`, true);
@@ -1949,3 +1953,60 @@ publishConfirm.addEventListener('click', async () => {
 });
 
 refreshPublishBadge();
+
+// ---------- 復原上一步 ----------
+/*
+  後台每個會寫檔的動作，server 都會在執行前先拍一份快照（見 admin-server/undo.mjs），
+  只留最近一次。這顆按鈕就是把那一份放回去。
+
+  標籤直接寫出會還原掉哪一個動作，而不是只寫「復原」——誤刪之後最需要知道的
+  就是「按下去會回到什麼狀態」，不該讓人按了才知道。
+*/
+
+const undoBtn = document.getElementById('undoBtn');
+const undoBtnLabel = document.getElementById('undoBtnLabel');
+
+async function refreshUndoButton() {
+  try {
+    const pending = await fetch(`${API}/api/history`).then((r) => r.json());
+    if (!pending) {
+      undoBtn.disabled = true;
+      undoBtnLabel.textContent = '沒有可復原的操作';
+      undoBtn.removeAttribute('title');
+      return;
+    }
+    undoBtn.disabled = false;
+    undoBtnLabel.textContent = `復原：${pending.label}`;
+    undoBtn.title = `復原：${pending.label}`;
+  } catch {
+    // server 連不上時維持停用，不要讓一顆點了沒反應的按鈕看起來像壞掉
+    undoBtn.disabled = true;
+    undoBtnLabel.textContent = '沒有可復原的操作';
+  }
+}
+
+undoBtn.addEventListener('click', async () => {
+  const label = undoBtnLabel.textContent;
+  // 復原是把整份檔案換回去，等於丟掉這一步之後的改動，所以先問一次
+  if (!confirm(`${label}？\n\n這一步之後的改動會一起還原。`)) return;
+
+  undoBtn.disabled = true;
+  try {
+    const res = await fetch(`${API}/api/undo`, { method: 'POST' });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || res.statusText);
+    showToast(`已復原：${body.label}`);
+  } catch (err) {
+    showToast(`復原失敗：${err.message}`, true);
+  }
+
+  // 不管成功或失敗都重讀一次：失敗時畫面上顯示的可能已經跟磁碟不一致
+  if (currentPage === 'content') await loadContentPage();
+  else if (currentPage === 'home') await loadPageImages();
+  else await loadImages();
+  await refreshUndoButton();
+  await refreshPublishBadge();
+  reloadPreview();
+});
+
+refreshUndoButton();
