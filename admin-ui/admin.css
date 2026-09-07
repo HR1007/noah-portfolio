@@ -895,8 +895,34 @@ svg {
   border: 1px solid var(--border);
 }
 
-.sec-card__del {
+/*
+  上移／下移。margin-left: auto 掛在這裡而不是 .sec-card__del 上——第一個帶 auto
+  的元素會吃掉中間的空白，所以這兩顆會跟「刪除段落」一起被推到右邊並排。
+*/
+.sec-move {
   margin-left: auto;
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.sec-move__btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+.sec-move__btn:hover:not(:disabled) { border-color: var(--muted); }
+.sec-move__btn:disabled { opacity: 0.3; cursor: default; }
+
+.sec-card__del {
+  margin-left: 4px;
   border: 0;
   background: transparent;
   color: var(--danger);

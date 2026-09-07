@@ -468,6 +468,12 @@ function buildSectionCard(section, slots, host) {
   const actions = document.createElement('div');
   actions.className = 'sec-card__actions';
 
+  if (canDrag) {
+    actions.appendChild(
+      buildSectionMoveButtons(section.index, currentSections.length, currentSlug, () => loadImages())
+    );
+  }
+
   if (list) {
     const addBtn = document.createElement('button');
     addBtn.className = 'sec-btn';
@@ -786,6 +792,39 @@ function handleAddSection(type, at) {
     '已新增段落，文字先填入 [需確認] 佔位，請到 Content 頁補上',
     loadImages
   );
+}
+
+/*
+  段落的上移／下移按鈕，Content 與 Portfolio 兩個分頁共用。
+
+  跟拖放走的是同一支 API，只是換一種操作方式。卡片很高、或要跨越整個畫面捲動時，
+  拖放並不好操作——按鈕是一定按得到的那條路，也不依賴瀏覽器的拖放行為。
+  已經在頭或尾的段落，對應方向的按鈕直接停用，不用按了才知道不能動。
+*/
+function buildSectionMoveButtons(index, total, slug, reload) {
+  const wrap = document.createElement('div');
+  wrap.className = 'sec-move';
+
+  const make = (label, title, to, disabled) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sec-move__btn';
+    btn.textContent = label;
+    btn.title = disabled ? '' : title;
+    btn.disabled = disabled;
+    if (!disabled) {
+      btn.addEventListener('click', (e) => {
+        // 卡片本身也綁著拖放與其他點擊行為，這個按鈕只做自己的事
+        e.stopPropagation();
+        reorderSection(slug, index, to, reload);
+      });
+    }
+    return btn;
+  };
+
+  wrap.appendChild(make('↑', '上移一段', index - 1, index <= 0));
+  wrap.appendChild(make('↓', '下移一段', index + 1, index >= total - 1));
+  return wrap;
 }
 
 /*
@@ -1630,6 +1669,9 @@ function renderProjectCard(slug, title, form) {
     head.innerHTML = `<span class="sec-card__grip" title="拖拉調整順序">⠿</span>
       <strong>${sectionTitle(sec, i)}</strong>
       <span class="sec-card__type">${sectionTypeLabel(sec.type)}</span>`;
+    head.appendChild(
+      buildSectionMoveButtons(i, (data.sections || []).length, slug, () => loadContentPage())
+    );
     const del = document.createElement('button');
     del.className = 'sec-card__del';
     del.textContent = '刪除段落';
