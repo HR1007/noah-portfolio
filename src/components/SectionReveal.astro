@@ -1,0 +1,86 @@
+---
+/*
+  全站的進場動畫（對應 Figma 的 Reveal：Trigger「In view」、Enter「Slide in top」、Replay 開）。
+
+  這支元件不輸出任何標記，只掛樣式與行為，所以各頁面不必為了動畫多包一層 <div>——
+  多包一層會動到既有的 flex / grid 版面。
+
+  哪些元素會動：
+    - <main> 底下的 <section>
+    - 但如果那個 section 裡面已經有 [data-reveal]，就換成讓那些子區塊各自動
+      （Portfolio 與 Gallery 整頁只有一個 section，動整塊等於沒有分段效果）
+
+  預設狀態刻意是「看得見」，由 <head> 的 inline script 加上 data-reveal-ready 之後
+  才隱藏。這樣萬一 JS 沒跑到（載入失敗、被擋、瀏覽器不支援），內容仍然正常顯示，
+  而不是整頁停在 opacity: 0 變空白。
+*/
+---
+
+<script is:inline>
+  // 放在 head、比內容先執行：先掛上旗標，元素從第一次繪製就是隱藏的，不會閃一下才消失。
+  // 系統開啟「減少動態」時整段跳過，元素維持預設的可見狀態。
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.dataset.revealReady = '';
+  }
+</script>
+
+<style is:global>
+  html[data-reveal-ready] main section:not(:has([data-reveal])),
+  html[data-reveal-ready] main [data-reveal] {
+    opacity: 0;
+    transform: translateY(calc(var(--reveal-distance) * -1));
+  }
+
+  html[data-reveal-ready] main section:not(:has([data-reveal])),
+  html[data-reveal-ready] main [data-reveal] {
+    transition:
+      opacity var(--reveal-duration) var(--reveal-easing),
+      transform var(--reveal-duration) var(--reveal-easing);
+  }
+
+  /*
+    顯示規則必須沿用跟隱藏規則「一模一樣」的選擇器再加上 .is-revealed。
+    只寫 main .is-revealed 會輸掉——隱藏那條帶了 :not(:has([data-reveal]))，
+    :has() 內的選擇器會計入特異性，結果隱藏比顯示更強，class 加了也不會亮。
+  */
+  html[data-reveal-ready] main section:not(:has([data-reveal])).is-revealed,
+  html[data-reveal-ready] main [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+
+  /*
+    即使 JS 已經加上旗標，這裡再擋一次：使用者可能在載入後才改系統設定，
+    或瀏覽器在 matchMedia 之外另有偏好。無障礙的規則要在 CSS 層也成立。
+  */
+  @media (prefers-reduced-motion: reduce) {
+    html[data-reveal-ready] main section,
+    html[data-reveal-ready] main [data-reveal] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const SELECTOR = 'main section:not(:has([data-reveal])), main [data-reveal]';
+
+  if (document.documentElement.hasAttribute('data-reveal-ready')) {
+    const items = document.querySelectorAll(SELECTOR);
+
+    // 共用同一個 observer，不是每個區塊各開一個
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          // Replay：離開視窗就移除，捲回去會再播一次
+          entry.target.classList.toggle('is-revealed', entry.isIntersecting);
+        }
+      },
+      // 底部收 10%：元素要真的進來一點才播，而不是剛冒出一條邊就觸發
+      { rootMargin: '0px 0px -10% 0px', threshold: 0.05 }
+    );
+
+    for (const item of items) observer.observe(item);
+  }
+</script>

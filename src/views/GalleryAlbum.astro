@@ -27,14 +27,16 @@ const images = getGalleryAlbumImages(slug);
     <BackLink label={backLabel} href={`/${locale}/gallery`} />
   </div>
   <section class="gallery-album">
-    <div class="gallery-album__hero">
+    <div class="gallery-album__hero" data-reveal>
       <div class="gallery-album__hero-illustration">
         <Media image={heroImage} ratio="159/436" alt={`${title} illustration`} loading="eager" />
       </div>
       <SectionIntro eyebrow={eyebrow} headline={title} body={intro} />
     </div>
 
-    <PhotoGrid images={images} labelPrefix={title} />
+    <div data-reveal>
+      <PhotoGrid images={images} labelPrefix={title} />
+    </div>
   </section>
 </BaseLayout>
 

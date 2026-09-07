@@ -20,7 +20,7 @@ const heroImage = getPortfolioImage('hero');
 
 <BaseLayout title={`${headline} — Noah Wen`} description={intro}>
   <section class="portfolio">
-    <div class="portfolio__hero">
+    <div class="portfolio__hero" data-reveal>
       {
         heroImage && (
           <div class="portfolio__hero-illustration">
@@ -35,7 +35,7 @@ const heroImage = getPortfolioImage('hero');
       }
       <SectionIntro eyebrow={eyebrow} headline={headline} body={intro} />
     </div>
-    <div class="portfolio__list">
+    <div class="portfolio__list" data-reveal>
       {
         projects.map((project, index) => (
           <PortfolioCard

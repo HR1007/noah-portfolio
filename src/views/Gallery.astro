@@ -24,14 +24,14 @@ const germanyImages = getGalleryAlbumImages('germany');
 
 <BaseLayout title={`${headline} — Noah Wen`} description={intro}>
   <section class="gallery">
-    <div class="gallery__hero">
+    <div class="gallery__hero" data-reveal>
       <div class="gallery__hero-illustration">
         <Media image={heroImage} ratio="159/436" alt={`${headline} illustration`} loading="eager" />
       </div>
       <SectionIntro eyebrow={eyebrow} headline={headline} body={intro} />
     </div>
 
-    <div class="gallery__albums">
+    <div class="gallery__albums" data-reveal>
       {
         albums.map((album) => (
           <AlbumCoverCard
@@ -44,7 +44,7 @@ const germanyImages = getGalleryAlbumImages('germany');
       }
     </div>
 
-    <div class="gallery__germany">
+    <div class="gallery__germany" data-reveal>
       <PhotoGrid images={germanyImages} labelPrefix={germany.title} />
       <AlbumHeading
         title={germany.title}
@@ -53,7 +53,9 @@ const germanyImages = getGalleryAlbumImages('germany');
       />
     </div>
 
-    <GalleryCta heading={cta.heading} body={cta.body} ctaLabel={cta.ctaLabel} ctaHref={cta.ctaHref} avatar={ctaAvatar} />
+    <div data-reveal>
+      <GalleryCta heading={cta.heading} body={cta.body} ctaLabel={cta.ctaLabel} ctaHref={cta.ctaHref} avatar={ctaAvatar} />
+    </div>
   </section>
 </BaseLayout>
 

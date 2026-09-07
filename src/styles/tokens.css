@@ -93,6 +93,14 @@
   */
   --media-stack-max-height: 900px;
 
+  /*
+    進場動畫（Reveal）。對應 Figma 的 Trigger: In view / Enter: Slide in top：
+    元素從上方位移進來並淡入，離開視窗後復位，捲回去會再播一次。
+  */
+  --reveal-distance: 24px;
+  --reveal-duration: 520ms;
+  --reveal-easing: cubic-bezier(0.16, 1, 0.3, 1);
+
   /* 圓角 */
   --radius: 16px;
   --radius-pill: 999px; /* [需確認] 目前站上沒有藥丸形元件，先保留備用 */
