@@ -36,3 +36,8 @@ raw-assets/
 
 # 後台「復原上一步」的快照，只是本機暫存
 .admin-undo/
+
+# DesignAgent 丟給 Figma 用的中介 HTML，每跑一次就多一個檔。
+# 網站不依賴它們（在 src/ 與 public/ 之外，Astro 不會 build），
+# 留著只會把發布面板的檔案清單塞滿雜訊——那份清單是發布前唯一的人工檢查。
+.designagent-tmp/
