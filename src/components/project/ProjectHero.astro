@@ -2,6 +2,7 @@
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import Placeholder from '../Placeholder.astro';
+import heroBackground from '../../assets/hero-background.png';
 import Button from '../Button.astro';
 
 interface Props {
@@ -9,10 +10,9 @@ interface Props {
   ctaLabel: string;
   ctaHref: string;
   image: ImageMetadata | undefined;
-  gradient?: 'warm' | 'cool' | 'violet' | 'mint' | 'slate';
 }
 
-const { title, ctaLabel, ctaHref, image, gradient = 'slate' } = Astro.props;
+const { title, ctaLabel, ctaHref, image } = Astro.props;
 
 // hero 圖不套固定比例：直接用圖片自己的原始尺寸，只有寬度超過容器（1040px）
 // 時才等比例縮小。這樣不同案例的 hero 可以是不同形狀，也永遠不會被裁切或
@@ -20,14 +20,19 @@ const { title, ctaLabel, ctaHref, image, gradient = 'slate' } = Astro.props;
 const PLACEHOLDER_RATIO = '1040 / 675.66';
 ---
 
-<section class="project-hero" data-gradient={gradient}>
+<section class="project-hero">
+  {/*
+    所有案例共用同一張 hero 背景圖。alt 留空是刻意的——它純粹是裝飾，
+    讀螢幕軟體不該把它唸出來，內容意義由下方的標題承擔。
+  */}
+  <Image class="project-hero__bg" src={heroBackground} alt="" loading="eager" fetchpriority="high" quality={90} />
   <div class="project-hero__inner">
     <h1 class="project-hero__title">{title}</h1>
     <Button label={ctaLabel} href={ctaHref} variant="secondary" />
     <div class="project-hero__frame">
       {
         image ? (
-          <Image src={image} alt={`${title} hero`} loading="eager" fetchpriority="high" />
+          <Image src={image} alt={`${title} hero`} loading="eager" fetchpriority="high" quality={90} />
         ) : (
           <Placeholder ratio={PLACEHOLDER_RATIO} label={`${title} hero`} />
         )
@@ -44,14 +49,23 @@ const PLACEHOLDER_RATIO = '1040 / 675.66';
     間距統一用同一個 gap，不個別微調。
   */
   .project-hero {
+    position: relative;
+    overflow: hidden;
     padding: var(--sp-6) var(--content-gutter);
   }
 
-  .project-hero[data-gradient='warm'] { background: var(--gradient-warm); }
-  .project-hero[data-gradient='cool'] { background: var(--gradient-cool); }
-  .project-hero[data-gradient='violet'] { background: var(--gradient-violet); }
-  .project-hero[data-gradient='mint'] { background: var(--gradient-mint); }
-  .project-hero[data-gradient='slate'] { background: var(--gradient-slate); }
+  /*
+    背景圖鋪滿整個 hero，內容疊在上面。用 <Image> 而不是 CSS background-image，
+    才吃得到 astro:assets 的最佳化（webp 轉檔與尺寸產生）。
+  */
+  .project-hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
 
   .project-hero {
     /* hero 圖的高度上限；改這一個值就能調整所有案例的 hero 高度 */
@@ -59,6 +73,8 @@ const PLACEHOLDER_RATIO = '1040 / 675.66';
   }
 
   .project-hero__inner {
+    position: relative;
+    z-index: 1;
     max-width: var(--content-width);
     margin: 0 auto;
     display: flex;
@@ -70,16 +86,16 @@ const PLACEHOLDER_RATIO = '1040 / 675.66';
 
   .project-hero__title {
     font-size: var(--font-size-h1);
-    /* 漸層不隨主題反轉，文字色也不能跟著翻，否則深色模式會落在淺底上看不見 */
-    color: var(--color-on-gradient);
+    /* 背景圖不隨主題反轉，文字色也不能跟著翻，否則深色模式會落在淺底上看不見 */
+    color: var(--color-on-hero);
     text-wrap: balance;
     margin: 0;
   }
 
-  /* 按鈕坐在漸層上，邊框與文字都改用同一個不反轉的色 */
+  /* 按鈕坐在背景圖上，邊框與文字跟標題用同一個不反轉的色 */
   .project-hero__inner :global(.button--secondary) {
-    color: var(--color-on-gradient);
-    border-color: var(--color-on-gradient);
+    color: var(--color-on-hero);
+    border-color: var(--color-on-hero);
   }
 
   .project-hero__frame {

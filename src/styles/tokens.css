@@ -57,6 +57,14 @@
   */
   --color-on-gradient: #2b2b2b;
 
+  /*
+    疊在 hero 背景圖上的標題色。跟 --color-on-gradient 同樣的道理：背景圖不隨
+    主題反轉，文字色也就不能跟著翻，否則深色模式會把白字翻成深色、落在藍灰底上
+    反而更難讀。獨立成一個 token 而不是共用 --color-on-gradient，是因為兩者的底
+    不同（一個是漸層色塊、一個是照片），日後要各自調整不會互相牽動。
+  */
+  --color-on-hero: #ffffff;
+
   --gradient-warm: linear-gradient(135deg, #f5c99b, #e08a5f);
   --gradient-cool: linear-gradient(135deg, #a8c8ec, #5b7fb8);
   --gradient-violet: linear-gradient(135deg, #c3b3e8, #8168c0);
