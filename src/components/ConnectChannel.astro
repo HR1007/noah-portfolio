@@ -42,8 +42,8 @@ const { icon, label, value, href } = Astro.props;
 
   .connect-channel__icon {
     flex: none;
-    width: 44px;
-    height: 44px;
+    width: var(--control-size-lg);
+    height: var(--control-size-lg);
     border-radius: calc(var(--radius) * 0.6);
     background: var(--color-bg);
     display: flex;
@@ -53,8 +53,8 @@ const { icon, label, value, href } = Astro.props;
   }
 
   .connect-channel__icon svg {
-    width: 22px;
-    height: 22px;
+    width: var(--icon-lg);
+    height: var(--icon-lg);
   }
 
   .connect-channel__text {

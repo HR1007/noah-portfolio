@@ -165,6 +165,10 @@ const blocks = ARROW.flatMap((cells, row) =>
     left: 0;
     right: 0;
     bottom: calc(var(--u) * -1);
+    /*
+      實質是一條 1px 框線，落在硬規則的 border 例外裡。用 ::after 而不是
+      border-bottom，是因為 border 沒辦法做 scaleX 的展開動畫。
+    */
     height: 1px;
     background: currentColor;
     transform: scaleX(0);

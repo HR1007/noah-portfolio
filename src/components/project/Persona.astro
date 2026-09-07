@@ -67,7 +67,8 @@ const { eyebrow, heading, personas, images, ctaLabel, ctaHref } = Astro.props;
 
   .persona__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    /* 240px 正好是 --sp-9，直接用階梯上的值，不另外寫一個數字 */
+    grid-template-columns: repeat(auto-fit, minmax(var(--sp-9), 1fr));
     gap: var(--sp-4);
   }
 </style>

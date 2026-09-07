@@ -17,7 +17,7 @@ interface Props {
    *   時才等比縮小。用在案例頁內容圖片——那些圖是作品本身，裁掉就失真。
    */
   fit?: 'cover' | 'natural';
-  /** natural 模式的高度上限，預設 675.66px（取自設計稿的 hero 高度） */
+  /** natural 模式的高度上限，預設 var(--hero-max-height)（取自設計稿的 hero 高度） */
   maxHeight?: string;
 }
 
@@ -85,7 +85,7 @@ const isNatural = fit === 'natural';
     用 max-width 而非 width 則確保不會被放大超過原始解析度而變糊。
   */
   .media--natural {
-    --media-max-height: 675.66px;
+    --media-max-height: var(--hero-max-height);
     display: flex;
     justify-content: center;
     /*

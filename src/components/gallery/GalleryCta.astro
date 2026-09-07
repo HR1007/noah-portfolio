@@ -70,13 +70,13 @@ const { heading, body, ctaLabel, ctaHref, avatar } = Astro.props;
   }
 
   .gallery-cta__link svg {
-    width: 20px;
-    height: 20px;
+    width: var(--icon-md);
+    height: var(--icon-md);
   }
 
   .gallery-cta__avatar {
     flex: none;
-    width: 96px;
+    width: var(--avatar-size-lg);
   }
 
   @media (max-width: 767px) {

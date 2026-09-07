@@ -73,7 +73,7 @@ const currentPath = Astro.url.pathname;
 
   .nav__link[aria-current='page'] {
     text-decoration: underline;
-    text-underline-offset: 4px;
+    text-underline-offset: calc(var(--sp-1) / 2);
     font-weight: var(--font-weight-semibold);
   }
 

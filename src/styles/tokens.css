@@ -115,6 +115,36 @@
   --reveal-duration: 520ms;
   --reveal-easing: cubic-bezier(0.16, 1, 0.3, 1);
 
+  /*
+    可點擊控制項的方形尺寸。兩個值不同是因為用途不同：nav 上的切換鈕是次要動線，
+    頁尾的聯絡管道圖示是主要點擊目標，做到 44px（觸控目標的常見下限）。
+  */
+  --control-size: 36px; /* ThemeToggle 按鈕、LangToggle 高度 */
+  --control-size-lg: 44px; /* ConnectChannel 的頻道圖示底 */
+
+  /*
+    控制項裡面圖示本身的尺寸。
+    [需確認] 站上目前有 18／20／22 三種相近的值，看起來是各元件各自長出來的，
+    不是刻意設計的階梯。這裡照現況保留三個，要不要收斂成一種請設計師決定——
+    收斂會改到畫面，不該由重構順手決定。
+  */
+  --icon-sm: 18px; /* ThemeToggle */
+  --icon-md: 20px; /* GalleryCta 的連結圖示 */
+  --icon-lg: 22px; /* ConnectChannel */
+
+  /* 頭像 */
+  --avatar-size: 56px; /* 首頁引言旁 */
+  --avatar-size-lg: 96px; /* Gallery 頁尾 CTA */
+
+  /*
+    版面上的固定寬度。這幾個先前散落在各元件裡寫死，其中 160px 重複三次、
+    675.66px 重複兩次——同一個值散在多處，調整時漏改一處畫面就會不一致。
+  */
+  --hero-illustration-width: 160px; /* Gallery／Portfolio／相簿內頁 hero 旁的窄長插圖 */
+  --home-hero-width: 157px; /* 首頁 hero 全身像素圖，取自原圖解析度，放大會糊 */
+  --connect-grid-width: 560px; /* 首頁聯絡管道的雙欄格線 */
+  --hero-max-height: 675.66px; /* hero 圖高度上限，取自設計稿 */
+
   /* 圓角 */
   --radius: 16px;
   --radius-pill: 999px; /* [需確認] 目前站上沒有藥丸形元件，先保留備用 */

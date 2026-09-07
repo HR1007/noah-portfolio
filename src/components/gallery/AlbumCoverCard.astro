@@ -38,7 +38,8 @@ const tiles = images.length > 0 ? images.slice(0, 6) : Array.from({ length: 6 },
   .album-cover__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 2px;
+    /* 小於一格的值從 --sp-1 推導，維持與間距階梯同源（同 BackLink 的做法） */
+    gap: calc(var(--sp-1) / 4);
     border-radius: var(--radius);
     overflow: hidden;
   }
