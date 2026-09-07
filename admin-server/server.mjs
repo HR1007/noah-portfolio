@@ -12,6 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { imageSize } from 'image-size';
 import matter from 'gray-matter';
+import crypto from 'node:crypto';
 import {
   getImageSlots, SECTION_META, SECTION_OPTIONS, describeSection, sectionItemCount,
   createSection, addSectionItem, removeSectionItem, sectionTypeOptions, CTA_DEFAULT,
@@ -397,11 +398,19 @@ function projectFilePath(slug) {
   return resolved;
 }
 
+/*
+  內容的「版本」＝整個檔案的雜湊。後台讀走時記下版本，寫回時帶上；
+  對不起來就代表檔案在這期間被別的地方改過（另一個分頁、直接編輯檔案、
+  或段落 API 自己改寫），這時候寧可擋下來，也不要拿舊資料把人家的修改蓋掉。
+*/
+function contentVersion(raw) {
+  return crypto.createHash('sha1').update(raw).digest('hex').slice(0, 12);
+}
+
 app.get('/api/projects/:slug/content', async (req, res) => {
   try {
     const raw = await fs.readFile(projectFilePath(req.params.slug), 'utf-8');
-    const { data } = matter(raw);
-    res.json(data);
+    res.json({ version: contentVersion(raw), data: matter(raw).data });
   } catch (err) {
     res.status(500).json({ error: String(err) });
   }
@@ -413,10 +422,20 @@ app.put('/api/projects/:slug/content', async (req, res) => {
   try {
     const file = projectFilePath(req.params.slug);
     const raw = await fs.readFile(file, 'utf-8');
+    const { version, data } = req.body ?? {};
+    if (!data) return res.status(400).json({ error: 'missing data' });
+
+    const current = contentVersion(raw);
+    if (version !== current) {
+      return res.status(409).json({
+        error: `「${req.params.slug}」的內容在你開啟之後被改過了，這次沒有寫入。請重新載入這一頁再存，否則會蓋掉那些改動。`,
+      });
+    }
+
     const { content } = matter(raw);
-    const next = matter.stringify(content, req.body);
-    await fs.writeFile(file, next, 'utf-8');
-    res.json({ ok: true });
+    await fs.writeFile(file, matter.stringify(content, data), 'utf-8');
+    const next = await fs.readFile(file, 'utf-8');
+    res.json({ ok: true, version: contentVersion(next) });
   } catch (err) {
     res.status(500).json({ error: String(err) });
   }

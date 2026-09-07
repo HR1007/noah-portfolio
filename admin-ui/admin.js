@@ -819,6 +819,8 @@ let sectionOptions = {};  // 型別 -> { 欄位: [可選值] }
 let ctaDefault = { ctaLabel: "Let's Try Out", ctaHref: '#' }; // 由 /api/cta-default 覆寫
 let projectSlots = {};   // slug -> 版位清單（含所屬段落）
 let projectImages = {};  // slug -> 已上傳的圖片
+let projectVersions = {}; // slug -> 讀取當下的檔案版本，寫回時用來擋掉過期覆蓋
+let projectLoaded = {};   // slug -> 讀進來當下的內容快照，用來判斷這個案例有沒有被改過
 let contentSlug = null;  // Content 分頁目前正在編輯的案例
 let sectionDragFrom = null;
 
@@ -1337,7 +1339,9 @@ async function loadContentPage() {
         fetch(`${API}/api/projects/${slug}/slots`).then((r) => r.json()).catch(() => []),
         fetch(`${API}/api/collections/projects/${slug}/images`).then((r) => r.json()).catch(() => ({ images: [] })),
       ]);
-      projectsData[slug] = content;
+      projectsData[slug] = content.data;
+      projectVersions[slug] = content.version;
+      projectLoaded[slug] = JSON.stringify(content.data);
       projectSlots[slug] = slots;
       projectImages[slug] = imgs.images || [];
     })
@@ -1733,9 +1737,12 @@ async function saveProjectData(slug) {
     const res = await fetch(`${API}/api/projects/${slug}/content`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(projectsData[slug]),
+      body: JSON.stringify({ version: projectVersions[slug], data: projectsData[slug] }),
     });
-    if (!res.ok) throw new Error(await res.text());
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(body.error || res.statusText);
+    projectVersions[slug] = body.version;
+    projectLoaded[slug] = JSON.stringify(projectsData[slug]);
     return true;
   } catch (err) {
     showToast(`儲存失敗：${err.message}`, true);
@@ -1745,21 +1752,29 @@ async function saveProjectData(slug) {
 
 async function handleSaveContent() {
   try {
-    const requests = [
+    await Promise.all([
       fetch(`${API}/api/site/en`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(siteEn) }),
       fetch(`${API}/api/site/zh`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(siteZh) }),
-      ...projectSlugs.map(({ slug }) =>
-        fetch(`${API}/api/projects/${slug}/content`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(projectsData[slug]),
-        })
-      ),
-    ];
-    const results = await Promise.all(requests);
-    const failed = results.find((r) => !r.ok);
-    if (failed) throw new Error(await failed.text());
-    showToast('文案已儲存');
+    ]).then((rs) => {
+      const bad = rs.find((r) => !r.ok);
+      if (bad) throw new Error('網站文案儲存失敗');
+    });
+
+    /*
+      只寫回「這一頁真的被改過」的案例。以前是五個案例每次都寫一遍，
+      等於在別處編輯某個案例時，其他四個會被這個分頁的舊資料蓋掉。
+    */
+    const dirty = projectSlugs
+      .map(({ slug }) => slug)
+      .filter((slug) => JSON.stringify(projectsData[slug]) !== projectLoaded[slug]);
+
+    const saved = [];
+    for (const slug of dirty) {
+      if (await saveProjectData(slug)) saved.push(slug);
+      else return; // 版本對不上時已經跳過錯誤訊息，不要再蓋其他案例
+    }
+
+    showToast(dirty.length ? `文案已儲存（案例：${saved.length} 個）` : '文案已儲存');
     reloadPreview();
   } catch (err) {
     showToast(`儲存失敗：${err.message}`, true);
