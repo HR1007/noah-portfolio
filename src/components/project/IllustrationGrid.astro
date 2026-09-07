@@ -31,9 +31,9 @@ const { eyebrow, heading, body, alt, images, ctaLabel, ctaHref } = Astro.props;
 
 <style>
   .illustration-grid {
-    max-width: var(--project-width);
+    max-width: var(--content-width);
     margin: 0 auto;
-    padding: var(--sp-6) var(--sp-3);
+    padding: var(--sp-6) var(--content-gutter);
     display: flex;
     flex-direction: column;
     gap: var(--sp-5);
@@ -43,7 +43,7 @@ const { eyebrow, heading, body, alt, images, ctaLabel, ctaHref } = Astro.props;
     display: flex;
     flex-direction: column;
     gap: var(--sp-2);
-    max-width: var(--project-width);
+    max-width: var(--content-width);
   }
 
   .illustration-grid__eyebrow {
@@ -57,7 +57,7 @@ const { eyebrow, heading, body, alt, images, ctaLabel, ctaHref } = Astro.props;
     font-size: var(--font-size-body);
     line-height: 1.7;
     color: var(--color-muted);
-    text-align: left;
+    text-align: justify;
   }
 
   .illustration-grid__tiles {

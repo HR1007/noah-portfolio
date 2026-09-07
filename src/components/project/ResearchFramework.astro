@@ -35,9 +35,6 @@ const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked', cta
     這裡只收窄「文字本身」且靠左，不用 margin auto 置中——置中會讓左緣
     又跑掉，等於白對齊。
   */
-  .reading-measure {
-    max-width: 65ch;
-  }
 
   /* split：文字在左、圖片在右；768 以下落回單欄 */
   /*
@@ -75,9 +72,9 @@ const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked', cta
   }
 
   .research-framework {
-    max-width: var(--project-width);
+    max-width: var(--content-width);
     margin: 0 auto;
-    padding: var(--sp-6) var(--sp-3);
+    padding: var(--sp-6) var(--content-gutter);
     display: flex;
     flex-direction: column;
     gap: var(--sp-4);
@@ -87,7 +84,7 @@ const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked', cta
     display: flex;
     flex-direction: column;
     gap: var(--sp-2);
-    max-width: var(--project-width);
+    max-width: var(--content-width);
   }
 
   .research-framework__eyebrow {
@@ -101,6 +98,6 @@ const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked', cta
     font-size: var(--font-size-body);
     line-height: 1.7;
     color: var(--color-muted);
-    text-align: left;
+    text-align: justify;
   }
 </style>

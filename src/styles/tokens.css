@@ -26,13 +26,13 @@
 
   /* 字級階層 */
   --font-size-hero: 100px; /* 實測：Nav 字標「NOAH WEN」與首頁「About me」大標題共用此字級 */
-  --font-size-h1: 48px;
-  --font-size-h2: 36px;
-  --font-size-h3: 24px;
-  --font-size-body-lg: 20px;
-  --font-size-body: 18px;
-  --font-size-label: 16px;
-  --font-size-meta: 12px;
+  --font-size-h1: 56px;
+  --font-size-h2: 40px;
+  --font-size-h3: 28px;
+  --font-size-body-lg: 22px;
+  --font-size-body: 20px;
+  --font-size-label: 17px;
+  --font-size-meta: 13px;
 
   /* 間距階梯（8px 基準，實測值） */
   --sp-1: 8px;
@@ -68,7 +68,22 @@
     五種值，容器都置中，寬度不同左緣就各自跑掉，捲動時文字看起來忽左忽右。
     數值取自設計稿的 hero 寬度。
   */
-  --project-width: 1040px;
+  --content-width: 1440px;
+
+  /*
+    全站內容區的左右內距。原本各頁是「1040～1120px 置中 ＋ 24px」，在 1440 寬的
+    螢幕上兩側各空掉 160～200px，內容被擠在正中間、圖片與文字都顯得小。
+    改成由內距決定邊界：768 以上留 64px，小螢幕維持 24px
+    （375px 上若留 64px 會只剩 247px 可用，反而更擠）。
+  */
+  --content-gutter: var(--sp-3);
+
+  /*
+    段落內多張圖「直向堆疊」時的高度上限。比 --media-max-height（單張圖用）寬鬆，
+    讓每一張都能撐滿欄寬、左右邊緣對齊——上限設太緊的話，比例較高的那張會先撞到
+    高度而變窄，同一段落裡的圖看起來就寬窄不一。
+  */
+  --media-stack-max-height: 900px;
 
   /* 圓角 */
   --radius: 16px;
@@ -84,6 +99,12 @@
   Dark theme：非實測值。用 light 主題的語意對應關係等價反轉
   （--color-bg ↔ --color-ink 互換基準），讓所有元件不需要改一行程式碼就能換色。
 */
+@media (min-width: 768px) {
+  :root {
+    --content-gutter: var(--sp-7);
+  }
+}
+
 :root[data-theme='dark'] {
   --color-bg: #18181a;
   --color-surface: #222225;

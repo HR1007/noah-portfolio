@@ -23,17 +23,14 @@ const { eyebrow, heading, paragraphs, ctaLabel, ctaHref } = Astro.props;
     這裡只收窄「文字本身」且靠左，不用 margin auto 置中——置中會讓左緣
     又跑掉，等於白對齊。
   */
-  .reading-measure {
-    max-width: 65ch;
-  }
 
   .text-section {
     display: flex;
     flex-direction: column;
     gap: var(--sp-2);
-    max-width: var(--project-width);
+    max-width: var(--content-width);
     margin: 0 auto;
-    padding: var(--sp-6) var(--sp-3);
+    padding: var(--sp-6) var(--content-gutter);
   }
 
   .text-section__eyebrow {
@@ -47,6 +44,6 @@ const { eyebrow, heading, paragraphs, ctaLabel, ctaHref } = Astro.props;
     font-size: var(--font-size-body);
     line-height: 1.7;
     color: var(--color-muted);
-    text-align: left;
+    text-align: justify;
   }
 </style>

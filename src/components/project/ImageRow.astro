@@ -36,9 +36,9 @@ const { rows, images, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
 
 <style>
   .image-row-section {
-    max-width: var(--project-width);
+    max-width: var(--content-width);
     margin: 0 auto;
-    padding: 0 var(--sp-3) var(--sp-6);
+    padding: 0 var(--content-gutter) var(--sp-6);
   }
 
   /* 區塊小標與標題：與其他段落型別共用同一組樣式，新增作品頁時外觀才會一致 */
@@ -61,7 +61,7 @@ const { rows, images, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
   }
 
   .image-row {
-    padding: 0 var(--sp-3) var(--sp-6);
+    padding: 0 var(--content-gutter) var(--sp-6);
     display: grid;
     grid-template-columns: repeat(var(--columns), 1fr);
     gap: var(--sp-3);

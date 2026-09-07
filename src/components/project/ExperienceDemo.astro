@@ -32,9 +32,9 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = '
 
 <style>
   .experience-demo {
-    max-width: var(--project-width);
+    max-width: var(--content-width);
     margin: 0 auto;
-    padding: var(--sp-6) var(--sp-3);
+    padding: var(--sp-6) var(--content-gutter);
     display: flex;
     flex-direction: column;
     gap: var(--sp-4);
@@ -83,7 +83,7 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = '
     flex-direction: column;
     align-items: flex-start;
     gap: var(--sp-2);
-    max-width: var(--project-width);
+    max-width: var(--content-width);
   }
 
   .experience-demo__eyebrow {
@@ -97,6 +97,6 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = '
     font-size: var(--font-size-body);
     line-height: 1.7;
     color: var(--color-muted);
-    text-align: left;
+    text-align: justify;
   }
 </style>
