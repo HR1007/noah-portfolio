@@ -25,15 +25,19 @@ const { eyebrow, heading, themes, images = [], ctaLabel, ctaHref } = Astro.props
     <h2 class="design-themes__heading">{heading}</h2>
   </div>
   <SectionCta label={ctaLabel} href={ctaHref} />
+  {/* 只放圖：標題與說明文字都不在頁面上呈現，連還沒上傳時的佔位框也不標字
+      （這些圖本身就帶著自己的標題）。title 仍保留在資料裡，供 alt 與後台版位標籤使用。 */}
   <div class="design-themes__grid">
     {
       themes.map((theme, i) => (
-        <div class="design-themes__card">
-          {/* 只放圖：標題與說明文字都不在頁面上呈現，連還沒上傳時的佔位框也不標字
-              （這些圖本身就帶著自己的標題）。title 仍保留在資料裡，供 alt 與後台版位標籤使用。 */}
-          <div class="design-themes__media">
-            <Media image={images[i]} ratio="4/3" alt={theme.title} fit="natural" label="" />
-          </div>
+        <div class="design-themes__media">
+          {/*
+            maxHeight 給 none，刻意不設高度上限。natural 模式下 max-height 一旦撞到，
+            寬度會跟著等比縮小——而這一區四張圖的長寬比各不相同（有橫有直），
+            全部先撞到同一個高度上限後就各縮各的寬度，同一段落裡的圖左右邊緣對不齊。
+            只讓容器寬度當唯一的約束，四張才會齊寬。
+          */}
+          <Media image={images[i]} ratio="4/3" alt={theme.title} fit="natural" label="" maxHeight="none" />
         </div>
       ))
     }
@@ -64,23 +68,18 @@ const { eyebrow, heading, themes, images = [], ctaLabel, ctaHref } = Astro.props
   }
 
   /*
-    卡片格線改為單欄直向堆疊：這個區塊的內容只有圖片（設計系統的截圖、
-    色票、字體規格），擠成多欄後每張都太小看不清細節。改成一張一列、
-    佔滿容器寬度，圖片仍由 Media 的 natural 模式維持原始比例不裁切。
+    單欄直向堆疊：這個區塊的內容只有圖片（設計系統的截圖、色票、字體規格），
+    擠成多欄後每張都太小看不清細節。改成一張一列、佔滿容器寬度，圖片仍由
+    Media 的 natural 模式維持原始比例不裁切。
+
+    圖片外面不再包一層有內距與外框的卡片。那個卡片是當初要放主題標題與說明
+    文字才加的，文字拿掉後只剩一個空框——而且框自己有 --radius 圓角、裡面的圖
+    也有 --radius 圓角，兩層同樣的圓角隔著內距疊在一起，看起來就是兩種圓角。
+    現在整個區塊只剩圖片本身這一層圓角。
   */
   .design-themes__grid {
     display: flex;
     flex-direction: column;
     gap: var(--sp-4);
   }
-
-  .design-themes__card {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-2);
-    padding: var(--sp-3);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-  }
-
 </style>
