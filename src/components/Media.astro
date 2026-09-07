@@ -40,10 +40,26 @@ const isNatural = fit === 'natural';
     <div
       class:list={['media', { 'media--natural': isNatural }]}
       style={isNatural
-        ? (maxHeight ? `--media-max-height: ${maxHeight}` : undefined)
+        ? [
+            // 用圖片自己的長寬比先把版面空間佔住。少了這一行，lazy load 還沒把圖抓回來時
+            // width/height 都是 auto，容器會塌成 0 高，捲動過程中區塊忽大忽小、
+            // 中間出現整片空白——看起來就像頁面壞掉。
+            `aspect-ratio: ${image.width} / ${image.height}`,
+            /*
+              寬度同時受兩件事限制，缺一不可：
+                100%        —— 不得超出所在欄位。少了它，格線裡的項目會先被列高
+                               撐開，再由 aspect-ratio 反推出比欄寬更大的寬度，
+                               直接壓到隔壁那一格上（插畫格線就是這樣重疊的）。
+                原圖寬度     —— 不得超過原始解析度。放大補不回細節，只會變糊。
+            */
+            `max-width: min(100%, ${image.width}px)`,
+            maxHeight ? `--media-max-height: ${maxHeight}` : null,
+          ]
+            .filter(Boolean)
+            .join('; ')
         : `aspect-ratio: ${ratio}`}
     >
-      <Image src={image} alt={alt} loading={loading} fetchpriority={fetchpriority} />
+      <Image src={image} alt={alt} loading={loading} fetchpriority={fetchpriority} quality={90} />
     </div>
   ) : (
     <Placeholder ratio={ratio} label={label ?? alt} />
@@ -72,6 +88,23 @@ const isNatural = fit === 'natural';
     --media-max-height: 675.66px;
     display: flex;
     justify-content: center;
+    /*
+      align-items 一定要指定。flex 容器預設是 stretch，圖片會被「垂直」拉滿到
+      aspect-ratio 算出來的容器高度，再依原始比例反推寬度——結果就是把一張 752px
+      的圖撐成 1280px 顯示，放大 1.7 倍、整張糊掉。放大永遠補不回細節，寧可留白。
+    */
+    align-items: center;
+    /*
+      容器同時有 aspect-ratio 與 max-height 時，瀏覽器會為了維持比例把「容器本身」
+      縮窄（例：675.66 × 1152/888 ≈ 877px）。justify-content 只管容器「內部」的圖，
+      管不到被縮窄的容器自己——少了這行，容器就會靠左貼齊，右邊留一大塊空白。
+    */
+    margin-inline: auto;
+    /*
+      容器用圖片的原始長寬比佔位（inline style），但高度仍受 --media-max-height 節制，
+      否則一張很高的圖會把整個段落撐開。
+    */
+    max-height: var(--media-max-height);
   }
 
   .media--natural :global(img) {
