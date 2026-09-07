@@ -218,9 +218,9 @@ const { Content } = await render(project);
   .project-hero,
   .project-showcase,
   .project-body {
-    max-width: 900px;
+    max-width: var(--prose-width);
     margin: 0 auto;
-    padding: var(--sp-6) var(--sp-3);
+    padding: var(--sp-6) var(--content-gutter);
   }
 
   .project-hero__title {
