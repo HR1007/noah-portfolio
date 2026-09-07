@@ -50,7 +50,7 @@ sections:
           the cold technical visuals Web3 usually arrives in.
       - title: '[需確認] 主題標題'
         description: '[需確認] 主題說明，待補'
-    direction: vertical
+    direction: horizontal
   - type: flow
     eyebrow: FLOW
     heading: From beep to keepsake
