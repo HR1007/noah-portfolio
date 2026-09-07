@@ -24,6 +24,15 @@ let currentType = 'gallery'; // 'gallery' | 'projects' —— 對應後端 /api/
 let currentSlug = null;
 let currentImages = [];
 let dragFromIndex = null;
+/*
+  現在拖的是哪一種東西：'tile'（圖片磚）或 'section'（段落卡片）。
+
+  Portfolio 分頁上圖片磚就住在段落卡片裡面，兩者都可拖，所以只靠事件冒泡分不出來。
+  先前是給磚塊無差別加 stopPropagation，結果拖段落時只要指標壓在任何一張圖上，
+  外層卡片就收不到 dragover／drop——而卡片裡幾乎整片都是圖，等於整張卡片都是死區。
+  改成看這個旗標：不是自己這一種，就完全不插手，讓事件正常冒泡上去。
+*/
+let dragKind = null;
 let selectedIndex = null;
 let pendingUpload = null; // { type:'collection', type/slug } 或 { type:'home', name } —— fileInput 觸發時要知道存去哪
 
@@ -336,27 +345,32 @@ function buildAddTile(pending) {
 
 /** 拖拉的共用綁定：key 是「拖的是哪一個」，Gallery 傳陣列位置，案例頁傳版位編號。 */
 function bindDrag(tile, key, container, onDrop) {
-  /*
-    每個事件都要 stopPropagation：Portfolio 分頁的圖片磚外面包著一張同樣可拖的
-    段落卡片，不擋住冒泡的話，拖一張圖會同時被當成「拖整個段落」，兩個 handler
-    互相打架——放開後可能圖沒換、段落卻被搬走了。
-  */
   tile.addEventListener('dragstart', (e) => {
+    // 只有 dragstart 一定要擋冒泡：不擋的話外層段落卡片會同時開始拖，兩件事一起發生
     e.stopPropagation();
+    dragKind = 'tile';
     dragFromIndex = key;
     tile.classList.add('dragging');
+    // Firefox 不設 dataTransfer 就不會真的開始拖；值本身用不到
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(key));
   });
   tile.addEventListener('dragend', () => {
+    dragKind = null;
+    dragFromIndex = null;
     tile.classList.remove('dragging');
     container.querySelectorAll('.tile').forEach((t) => t.classList.remove('drop-target'));
   });
   tile.addEventListener('dragover', (e) => {
+    // 拖的是段落卡片時完全不插手，讓事件冒泡給外層的卡片處理
+    if (dragKind !== 'tile') return;
     e.preventDefault();
     e.stopPropagation();
     tile.classList.add('drop-target');
   });
   tile.addEventListener('dragleave', () => tile.classList.remove('drop-target'));
   tile.addEventListener('drop', (e) => {
+    if (dragKind !== 'tile') return;
     e.preventDefault();
     e.stopPropagation();
     tile.classList.remove('drop-target');
@@ -783,26 +797,30 @@ function bindSectionDrag(card, index, slug, reload) {
   card.dataset.idx = String(index);
 
   card.addEventListener('dragstart', (e) => {
+    dragKind = 'section';
     sectionDragFrom = index;
     card.classList.add('sec-card--dragging');
     e.dataTransfer.effectAllowed = 'move';
+    // Firefox 不設 dataTransfer 就不會真的開始拖；值本身用不到
+    e.dataTransfer.setData('text/plain', String(index));
   });
   card.addEventListener('dragend', () => {
+    dragKind = null;
     sectionDragFrom = null;
     document.querySelectorAll('.sec-card').forEach((c) =>
       c.classList.remove('sec-card--dragging', 'sec-card--over')
     );
   });
   card.addEventListener('dragover', (e) => {
-    if (sectionDragFrom === null || sectionDragFrom === index) return;
+    if (dragKind !== 'section' || sectionDragFrom === null || sectionDragFrom === index) return;
     e.preventDefault();
     card.classList.add('sec-card--over');
   });
   card.addEventListener('dragleave', () => card.classList.remove('sec-card--over'));
   card.addEventListener('drop', (e) => {
+    if (dragKind !== 'section' || sectionDragFrom === null || sectionDragFrom === index) return;
     e.preventDefault();
     card.classList.remove('sec-card--over');
-    if (sectionDragFrom === null || sectionDragFrom === index) return;
     reorderSection(slug, sectionDragFrom, index, reload);
   });
 }
