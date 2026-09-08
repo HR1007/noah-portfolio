@@ -27,20 +27,27 @@ const { eyebrow, heading, themes, images = [], direction = 'vertical', ctaLabel,
     <h2 class="design-themes__heading">{heading}</h2>
   </div>
   <SectionCta label={ctaLabel} href={ctaHref} />
-  {/* 只放圖：標題與說明文字都不在頁面上呈現，連還沒上傳時的佔位框也不標字
-      （這些圖本身就帶著自己的標題）。title 仍保留在資料裡，供 alt 與後台版位標籤使用。 */}
   <div class="design-themes__grid" style={`--columns: ${themes.length}`}>
     {
       themes.map((theme, i) => (
-        <div class="design-themes__media">
+        <article class="design-themes__item">
           {/*
             maxHeight 給 none，刻意不設高度上限。natural 模式下 max-height 一旦撞到，
-            寬度會跟著等比縮小——而這一區四張圖的長寬比各不相同（有橫有直），
-            全部先撞到同一個高度上限後就各縮各的寬度，同一段落裡的圖左右邊緣對不齊。
-            只讓容器寬度當唯一的約束，四張才會齊寬。
+            寬度會跟著等比縮小——而這一區的圖長寬比各不相同（有橫有直），全部先撞到
+            同一個高度上限後就各縮各的寬度，同一段落裡的圖左右邊緣對不齊。
+            只讓容器寬度當唯一的約束，才會齊寬。
           */}
           <Media image={images[i]} ratio="4/3" alt={theme.title} fit="natural" label="" maxHeight="none" />
-        </div>
+          {/*
+            圖說用的就是後台既有的「主題標題」與「主題說明」兩個欄位，沒有另外開新欄位——
+            那兩欄本來就存在、後台也一直編得到，先前只是沒有渲染出來而已。
+            description 是選填，沒填就只出標題，不留一塊空白。
+          */}
+          <div class="design-themes__caption">
+            <h3 class="design-themes__title">{theme.title}</h3>
+            {theme.description && <p class="design-themes__text">{theme.description}</p>}
+          </div>
+        </article>
       ))
     }
   </div>
@@ -82,7 +89,32 @@ const { eyebrow, heading, themes, images = [], direction = 'vertical', ctaLabel,
   .design-themes__grid {
     display: grid;
     grid-template-columns: repeat(var(--columns), 1fr);
-    gap: var(--sp-4);
+    gap: var(--sp-5);
+  }
+
+  /* 圖與圖說是一組，直向排列後整組當成格線裡的一格 */
+  .design-themes__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .design-themes__caption {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    /* 圖說不跟著圖片一樣寬：一行文字太長會讀不完整行就跳行 */
+    max-width: 68ch;
+  }
+
+  .design-themes__title {
+    font-size: var(--font-size-h3);
+  }
+
+  .design-themes__text {
+    font-size: var(--font-size-body);
+    line-height: 1.7;
+    color: var(--color-muted);
   }
 
   .design-themes[data-direction='vertical'] .design-themes__grid {
