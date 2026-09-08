@@ -12,14 +12,16 @@ interface Props {
   eyebrow?: string;
   heading: string;
   themes: Theme[];
-  images?: (ImageMetadata | undefined)[];  ctaLabel?: string;
+  images?: (ImageMetadata | undefined)[];
+  direction?: 'vertical' | 'horizontal';
+  ctaLabel?: string;
   ctaHref?: string;
 }
 
-const { eyebrow, heading, themes, images = [], ctaLabel, ctaHref } = Astro.props;
+const { eyebrow, heading, themes, images = [], direction = 'vertical', ctaLabel, ctaHref } = Astro.props;
 ---
 
-<section class="design-themes">
+<section class="design-themes" data-direction={direction}>
   <div class="design-themes__intro">
     {eyebrow && <p class="design-themes__eyebrow">{eyebrow}</p>}
     <h2 class="design-themes__heading">{heading}</h2>
@@ -27,7 +29,7 @@ const { eyebrow, heading, themes, images = [], ctaLabel, ctaHref } = Astro.props
   <SectionCta label={ctaLabel} href={ctaHref} />
   {/* 只放圖：標題與說明文字都不在頁面上呈現，連還沒上傳時的佔位框也不標字
       （這些圖本身就帶著自己的標題）。title 仍保留在資料裡，供 alt 與後台版位標籤使用。 */}
-  <div class="design-themes__grid">
+  <div class="design-themes__grid" style={`--columns: ${themes.length}`}>
     {
       themes.map((theme, i) => (
         <div class="design-themes__media">
@@ -68,18 +70,29 @@ const { eyebrow, heading, themes, images = [], ctaLabel, ctaHref } = Astro.props
   }
 
   /*
-    單欄直向堆疊：這個區塊的內容只有圖片（設計系統的截圖、色票、字體規格），
-    擠成多欄後每張都太小看不清細節。改成一張一列、佔滿容器寬度，圖片仍由
-    Media 的 natural 模式維持原始比例不裁切。
+    vertical（預設）：一張一列、佔滿容器寬度。這一區放的是設計系統的截圖、色票、
+    字體規格，擠成多欄後每張都太小看不清細節，所以預設直排。
+    horizontal：並排成一列，欄數等於主題數，適合圖本身就窄的情況。
 
-    圖片外面不再包一層有內距與外框的卡片。那個卡片是當初要放主題標題與說明
-    文字才加的，文字拿掉後只剩一個空框——而且框自己有 --radius 圓角、裡面的圖
-    也有 --radius 圓角，兩層同樣的圓角隔著內距疊在一起，看起來就是兩種圓角。
-    現在整個區塊只剩圖片本身這一層圓角。
+    圖片外面不包卡片。那層卡片是當初要放主題標題與說明文字才加的，文字拿掉後
+    只剩一個空框——而且框自己有 --radius 圓角、裡面的圖也有 --radius 圓角，
+    兩層同樣的圓角隔著內距疊在一起，看起來就是兩種圓角。現在整區只剩圖片
+    本身這一層。圖片則由 Media 的 natural 模式維持原始比例不裁切。
   */
   .design-themes__grid {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(var(--columns), 1fr);
     gap: var(--sp-4);
+  }
+
+  .design-themes[data-direction='vertical'] .design-themes__grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* 小螢幕一律單欄：橫排在 375 上每欄只剩幾十 px，等於看不到內容 */
+  @media (max-width: 767px) {
+    .design-themes__grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

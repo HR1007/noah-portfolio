@@ -136,6 +136,9 @@ const designThemesBlock = z.object({
   type: z.literal('designThemes'),
   eyebrow: z.string().optional(),
   heading: z.string(),
+  // 預設 vertical：這一區放的是設計系統規格圖，橫排會讓每張都太小看不清細節。
+  // 預設值要跟 image-slots.mjs 的 SECTION_OPTIONS 第一個選項一致。
+  direction: z.enum(['vertical', 'horizontal']).default('vertical'),
   themes: z.array(
     z.object({
       title: z.string(),

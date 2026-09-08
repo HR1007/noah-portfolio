@@ -168,7 +168,15 @@ const { Content } = await render(project);
               );
             case 'designThemes':
               return (
-                <DesignThemes eyebrow={section.eyebrow} heading={section.heading} themes={section.themes} images={imagesFor(sectionIndex)} ctaLabel={section.ctaLabel} ctaHref={section.ctaHref} />
+                <DesignThemes
+                  eyebrow={section.eyebrow}
+                  heading={section.heading}
+                  themes={section.themes}
+                  direction={section.direction}
+                  images={imagesFor(sectionIndex)}
+                  ctaLabel={section.ctaLabel}
+                  ctaHref={section.ctaHref}
+                />
               );
             case 'flow':
               return (
