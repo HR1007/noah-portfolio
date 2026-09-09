@@ -15,7 +15,21 @@
         "href": "/en/gallery"
       }
     ],
-    "backLabel": "Back"
+    "backLabel": "Back",
+    "status": {
+      "city": "Tainan",
+      "latitude": 22.9908,
+      "longitude": 120.2133,
+      "weather": {
+        "clear": "Clear",
+        "cloudy": "Partly cloudy",
+        "overcast": "Overcast",
+        "fog": "Fog",
+        "rain": "Rain",
+        "snow": "Snow",
+        "thunder": "Thunderstorm"
+      }
+    }
   },
   "marquee": {
     "items": [

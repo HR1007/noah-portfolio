@@ -226,6 +226,27 @@ const site = defineCollection({
       links: z.array(z.object({ label: z.string(), href: z.string() })),
       // 案例頁／相簿頁左上角的返回鍵文案
       backLabel: z.string(),
+      /*
+        導覽列右側的「此刻」：設計師所在地的時間與天氣。
+
+        座標跟城市名放在一起，是因為它們講的是同一件事——「Noah 人在哪裡」。
+        搬家時只要改這一塊，不必去元件裡找另一個寫死的數字。
+        天氣描述給螢幕閱讀器用；畫面上只出現圖示。
+      */
+      status: z.object({
+        city: z.string(),
+        latitude: z.number(),
+        longitude: z.number(),
+        weather: z.object({
+          clear: z.string(),
+          cloudy: z.string(),
+          overcast: z.string(),
+          fog: z.string(),
+          rain: z.string(),
+          snow: z.string(),
+          thunder: z.string(),
+        }),
+      }),
     }),
     marquee: z.object({
       items: z.array(z.string()),

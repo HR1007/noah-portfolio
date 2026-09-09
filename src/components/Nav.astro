@@ -2,6 +2,7 @@
 import { getEntry } from 'astro:content';
 import ThemeToggle from './ThemeToggle.astro';
 import LangToggle from './LangToggle.astro';
+import NavStatus from './NavStatus.astro';
 
 const locale = Astro.currentLocale ?? 'en';
 const site = await getEntry('site', `main-${locale}`);
@@ -26,6 +27,7 @@ const currentPath = Astro.url.pathname;
         })
       }
     </ul>
+    <NavStatus />
     <LangToggle />
     <ThemeToggle />
   </div>

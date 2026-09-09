@@ -1,0 +1,232 @@
+---
+/*
+  導覽列右側的「此刻」：設計師所在地的時間與天氣。
+
+  顯示的是「Noah 在哪裡、現在幾點」，不是訪客的時間——後者要跳定位授權，
+  而且顯示訪客自己的天氣對他來說沒有任何資訊量。
+
+  時間、城市、座標與天氣描述全部來自 src/content/site，元件裡不寫死。
+*/
+import { getEntry } from 'astro:content';
+
+const locale = Astro.currentLocale ?? 'en';
+const site = await getEntry('site', `main-${locale}`);
+const { city, latitude, longitude, weather } = site!.data.nav.status;
+
+// 七種天氣各一個圖示。WMO 的代碼有二十幾種，但在導覽列這個尺寸上，
+// 再細的區分肉眼也分不出來，收斂成七類反而讀得快。
+const ICONS = ['clear', 'cloudy', 'overcast', 'fog', 'rain', 'snow', 'thunder'] as const;
+---
+
+<div class="nav-status">
+  <span class="nav-status__city">{city}</span>
+  {/*
+    先渲染一個等寬的佔位字串，JS 立刻覆蓋。時間必須用 is:inline 同步寫入，
+    否則 module script 是 defer 的，畫面會先閃一下「--:--」才跳成正確時間。
+  */}
+  <time class="nav-status__time" data-nav-time>--:--</time>
+
+  <span class="nav-status__weather" data-nav-weather hidden>
+    {
+      ICONS.map((name) => (
+        <svg class="nav-status__icon" data-icon={name} viewBox="0 0 24 24" aria-hidden="true">
+          {name === 'clear' && (
+            <>
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+            </>
+          )}
+          {name === 'cloudy' && (
+            <>
+              <circle cx="8" cy="8" r="3" />
+              <path d="M8 2.5v1.5M2.5 8H4M4.4 4.4l1 1M11.6 4.4l-1 1" />
+              <path d="M17.5 20H9a4 4 0 0 1 0-8 5 5 0 0 1 9.5 1.5A3.2 3.2 0 0 1 17.5 20Z" />
+            </>
+          )}
+          {name === 'overcast' && <path d="M17.5 19H8a4.5 4.5 0 0 1 0-9 5.5 5.5 0 0 1 10.5 1.6A3.6 3.6 0 0 1 17.5 19Z" />}
+          {name === 'fog' && (
+            <>
+              <path d="M17 14H8a4 4 0 0 1 0-8 5 5 0 0 1 9.5 1.5A3.2 3.2 0 0 1 17 14Z" />
+              <path d="M4 18h16M7 21.5h10" />
+            </>
+          )}
+          {name === 'rain' && (
+            <>
+              <path d="M17 14H8a4 4 0 0 1 0-8 5 5 0 0 1 9.5 1.5A3.2 3.2 0 0 1 17 14Z" />
+              <path d="M8.5 17.5 7.5 21M12.5 17.5 11.5 21M16.5 17.5 15.5 21" />
+            </>
+          )}
+          {name === 'snow' && (
+            <>
+              <path d="M17 13H8a4 4 0 0 1 0-8 5 5 0 0 1 9.5 1.5A3.2 3.2 0 0 1 17 13Z" />
+              <path d="M8 17h.01M12 19h.01M16 17h.01M10 21h.01M14 21h.01" />
+            </>
+          )}
+          {name === 'thunder' && (
+            <>
+              <path d="M17 13H8a4 4 0 0 1 0-8 5 5 0 0 1 9.5 1.5A3.2 3.2 0 0 1 17 13Z" />
+              <path d="m13 15-4 4.5h3L11 23l4-4.5h-3L13 15Z" />
+            </>
+          )}
+        </svg>
+      ))
+    }
+    <span class="nav-status__label" data-nav-weather-label></span>
+  </span>
+</div>
+
+{/*
+  時間用 is:inline 同步跑，避免 defer 造成的閃動。
+  只在整點分鐘更新，不用每秒——秒數在導覽列上只是噪音，還會一直觸發重繪。
+*/}
+<script is:inline>
+  (() => {
+    const el = document.querySelector('[data-nav-time]');
+    if (!el) return;
+    const fmt = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Taipei',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const tick = () => {
+      el.textContent = fmt.format(new Date());
+      // 對齊到下一個整分，而不是固定間隔——不然顯示的分鐘會慢半拍
+      setTimeout(tick, 60000 - (Date.now() % 60000) + 50);
+    };
+    tick();
+  })();
+</script>
+
+<script define:vars={{ latitude, longitude, weather }}>
+  /*
+    天氣走 Open-Meteo：免費、免 API key、支援 CORS。
+
+    這是站上唯一的第三方請求，所以它必須是「錦上添花」等級——抓不到就整塊藏起來，
+    絕不擋畫面、也不留一個壞掉的空框。結果存進 sessionStorage 快取三十分鐘，
+    在站內換頁不會每一頁都打一次。
+  */
+  (() => {
+    const box = document.querySelector('[data-nav-weather]');
+    if (!box) return;
+
+    const CACHE_KEY = 'nav-weather';
+    const TTL = 30 * 60 * 1000;
+
+    // WMO 天氣代碼收斂成七類，跟畫面上的七個圖示對應
+    const bucket = (code) => {
+      if (code <= 1) return 'clear';
+      if (code === 2) return 'cloudy';
+      if (code === 3) return 'overcast';
+      if (code === 45 || code === 48) return 'fog';
+      if (code >= 95) return 'thunder';
+      if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
+      return 'rain';
+    };
+
+    const show = (code) => {
+      const name = bucket(code);
+      const icon = box.querySelector(`[data-icon="${name}"]`);
+      if (!icon) return;
+      icon.classList.add('is-on');
+      box.querySelector('[data-nav-weather-label]').textContent = weather[name];
+      box.hidden = false;
+    };
+
+    const cached = (() => {
+      try {
+        const raw = sessionStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const { code, at } = JSON.parse(raw);
+        return Date.now() - at < TTL ? code : null;
+      } catch {
+        return null; // 隱私模式下 sessionStorage 會丟錯，當成沒有快取就好
+      }
+    })();
+
+    if (cached != null) {
+      show(cached);
+      return;
+    }
+
+    const url =
+      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}` +
+      `&current=weather_code&timezone=Asia%2FTaipei`;
+
+    fetch(url)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data) => {
+        const code = data?.current?.weather_code;
+        if (typeof code !== 'number') return;
+        try {
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify({ code, at: Date.now() }));
+        } catch {
+          // 存不進去不影響顯示，只是下一頁會重抓
+        }
+        show(code);
+      })
+      .catch(() => {
+        // 抓不到就維持隱藏，只留時間。不顯示錯誤，那不是訪客該處理的事。
+      });
+  })();
+</script>
+
+<style>
+  .nav-status {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-1);
+    font-size: var(--font-size-meta);
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
+  /*
+    時間用等寬數字：比例字型下 1 比 0 窄，每分鐘跳動時整塊寬度會抖一下。
+    font-variant-numeric 讓數字等寬，位置就固定了。
+  */
+  .nav-status__time {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .nav-status__weather {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-1);
+  }
+
+  .nav-status__icon {
+    display: none;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .nav-status__icon.is-on {
+    display: block;
+  }
+
+  /*
+    天氣描述只給螢幕閱讀器：畫面上圖示就夠了，多一段文字會把導覽列撐長。
+    用 clip 而不是 display:none——後者會讓螢幕閱讀器也讀不到。
+  */
+  .nav-status__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* 手機上導覽列已經很擠，這一塊是附加資訊，優先讓位 */
+  @media (max-width: 767px) {
+    .nav-status {
+      display: none;
+    }
+  }
+</style>

@@ -15,7 +15,21 @@
         "href": "/zh/gallery"
       }
     ],
-    "backLabel": "返回上一頁"
+    "backLabel": "返回上一頁",
+    "status": {
+      "city": "台南",
+      "latitude": 22.9908,
+      "longitude": 120.2133,
+      "weather": {
+        "clear": "晴",
+        "cloudy": "多雲",
+        "overcast": "陰",
+        "fog": "有霧",
+        "rain": "下雨",
+        "snow": "下雪",
+        "thunder": "雷雨"
+      }
+    }
   },
   "marquee": {
     "items": [
