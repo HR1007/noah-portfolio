@@ -2,39 +2,53 @@ import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { HERO_GRADIENTS } from './lib/hero-gradients.mjs';
 
+/*
+  會顯示在頁面上的文字：中英對照。
+
+  刻意接受兩種寫法。純字串代表「還沒雙語化」，維持原樣運作；轉成物件之後
+  zh 才是選填——沒填就由 t() 退回 en。這樣不需要一次性大遷移，也不會有
+  「翻譯做到一半、站台卻開天窗」的空窗期，可以一個欄位一個案例慢慢轉。
+
+  ratio／layout／direction／ctaHref 這些不是給人讀的值，不套用。
+  persona 的 name 與 flow 的 step label 也不套用——它們不輸出到頁面，
+  只是後台辨識版位用的標籤。
+*/
+const localized = () =>
+  z.union([z.string(), z.object({ en: z.string(), zh: z.string().optional() })]);
+
 // 案例頁區塊：每個專案依自己的 wireframe 排列不同組合與順序的區塊。
 // 區塊一律不帶圖片路徑／檔名，頁面依 sections 出現順序，依序從該專案的圖片資料夾取下一張圖（沒有圖就顯示佔位框）。
 const textSectionBlock = z.object({
   type: z.literal('textSection'),
-  eyebrow: z.string().optional(),
-  heading: z.string(),
-  paragraphs: z.array(z.string()),
+  eyebrow: localized().optional(),
+  heading: localized(),
+  paragraphs: z.array(localized()),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
   // 每種段落都支援，後台的「進階設定」可以逐段開關。
-  ctaLabel: z.string().optional(),
+  ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
 });
 
 const deviceShowcaseBlock = z.object({
   type: z.literal('deviceShowcase'),
-  eyebrow: z.string().optional(),
-  heading: z.string().optional(),
+  eyebrow: localized().optional(),
+  heading: localized().optional(),
   ratio: z.string(),
-  alt: z.string(),
+  alt: localized(),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
   // 每種段落都支援，後台的「進階設定」可以逐段開關。
-  ctaLabel: z.string().optional(),
+  ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
 });
 
 const experienceDemoBlock = z.object({
   type: z.literal('experienceDemo'),
-  eyebrow: z.string().optional(),
-  heading: z.string(),
-  body: z.string(),
+  eyebrow: localized().optional(),
+  heading: localized(),
+  body: localized(),
   ratio: z.string(),
-  alt: z.string(),
-  ctaLabel: z.string().optional(),
+  alt: localized(),
+  ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
   // stacked：文字在上、圖片在下（預設）；split：文字在左、圖片在右
   // stacked 文上圖下／split 左文右圖／split-reverse 左圖右文
@@ -43,72 +57,72 @@ const experienceDemoBlock = z.object({
 
 const featureSplitBlock = z.object({
   type: z.literal('featureSplit'),
-  eyebrow: z.string().optional(),
-  heading: z.string(),
-  body: z.string(),
+  eyebrow: localized().optional(),
+  heading: localized(),
+  body: localized(),
   imagePosition: z.enum(['left', 'right']),
   ratio: z.string(),
-  alt: z.string(),
-  ctaLabel: z.string().optional(),
+  alt: localized(),
+  ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
 });
 
 const featureGridBlock = z.object({
   type: z.literal('featureGrid'),
-  eyebrow: z.string().optional(),
-  heading: z.string().optional(),
+  eyebrow: localized().optional(),
+  heading: localized().optional(),
   columns: z.array(
     z.object({
-      heading: z.string(),
-      body: z.string(),
+      heading: localized(),
+      body: localized(),
       ratio: z.string(),
-      alt: z.string(),
+      alt: localized(),
     })
   ),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
   // 每種段落都支援，後台的「進階設定」可以逐段開關。
-  ctaLabel: z.string().optional(),
+  ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
 });
 
 const imageRowBlock = z.object({
   type: z.literal('imageRow'),
-  eyebrow: z.string().optional(),
-  heading: z.string().optional(),
-  images: z.array(z.object({ ratio: z.string(), alt: z.string() })).min(1).max(3),
+  eyebrow: localized().optional(),
+  heading: localized().optional(),
+  images: z.array(z.object({ ratio: z.string(), alt: localized() })).min(1).max(3),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
   // 每種段落都支援，後台的「進階設定」可以逐段開關。
-  ctaLabel: z.string().optional(),
+  ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
 });
 
 // 圖片數量可調：設計師之後增減插畫素材時，把這裡的 count 改成資料夾裡實際的插畫張數即可。
 const illustrationGridBlock = z.object({
   type: z.literal('illustrationGrid'),
-  eyebrow: z.string().optional(),
-  heading: z.string(),
-  body: z.string().optional(),
+  eyebrow: localized().optional(),
+  heading: localized(),
+  body: localized().optional(),
   count: z.number(),
-  alt: z.string(),
+  alt: localized(),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
   // 每種段落都支援，後台的「進階設定」可以逐段開關。
-  ctaLabel: z.string().optional(),
+  ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
 });
 
 const researchFrameworkBlock = z.object({
   type: z.literal('researchFramework'),
-  eyebrow: z.string().optional(),
-  heading: z.string(),
-  paragraphs: z.array(z.string()),
+  eyebrow: localized().optional(),
+  heading: localized(),
+  paragraphs: z.array(localized()),
   ratio: z.string(),
-  alt: z.string(),
+  alt: localized(),
   // stacked：文字在上、圖片在下（預設）；split：文字在左、圖片在右
   // stacked 文上圖下／split 左文右圖／split-reverse 左圖右文
   layout: z.enum(['stacked', 'split', 'split-reverse']).default('stacked'),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
   // 每種段落都支援，後台的「進階設定」可以逐段開關。
-  ctaLabel: z.string().optional(),
+  ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
 });
 
@@ -117,52 +131,52 @@ const researchFrameworkBlock = z.object({
 // name 不會輸出到頁面，是後台版位標籤用來辨識「這格是誰」的依據。
 const personaBlock = z.object({
   type: z.literal('persona'),
-  eyebrow: z.string().optional(),
-  heading: z.string(),
+  eyebrow: localized().optional(),
+  heading: localized(),
   personas: z.array(
     z.object({
       name: z.string(),
       ratio: z.string(),
-      alt: z.string(),
+      alt: localized(),
     })
   ),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
   // 每種段落都支援，後台的「進階設定」可以逐段開關。
-  ctaLabel: z.string().optional(),
+  ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
 });
 
 const designThemesBlock = z.object({
   type: z.literal('designThemes'),
-  eyebrow: z.string().optional(),
-  heading: z.string(),
+  eyebrow: localized().optional(),
+  heading: localized(),
   // 預設 vertical：這一區放的是設計系統規格圖，橫排會讓每張都太小看不清細節。
   // 預設值要跟 image-slots.mjs 的 SECTION_OPTIONS 第一個選項一致。
   direction: z.enum(['vertical', 'horizontal']).default('vertical'),
   themes: z.array(
     z.object({
-      title: z.string(),
+      title: localized(),
       // 不在頁面上呈現，只作為後台版位標籤與 alt 文字，因此選填
-      description: z.string().optional(),
+      description: localized().optional(),
     })
   ),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
   // 每種段落都支援，後台的「進階設定」可以逐段開關。
-  ctaLabel: z.string().optional(),
+  ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
 });
 
 const flowBlock = z.object({
   type: z.literal('flow'),
-  eyebrow: z.string().optional(),
-  heading: z.string(),
-  body: z.string().optional(),
+  eyebrow: localized().optional(),
+  heading: localized(),
+  body: localized().optional(),
   // horizontal：步驟並排成一列（預設）；vertical：一步一列往下排
   direction: z.enum(['horizontal', 'vertical']).default('horizontal'),
-  steps: z.array(z.object({ label: z.string(), ratio: z.string(), alt: z.string() })),
+  steps: z.array(z.object({ label: z.string(), ratio: z.string(), alt: localized() })),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
   // 每種段落都支援，後台的「進階設定」可以逐段開關。
-  ctaLabel: z.string().optional(),
+  ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
 });
 
@@ -183,17 +197,17 @@ const projectSection = z.discriminatedUnion('type', [
 const projects = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/projects' }),
   schema: z.object({
-    title: z.string(),
+    title: localized(),
     order: z.number(),
     year: z.string().optional(), // [需確認] live 站未展示年份，待設計師提供
-    summary: z.string(),
+    summary: localized(),
     tags: z.array(z.string()).default([]), // [需確認] live 站卡片未展示 tag，待設計師提供
-    ctaLabel: z.string().default('More Details'), // Portfolio 卡片上的按鈕文字
+    ctaLabel: localized().default('More Details'), // Portfolio 卡片上的按鈕文字
     // hero／sections 為新版區塊式案例頁用；尚未依 wireframe 重新拆解的專案先留空，
     // [slug].astro 會 fallback 回舊版簡易版型（標題＋摘要＋單張圖＋Markdown 內文），不讓 build 失敗。
     hero: z
       .object({
-        ctaLabel: z.string(),
+        ctaLabel: localized(),
         ctaHref: z.string().default('#'), // [需確認] 待設計師提供實際 demo／prototype 連結
         // 漸層底色只存名稱，實際色值定義在 src/styles/tokens.css，
         // 避免把 hex 散進內容檔。
@@ -277,7 +291,7 @@ const site = defineCollection({
       cta: z.object({
         heading: z.string(),
         body: z.string(),
-        ctaLabel: z.string(),
+        ctaLabel: localized(),
         ctaHref: z.string().default('#'),
       }),
     }),

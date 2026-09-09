@@ -18,6 +18,7 @@ import DesignThemes from '../components/project/DesignThemes.astro';
 import Flow from '../components/project/Flow.astro';
 import ProjectQuote from '../components/project/ProjectQuote.astro';
 import { getProjectImageMap } from '../lib/media';
+import { t, type LocalizedText } from '../lib/i18n';
 import { assignImages } from '../lib/image-slots.mjs';
 
 interface Props {
@@ -40,10 +41,27 @@ const images = getProjectImageMap(project.id);
 const { hero: heroImage, bySection } = assignImages(project.data, images);
 const imagesFor = (i: number) => bySection[i] ?? [];
 
+/*
+  這一頁所有「給人看的文字」都經過這裡取值：欄位還是純字串就原樣回傳，
+  已經雙語化的就依 locale 取，zh 沒填時退回 en（見 lib/i18n 的 t）。
+  ratio／layout／direction／ctaHref 不經過——那些不是給人讀的。
+*/
+const tr = (v: LocalizedText | undefined) => t(v, locale);
+const trReq = (v: LocalizedText) => t(v, locale);
+
+// 陣列型欄位裡的文字也要逐項取值，其餘設定原樣帶過
+const trAlt = <T extends { alt: LocalizedText }>(items: T[]) =>
+  items.map((item) => ({ ...item, alt: trReq(item.alt) }));
+const trColumns = (
+  cols: { heading: LocalizedText; body: LocalizedText; ratio: string; alt: LocalizedText }[]
+) => cols.map((c) => ({ ...c, heading: trReq(c.heading), body: trReq(c.body), alt: trReq(c.alt) }));
+const trThemes = (themes: { title: LocalizedText; description?: LocalizedText }[]) =>
+  themes.map((x) => ({ ...x, title: trReq(x.title), description: tr(x.description) }));
+
 const { Content } = await render(project);
 ---
 
-<BaseLayout title={`${project.data.title} — Noah Wen`} description={project.data.summary}>
+<BaseLayout title={`${trReq(project.data.title)} — Noah Wen`} description={trReq(project.data.summary)}>
   <div class="project-back">
     <BackLink label={backLabel} href={`/${locale}/portfolio`} />
   </div>
@@ -51,8 +69,8 @@ const { Content } = await render(project);
     isMigrated ? (
       <Fragment>
         <ProjectHero
-          title={project.data.title}
-          ctaLabel={hero!.ctaLabel}
+          title={trReq(project.data.title)}
+          ctaLabel={trReq(hero!.ctaLabel)}
           ctaHref={hero!.ctaHref}
           image={heroImage}
         />
@@ -62,10 +80,10 @@ const { Content } = await render(project);
             case 'textSection':
               return (
                 <TextSection
-                  eyebrow={section.eyebrow}
-                  heading={section.heading}
-                  paragraphs={section.paragraphs}
-                  ctaLabel={section.ctaLabel}
+                  eyebrow={tr(section.eyebrow)}
+                  heading={trReq(section.heading)}
+                  paragraphs={section.paragraphs.map(trReq)}
+                  ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
                 />
               );
@@ -73,22 +91,22 @@ const { Content } = await render(project);
               return <DeviceShowcase
                   image={imagesFor(sectionIndex)[0]}
                   ratio={section.ratio}
-                  alt={section.alt}
-                  eyebrow={section.eyebrow}
-                  heading={section.heading}
-                  ctaLabel={section.ctaLabel}
+                  alt={trReq(section.alt)}
+                  eyebrow={tr(section.eyebrow)}
+                  heading={tr(section.heading)}
+                  ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
                 />;
             case 'experienceDemo':
               return (
                 <ExperienceDemo
-                  eyebrow={section.eyebrow}
-                  heading={section.heading}
-                  body={section.body}
+                  eyebrow={tr(section.eyebrow)}
+                  heading={trReq(section.heading)}
+                  body={tr(section.body)}
                   image={imagesFor(sectionIndex)[0]}
                   ratio={section.ratio}
-                  alt={section.alt}
-                  ctaLabel={section.ctaLabel}
+                  alt={trReq(section.alt)}
+                  ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
                   layout={section.layout}
                 />
@@ -96,98 +114,98 @@ const { Content } = await render(project);
             case 'featureSplit':
               return (
                 <FeatureSplit
-                  eyebrow={section.eyebrow}
-                  heading={section.heading}
-                  body={section.body}
+                  eyebrow={tr(section.eyebrow)}
+                  heading={trReq(section.heading)}
+                  body={tr(section.body)}
                   imagePosition={section.imagePosition}
                   image={imagesFor(sectionIndex)[0]}
                   ratio={section.ratio}
-                  alt={section.alt}
-                  ctaLabel={section.ctaLabel}
+                  alt={trReq(section.alt)}
+                  ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
                 />
               );
             case 'featureGrid':
               return (
                 <FeatureGrid
-                  eyebrow={section.eyebrow}
-                  heading={section.heading}
-                  columns={section.columns}
+                  eyebrow={tr(section.eyebrow)}
+                  heading={tr(section.heading)}
+                  columns={trColumns(section.columns)}
                   images={imagesFor(sectionIndex)}
-                  ctaLabel={section.ctaLabel}
+                  ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
                 />
               );
             case 'imageRow':
               return (
                 <ImageRow
-                  rows={section.images}
+                  rows={trAlt(section.images)}
                   images={imagesFor(sectionIndex)}
-                  eyebrow={section.eyebrow}
-                  heading={section.heading}
-                  ctaLabel={section.ctaLabel}
+                  eyebrow={tr(section.eyebrow)}
+                  heading={tr(section.heading)}
+                  ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
                 />
               );
             case 'illustrationGrid':
               return (
                 <IllustrationGrid
-                  eyebrow={section.eyebrow}
-                  heading={section.heading}
-                  body={section.body}
-                  alt={section.alt}
+                  eyebrow={tr(section.eyebrow)}
+                  heading={trReq(section.heading)}
+                  body={tr(section.body)}
+                  alt={trReq(section.alt)}
                   images={imagesFor(sectionIndex)}
-                  ctaLabel={section.ctaLabel}
+                  ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
                 />
               );
             case 'researchFramework':
               return (
                 <ResearchFramework
-                  eyebrow={section.eyebrow}
-                  heading={section.heading}
-                  paragraphs={section.paragraphs}
+                  eyebrow={tr(section.eyebrow)}
+                  heading={trReq(section.heading)}
+                  paragraphs={section.paragraphs.map(trReq)}
                   image={imagesFor(sectionIndex)[0]}
                   ratio={section.ratio}
-                  alt={section.alt}
+                  alt={trReq(section.alt)}
                   layout={section.layout}
-                  ctaLabel={section.ctaLabel}
+                  ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
                 />
               );
             case 'persona':
               return (
                 <Persona
-                  eyebrow={section.eyebrow}
-                  heading={section.heading}
-                  personas={section.personas}
+                  eyebrow={tr(section.eyebrow)}
+                  heading={trReq(section.heading)}
+                  personas={trAlt(section.personas)}
                   images={imagesFor(sectionIndex)}
-                  ctaLabel={section.ctaLabel}
+                  ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
                 />
               );
             case 'designThemes':
               return (
                 <DesignThemes
-                  eyebrow={section.eyebrow}
-                  heading={section.heading}
-                  themes={section.themes}
+                  eyebrow={tr(section.eyebrow)}
+                  heading={trReq(section.heading)}
+                  themes={trThemes(section.themes)}
                   direction={section.direction}
                   images={imagesFor(sectionIndex)}
-                  ctaLabel={section.ctaLabel}
+                  ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
                 />
               );
             case 'flow':
               return (
                 <Flow
-                  eyebrow={section.eyebrow}
-                  heading={section.heading}
-                  body={section.body}
-                  steps={section.steps}
+                  eyebrow={tr(section.eyebrow)}
+                  heading={trReq(section.heading)}
+                  body={tr(section.body)}
+                  steps={trAlt(section.steps)}
                   direction={section.direction}
                   images={imagesFor(sectionIndex)}
-                  ctaLabel={section.ctaLabel}
+                  ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
                 />
               );
@@ -201,12 +219,12 @@ const { Content } = await render(project);
     ) : (
       <Fragment>
         <section class="project-hero">
-          <h1 class="project-hero__title">{project.data.title}</h1>
-          <p class="project-hero__summary">{project.data.summary}</p>
+          <h1 class="project-hero__title">{trReq(project.data.title)}</h1>
+          <p class="project-hero__summary">{trReq(project.data.summary)}</p>
         </section>
 
         <section class="project-showcase">
-          <Media image={images[0]} ratio="4/3" alt={`${project.data.title} showcase`} />
+          <Media image={images[0]} ratio="4/3" alt={`${trReq(project.data.title)} showcase`} />
         </section>
 
         <section class="project-body">

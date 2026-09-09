@@ -14,7 +14,7 @@ import { imageSize } from 'image-size';
 import matter from 'gray-matter';
 import crypto from 'node:crypto';
 import {
-  getImageSlots, SECTION_META, SECTION_OPTIONS, describeSection, sectionItemCount,
+  getImageSlots, SECTION_META, SECTION_OPTIONS, describeSection, sectionItemCount, plain,
   createSection, addSectionItem, removeSectionItem, sectionTypeOptions, CTA_DEFAULT,
 } from '../src/lib/image-slots.mjs';
 import { HERO_GRADIENTS } from '../src/lib/hero-gradients.mjs';
@@ -244,7 +244,9 @@ function summarizeSections(data) {
 // 但要看得出哪一項是哪一項，否則不知道自己按的「移除」會拿掉哪一段。
 function textItemPreviews(section, list) {
   return (section[list.key] || []).map((item) => {
-    const text = typeof item === 'string' ? item : item.title || item.name || item.label || '';
+    const text = typeof item === 'string'
+      ? item
+      : plain(item.title) || plain(item.name) || plain(item.label);
     return text.length > 60 ? `${text.slice(0, 60)}…` : text;
   });
 }
@@ -455,7 +457,7 @@ app.get('/api/collections/projects', async (req, res) => {
       files.map(async (file) => {
         const raw = await fs.readFile(path.join(PROJECTS_CONTENT_DIR, file), 'utf-8');
         const { data } = matter(raw);
-        return { slug: file.replace(/\.md$/, ''), title: data.title, order: data.order ?? 999 };
+        return { slug: file.replace(/\.md$/, ''), title: plain(data.title), order: data.order ?? 999 };
       })
     );
     projects.sort((a, b) => a.order - b.order);

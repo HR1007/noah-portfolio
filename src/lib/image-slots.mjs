@@ -310,10 +310,29 @@ export function imageCountForSection(section) {
  * @param {any} section
  * @param {number} sectionIndex
  */
+/**
+ * 取出用於後台顯示的文字。
+ *
+ * 內容欄位可能是純字串（還沒雙語化），也可能是 { en, zh } 的中英對照。
+ * 後台一律顯示 en：那是原稿，而且中文還沒翻的欄位也才有東西可看，
+ * 不會變成一排空白的段落標題。
+ *
+ * @param {unknown} value
+ * @returns {string}
+ */
+export function plain(value) {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && 'en' in /** @type {any} */ (value)) {
+    return /** @type {any} */ (value).en ?? '';
+  }
+  return '';
+}
+
 export function describeSection(section, sectionIndex) {
   const meta = SECTION_META[section?.type];
   const name = meta?.label ?? section?.type ?? 'Unknown';
-  const hint = section?.eyebrow || section?.heading || '';
+  const hint = plain(section?.eyebrow) || plain(section?.heading);
   return `#${sectionIndex + 1} ${name}${hint ? ` — ${hint}` : ''}`;
 }
 
@@ -342,7 +361,7 @@ function describeSlot(section, sectionIndex, i) {
   }
 
   const item = (section[list.key] || [])[i] || {};
-  const hint = item.heading || item.name || item.label || item.title || '';
+  const hint = plain(item.heading) || plain(item.name) || plain(item.label) || plain(item.title);
   return {
     label: `#${n} ${name} — ${list.label} ${i + 1}${hint ? `（${hint}）` : ''}`,
     alt: item.alt,
@@ -368,7 +387,7 @@ export function getImageSlots(data) {
       sectionIndex: -1,
       type: 'showcase',
       label: 'Showcase（舊版單圖版型，未拆解成 sections）',
-      alt: data?.title ? `${data.title} showcase` : undefined,
+      alt: plain(data?.title) ? `${plain(data.title)} showcase` : undefined,
     });
     return slots;
   }
@@ -378,7 +397,7 @@ export function getImageSlots(data) {
     sectionIndex: -1,
     type: 'hero',
     label: 'Hero',
-    alt: data.title ? `${data.title} hero` : undefined,
+    alt: plain(data.title) ? `${plain(data.title)} hero` : undefined,
   });
 
   (data.sections || []).forEach((section, sectionIndex) => {

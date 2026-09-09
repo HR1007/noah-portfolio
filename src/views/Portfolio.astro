@@ -5,6 +5,7 @@ import SectionIntro from '../components/SectionIntro.astro';
 import PortfolioCard from '../components/PortfolioCard.astro';
 import Media from '../components/Media.astro';
 import { getProjectImages, getPortfolioImage } from '../lib/media';
+import { t } from '../lib/i18n';
 
 interface Props {
   locale: 'en' | 'zh';
@@ -39,9 +40,9 @@ const heroImage = getPortfolioImage('hero');
       {
         projects.map((project, index) => (
           <PortfolioCard
-            title={project.data.title}
-            summary={project.data.summary}
-            ctaLabel={project.data.ctaLabel}
+            title={t(project.data.title, locale)}
+            summary={t(project.data.summary, locale)}
+            ctaLabel={t(project.data.ctaLabel, locale)}
             href={`/${locale}/projects/${project.id}`}
             image={getProjectImages(project.id)[0]}
             reverse={index % 2 === 1}
