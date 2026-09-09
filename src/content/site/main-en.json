@@ -31,6 +31,12 @@
       }
     }
   },
+  "viewer": {
+    "close": "Close",
+    "prev": "Previous image",
+    "next": "Next image",
+    "hint": "Scroll to zoom · Drag to pan · Esc to close"
+  },
   "marquee": {
     "items": [
       "UI/UX DESIGNER",

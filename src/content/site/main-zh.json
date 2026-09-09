@@ -31,6 +31,12 @@
       }
     }
   },
+  "viewer": {
+    "close": "關閉",
+    "prev": "上一張",
+    "next": "下一張",
+    "hint": "滾動縮放 · 拖曳移動 · Esc 關閉"
+  },
   "marquee": {
     "items": [
       "UI/UX 設計師",

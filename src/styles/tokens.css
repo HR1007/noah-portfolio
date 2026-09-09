@@ -145,6 +145,16 @@
   --connect-grid-width: 560px; /* 首頁聯絡管道的雙欄格線 */
   --hero-max-height: 675.66px; /* hero 圖高度上限，取自設計稿 */
 
+  /*
+    全螢幕圖片檢視。底色與文字色刻意不隨主題反轉——看圖時暗底就是對的，
+    淺色模式下也一樣，不然照片會被亮底洗掉。
+    聚光燈是跟著游標走的一圈柔光，讓暗場裡的視線有落點。
+  */
+  --viewer-backdrop: rgba(10, 10, 12, 0.94);
+  --viewer-ink: #f2f2f2;
+  --viewer-spot: rgba(242, 242, 242, 0.1);
+  --viewer-spot-size: 320px;
+
   /* 圓角 */
   --radius: 16px;
   --radius-pill: 999px; /* [需確認] 目前站上沒有藥丸形元件，先保留備用 */

@@ -4,6 +4,7 @@ import Marquee from '../components/Marquee.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import SectionReveal from '../components/SectionReveal.astro';
+import ImageViewer from '../components/ImageViewer.astro';
 import { otherLocale as getOtherLocale, swapLocalePath, type Locale } from '../lib/i18n';
 
 interface Props {
@@ -58,5 +59,6 @@ const alternateURL = new URL(swapLocalePath(Astro.url.pathname, otherLocale), As
       <slot />
     </main>
     <Footer />
+    <ImageViewer />
   </body>
 </html>

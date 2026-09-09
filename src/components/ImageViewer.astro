@@ -1,0 +1,302 @@
+---
+/*
+  全螢幕圖片檢視：點案例頁上任何一張圖就打開，可以縮放與拖曳。
+
+  為什麼值得做：這個站上的圖有大量設計系統規格表與 UI 截圖，上面印著色碼、字級、
+  間距數字。原圖動輒 1500～3500px 寬，在 1120px 的內容欄裡那些數字根本讀不到。
+  這不是裝飾，是把已經做好的內容變成看得見的內容。
+
+  刻意不引入 lightbox 函式庫（硬規則：正式站台不引入 JS 函式庫）。縮放與平移
+  用原生 pointer 事件就夠，也不必為了一個功能扛整包相依。
+*/
+import { getEntry } from 'astro:content';
+
+const locale = Astro.currentLocale ?? 'en';
+const site = await getEntry('site', `main-${locale}`);
+const { close, prev, next, hint } = site!.data.viewer;
+---
+
+<div class="viewer" data-viewer hidden aria-modal="true" role="dialog">
+  {/* 跟著游標走的柔光。放在底色之上、圖片之下，所以是「打在背景上的燈」 */}
+  <div class="viewer__spot" data-viewer-spot aria-hidden="true"></div>
+
+  <img class="viewer__image" data-viewer-image alt="" draggable="false" />
+
+  <button class="viewer__btn viewer__btn--close" data-viewer-close type="button" aria-label={close}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+  </button>
+  <button class="viewer__btn viewer__btn--prev" data-viewer-prev type="button" aria-label={prev}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6" /></svg>
+  </button>
+  <button class="viewer__btn viewer__btn--next" data-viewer-next type="button" aria-label={next}>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6" /></svg>
+  </button>
+
+  <p class="viewer__hint">{hint}</p>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-viewer]');
+  const img = document.querySelector<HTMLImageElement>('[data-viewer-image]');
+  const spot = document.querySelector<HTMLElement>('[data-viewer-spot]');
+
+  if (root && img && spot) {
+    // 只收案例頁與相簿裡的內容圖。導覽列圖示、佔位框都不該點開。
+    const targets = () => Array.from(document.querySelectorAll<HTMLImageElement>('main .media img'));
+
+    let list: HTMLImageElement[] = [];
+    let at = 0;
+    let scale = 1;
+    let x = 0;
+    let y = 0;
+    let opener: HTMLElement | null = null;
+
+    const MIN = 1;
+    /*
+      縮放上限每張圖各自算，不寫死。
+
+      站上的圖解析度差很多——同樣是 1120px 的欄寬，有的原圖 1280px（只夠放大
+      1.14 倍），有的 3478px（能放大 3 倍）。上限若寫死成一個大數字，低解析度
+      那些圖會讓人一直放大到只剩糊掉的像素，看起來像壞掉。
+      所以貼著原生解析度走，再多給一點餘裕留給「想看大一點」的可讀性需求。
+    */
+    let MAX = 3;
+
+    const measure = () => {
+      const shown = img.offsetWidth || 1;
+      const native = img.naturalWidth || shown;
+      MAX = Math.min(6, Math.max(2, (native / shown) * 1.5));
+    };
+
+    img.addEventListener('load', measure);
+
+    const draw = () => {
+      img.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+      img.style.cursor = scale > 1 ? 'grab' : 'zoom-in';
+    };
+
+    const reset = () => {
+      scale = 1;
+      x = 0;
+      y = 0;
+      draw();
+    };
+
+    const load = (i: number) => {
+      at = (i + list.length) % list.length;
+      const source = list[at];
+      img.src = source.currentSrc || source.src;
+      img.alt = source.alt;
+      reset();
+    };
+
+    const open = (source: HTMLImageElement) => {
+      list = targets();
+      const i = list.indexOf(source);
+      if (i < 0) return;
+      opener = source;
+      load(i);
+      root.hidden = false;
+      // 鎖住背景捲動，否則在檢視器裡滾輪會連帶把底下的頁面捲走
+      document.documentElement.style.overflow = 'hidden';
+      (root.querySelector('[data-viewer-close]') as HTMLElement | null)?.focus();
+    };
+
+    const shut = () => {
+      root.hidden = true;
+      document.documentElement.style.overflow = '';
+      img.removeAttribute('src');
+      // 焦點還回原本那張圖，鍵盤使用者才不會被丟回頁面最上面
+      opener?.focus?.();
+      opener = null;
+    };
+
+    // ---- 開啟 ----
+    document.addEventListener('click', (e) => {
+      const el = (e.target as HTMLElement | null)?.closest?.('main .media img');
+      if (el) open(el as HTMLImageElement);
+    });
+
+    // ---- 關閉與換圖 ----
+    root.querySelector('[data-viewer-close]')?.addEventListener('click', shut);
+    root.querySelector('[data-viewer-prev]')?.addEventListener('click', () => load(at - 1));
+    root.querySelector('[data-viewer-next]')?.addEventListener('click', () => load(at + 1));
+
+    // 點空白處關閉，但點在圖片或按鈕上不算
+    root.addEventListener('click', (e) => {
+      if (e.target === root || e.target === spot) shut();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (root.hidden) return;
+      if (e.key === 'Escape') shut();
+      else if (e.key === 'ArrowLeft') load(at - 1);
+      else if (e.key === 'ArrowRight') load(at + 1);
+    });
+
+    // ---- 縮放：以游標為錨點，放大時游標底下的那一點不會跑掉 ----
+    root.addEventListener(
+      'wheel',
+      (e) => {
+        if (root.hidden) return;
+        e.preventDefault();
+        const box = img.getBoundingClientRect();
+        const cx = e.clientX - (box.left + box.width / 2);
+        const cy = e.clientY - (box.top + box.height / 2);
+        const next = Math.min(MAX, Math.max(MIN, scale * (e.deltaY < 0 ? 1.12 : 1 / 1.12)));
+        const k = next / scale;
+        x = e.clientX - cx * k - (box.left + box.width / 2) + x;
+        y = e.clientY - cy * k - (box.top + box.height / 2) + y;
+        scale = next;
+        if (scale === MIN) {
+          x = 0;
+          y = 0;
+        }
+        draw();
+      },
+      { passive: false }
+    );
+
+    // ---- 拖曳平移 ----
+    let dragging = false;
+    let px = 0;
+    let py = 0;
+
+    img.addEventListener('pointerdown', (e) => {
+      if (scale <= MIN) return;
+      dragging = true;
+      px = e.clientX;
+      py = e.clientY;
+      img.setPointerCapture(e.pointerId);
+      img.style.cursor = 'grabbing';
+    });
+    img.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      x += e.clientX - px;
+      y += e.clientY - py;
+      px = e.clientX;
+      py = e.clientY;
+      draw();
+    });
+    const endDrag = () => {
+      dragging = false;
+      draw();
+    };
+    img.addEventListener('pointerup', endDrag);
+    img.addEventListener('pointercancel', endDrag);
+
+    // 連點兩下在「原尺寸」與「放大兩倍」之間切換
+    img.addEventListener('dblclick', () => {
+      scale = scale > MIN ? MIN : 2;
+      x = 0;
+      y = 0;
+      draw();
+    });
+
+    // ---- 聚光燈 ----
+    root.addEventListener('pointermove', (e) => {
+      spot.style.setProperty('--x', `${e.clientX}px`);
+      spot.style.setProperty('--y', `${e.clientY}px`);
+    });
+  }
+</script>
+
+<style>
+  .viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--viewer-backdrop);
+    color: var(--viewer-ink);
+    overscroll-behavior: contain;
+  }
+
+  /*
+    聚光燈：一圈跟著游標的柔光。--x／--y 由 JS 寫入，預設放在畫面中央，
+    這樣還沒移動滑鼠前也不會整片全黑。
+  */
+  .viewer__spot {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle var(--viewer-spot-size) at var(--x, 50%) var(--y, 50%),
+      var(--viewer-spot),
+      transparent 100%
+    );
+    pointer-events: none;
+  }
+
+  .viewer__image {
+    max-width: 92vw;
+    max-height: 88vh;
+    /* transform 由 JS 控制，這裡只負責原點與不被拉伸 */
+    transform-origin: center;
+    object-fit: contain;
+    user-select: none;
+    touch-action: none;
+  }
+
+  .viewer__btn {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-size-lg);
+    height: var(--control-size-lg);
+    border: 1px solid var(--viewer-spot);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--viewer-ink);
+    cursor: pointer;
+  }
+
+  .viewer__btn svg {
+    width: var(--icon-md);
+    height: var(--icon-md);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .viewer__btn:hover {
+    border-color: var(--viewer-ink);
+  }
+
+  .viewer__btn--close {
+    top: var(--sp-3);
+    right: var(--sp-3);
+  }
+
+  .viewer__btn--prev {
+    left: var(--sp-3);
+  }
+
+  .viewer__btn--next {
+    right: var(--sp-3);
+  }
+
+  .viewer__hint {
+    position: absolute;
+    bottom: var(--sp-3);
+    margin: 0;
+    font-size: var(--font-size-meta);
+    opacity: 0.55;
+  }
+
+  /* 觸控裝置沒有滾輪也沒有 hover，提示文字換掉沒意義的部分不如整段收起來 */
+  @media (max-width: 767px) {
+    .viewer__hint {
+      display: none;
+    }
+
+    .viewer__btn--prev,
+    .viewer__btn--next {
+      bottom: var(--sp-3);
+    }
+  }
+</style>

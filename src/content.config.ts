@@ -248,6 +248,13 @@ const site = defineCollection({
         }),
       }),
     }),
+    /* 全螢幕圖片檢視的操作文案 */
+    viewer: z.object({
+      close: z.string(),
+      prev: z.string(),
+      next: z.string(),
+      hint: z.string(),
+    }),
     marquee: z.object({
       items: z.array(z.string()),
     }),
