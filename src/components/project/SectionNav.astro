@@ -1,0 +1,243 @@
+---
+/*
+  案例頁的側邊章節導覽。
+
+  為什麼需要：一個案例有十幾個段落（Persona、Design Themes、Flow、Experience Demo…），
+  讀到一半想回去看某一段，只能用滑鼠一路捲。這條鐵軌讓人隨時知道自己在哪一段、
+  也能直接跳過去；「回到頂端」只是它其中一個功能。
+
+  預設只有點，滑到才展開標籤——常駐一整排文字會跟內容搶注意力，
+  而這東西是輔助，不是內容。
+*/
+interface Item {
+  id: string;
+  label: string;
+}
+
+interface Props {
+  items: Item[];
+  toTopLabel: string;
+}
+
+const { items, toTopLabel } = Astro.props;
+---
+
+{
+  items.length > 1 && (
+    <nav class="section-nav" data-section-nav aria-label={toTopLabel}>
+      <button class="section-nav__top" data-section-nav-top type="button" aria-label={toTopLabel}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 19V5" />
+          <path d="m5 12 7-7 7 7" />
+        </svg>
+      </button>
+
+      <ul class="section-nav__list">
+        {items.map((item) => (
+          <li>
+            <a class="section-nav__link" href={`#${item.id}`} data-section-nav-link={item.id}>
+              <span class="section-nav__dot" aria-hidden="true" />
+              <span class="section-nav__label">{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<script>
+  const nav = document.querySelector<HTMLElement>('[data-section-nav]');
+
+  if (nav) {
+    const links = new Map<string, HTMLElement>();
+    nav.querySelectorAll<HTMLElement>('[data-section-nav-link]').forEach((el) => {
+      links.set(el.dataset.sectionNavLink!, el);
+    });
+
+    const sections = Array.from(links.keys())
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    /*
+      用 IntersectionObserver 而不是在 scroll 事件裡算位置：後者每次捲動都要
+      量一輪版面，長頁面上很容易掉幀。這裡只在段落進出視窗時被叫到。
+
+      rootMargin 把判定帶壓在畫面上方三分之一：以「剛捲到的那一段」為準，
+      不然整段還在畫面下緣時就被算成目前段落，指示會跑在人前面。
+    */
+    let visible = new Set<string>();
+
+    const mark = () => {
+      // 同時有多段在畫面上時取最上面那一個，指示才不會亂跳
+      const current = sections.find((s) => visible.has(s.id));
+      links.forEach((el, id) => el.classList.toggle('is-current', id === current?.id));
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target.id);
+          else visible.delete(entry.target.id);
+        }
+        mark();
+      },
+      { rootMargin: '-20% 0px -60% 0px' }
+    );
+
+    sections.forEach((s) => io.observe(s));
+
+    // 捲到最上面時整條收起來——在頁首它沒有作用，留著只是擋畫面
+    const top = new IntersectionObserver(
+      ([entry]) => nav.classList.toggle('is-off', entry.isIntersecting),
+      { threshold: 0 }
+    );
+    const sentinel = document.querySelector('main');
+    if (sentinel) {
+      const probe = document.createElement('div');
+      probe.style.position = 'absolute';
+      probe.style.top = '0';
+      probe.style.height = '60vh';
+      probe.style.width = '1px';
+      probe.style.pointerEvents = 'none';
+      sentinel.prepend(probe);
+      top.observe(probe);
+    }
+
+    nav.querySelector('[data-section-nav-top]')?.addEventListener('click', () => {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+  }
+</script>
+
+<style>
+  .section-nav {
+    position: fixed;
+    top: 50%;
+    right: var(--sp-3);
+    z-index: 40;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--sp-2);
+    transition: opacity var(--motion-fast) var(--motion-ease);
+  }
+
+  /* 在頁首時淡出並停止接收滑鼠，避免擋住內容 */
+  .section-nav.is-off {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .section-nav__top {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-size);
+    height: var(--control-size);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-bg);
+    color: var(--color-ink);
+    cursor: pointer;
+    transition:
+      border-color var(--motion-fast) var(--motion-ease),
+      background var(--motion-fast) var(--motion-ease);
+  }
+
+  .section-nav__top:hover {
+    border-color: var(--color-muted);
+    background: var(--color-surface);
+  }
+
+  .section-nav__top svg {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .section-nav__list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .section-nav__link {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--sp-1);
+    padding: calc(var(--sp-1) / 2) 0;
+    color: var(--color-muted);
+    font-size: var(--font-size-meta);
+    text-decoration: none;
+  }
+
+  .section-nav__dot {
+    flex: none;
+    width: var(--sp-2);
+    height: 1px;
+    background: currentColor;
+    transition:
+      width var(--motion-fast) var(--motion-ease),
+      background var(--motion-fast) var(--motion-ease);
+  }
+
+  /*
+    標籤預設收起來（用 max-width 而不是 display:none，才有中間狀態可以做過場），
+    滑到整條或該項是目前段落時才展開。
+  */
+  .section-nav__label {
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    transition:
+      max-width var(--motion-fast) var(--motion-ease),
+      opacity var(--motion-fast) var(--motion-ease);
+  }
+
+  .section-nav:hover .section-nav__label,
+  .section-nav__link:focus-visible .section-nav__label {
+    max-width: var(--sp-9);
+    opacity: 1;
+  }
+
+  .section-nav__link:hover,
+  .section-nav__link.is-current {
+    color: var(--color-ink);
+  }
+
+  .section-nav__link.is-current .section-nav__dot {
+    width: var(--sp-4);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .section-nav,
+    .section-nav__dot,
+    .section-nav__label,
+    .section-nav__top {
+      transition: none;
+    }
+  }
+
+  /*
+    1200 以下藏起來：內容欄兩側的留白不夠放這條鐵軌，硬擺會蓋到內容。
+    這是輔助navigation，不是唯一的到達方式——藏起來不影響任何人讀完整頁。
+  */
+  @media (max-width: 1199px) {
+    .section-nav {
+      display: none;
+    }
+  }
+</style>

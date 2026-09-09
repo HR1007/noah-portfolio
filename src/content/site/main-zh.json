@@ -16,6 +16,7 @@
       }
     ],
     "backLabel": "返回上一頁",
+    "toTop": "回到頂端",
     "status": {
       "city": "台南",
       "latitude": 22.9908,
@@ -30,6 +31,10 @@
         "thunder": "雷雨"
       }
     }
+  },
+  "readMore": {
+    "more": "閱讀更多",
+    "less": "收合"
   },
   "viewer": {
     "close": "關閉",

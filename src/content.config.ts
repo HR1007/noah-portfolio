@@ -226,6 +226,8 @@ const site = defineCollection({
       links: z.array(z.object({ label: z.string(), href: z.string() })),
       // 案例頁／相簿頁左上角的返回鍵文案
       backLabel: z.string(),
+      // 案例頁側邊章節導覽最上方的「回到頂端」
+      toTop: z.string(),
       /*
         導覽列右側的「此刻」：設計師所在地的時間與天氣。
 
@@ -248,6 +250,8 @@ const site = defineCollection({
         }),
       }),
     }),
+    /* 長段落收合的按鈕文案 */
+    readMore: z.object({ more: z.string(), less: z.string() }),
     /* 全螢幕圖片檢視的操作文案 */
     viewer: z.object({
       close: z.string(),

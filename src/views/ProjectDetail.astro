@@ -19,6 +19,7 @@ import Flow from '../components/project/Flow.astro';
 import ProjectQuote from '../components/project/ProjectQuote.astro';
 import { getProjectImageMap } from '../lib/media';
 import { t, type LocalizedText } from '../lib/i18n';
+import SectionNav from '../components/project/SectionNav.astro';
 import { assignImages } from '../lib/image-slots.mjs';
 
 interface Props {
@@ -58,6 +59,19 @@ const trColumns = (
 const trThemes = (themes: { title: LocalizedText; description?: LocalizedText }[]) =>
   themes.map((x) => ({ ...x, title: trReq(x.title), description: tr(x.description) }));
 
+/*
+  側邊章節導覽的項目。優先用 eyebrow（那是這一段的分類名，最短也最像目錄），
+  沒有就退回 heading；兩個都沒有的段落（例如純圖的 deviceShowcase）不列入——
+  目錄裡出現一個沒有名字的項目，比少一個項目更糟。
+*/
+const navItems = sections
+  .map((section, i) => {
+    const label = tr((section as { eyebrow?: LocalizedText }).eyebrow)
+      ?? tr((section as { heading?: LocalizedText }).heading);
+    return label ? { id: `sec-${i}`, label } : null;
+  })
+  .filter((x): x is { id: string; label: string } => x !== null);
+
 const { Content } = await render(project);
 ---
 
@@ -76,9 +90,17 @@ const { Content } = await render(project);
         />
 
         {sections.map((section, sectionIndex) => {
+          /*
+            包一層只帶 id 的容器當錨點。不直接在十一個段落元件上各加一個 id prop，
+            那要改十一個檔案，而且 id 是「這一頁怎麼被導覽」的事，不是元件自己的事。
+            這層 div 沒有樣式，不會動到段落元件自己的版面。
+          */
+          const anchor = (node: unknown) => (
+            <div class="project-anchor" id={`sec-${sectionIndex}`}>{node}</div>
+          );
           switch (section.type) {
             case 'textSection':
-              return (
+              return anchor(
                 <TextSection
                   eyebrow={tr(section.eyebrow)}
                   heading={trReq(section.heading)}
@@ -88,7 +110,7 @@ const { Content } = await render(project);
                 />
               );
             case 'deviceShowcase':
-              return <DeviceShowcase
+              return anchor(<DeviceShowcase
                   image={imagesFor(sectionIndex)[0]}
                   ratio={section.ratio}
                   alt={trReq(section.alt)}
@@ -96,9 +118,9 @@ const { Content } = await render(project);
                   heading={tr(section.heading)}
                   ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
-                />;
+                />);
             case 'experienceDemo':
-              return (
+              return anchor(
                 <ExperienceDemo
                   eyebrow={tr(section.eyebrow)}
                   heading={trReq(section.heading)}
@@ -112,7 +134,7 @@ const { Content } = await render(project);
                 />
               );
             case 'featureSplit':
-              return (
+              return anchor(
                 <FeatureSplit
                   eyebrow={tr(section.eyebrow)}
                   heading={trReq(section.heading)}
@@ -126,7 +148,7 @@ const { Content } = await render(project);
                 />
               );
             case 'featureGrid':
-              return (
+              return anchor(
                 <FeatureGrid
                   eyebrow={tr(section.eyebrow)}
                   heading={tr(section.heading)}
@@ -137,7 +159,7 @@ const { Content } = await render(project);
                 />
               );
             case 'imageRow':
-              return (
+              return anchor(
                 <ImageRow
                   rows={trAlt(section.images)}
                   images={imagesFor(sectionIndex)}
@@ -148,7 +170,7 @@ const { Content } = await render(project);
                 />
               );
             case 'illustrationGrid':
-              return (
+              return anchor(
                 <IllustrationGrid
                   eyebrow={tr(section.eyebrow)}
                   heading={trReq(section.heading)}
@@ -160,7 +182,7 @@ const { Content } = await render(project);
                 />
               );
             case 'researchFramework':
-              return (
+              return anchor(
                 <ResearchFramework
                   eyebrow={tr(section.eyebrow)}
                   heading={trReq(section.heading)}
@@ -174,7 +196,7 @@ const { Content } = await render(project);
                 />
               );
             case 'persona':
-              return (
+              return anchor(
                 <Persona
                   eyebrow={tr(section.eyebrow)}
                   heading={trReq(section.heading)}
@@ -185,7 +207,7 @@ const { Content } = await render(project);
                 />
               );
             case 'designThemes':
-              return (
+              return anchor(
                 <DesignThemes
                   eyebrow={tr(section.eyebrow)}
                   heading={trReq(section.heading)}
@@ -197,7 +219,7 @@ const { Content } = await render(project);
                 />
               );
             case 'flow':
-              return (
+              return anchor(
                 <Flow
                   eyebrow={tr(section.eyebrow)}
                   heading={trReq(section.heading)}
@@ -215,6 +237,7 @@ const { Content } = await render(project);
         })}
 
         <ProjectQuote quote={projectQuote.quote} name={projectQuote.name} tagline={projectQuote.tagline} />
+        <SectionNav items={navItems} toTopLabel={site!.data.nav.toTop} />
       </Fragment>
     ) : (
       <Fragment>
@@ -236,6 +259,14 @@ const { Content } = await render(project);
 </BaseLayout>
 
 <style>
+  /*
+    章節錨點。scroll-margin-top 是必要的——導覽列是 sticky 的，
+    不留這段空白，跳過去之後段落標題會被導覽列蓋住。
+  */
+  .project-anchor {
+    scroll-margin-top: var(--sp-7);
+  }
+
   /* 返回鍵是全域導覽元件，對齊 Nav 的滿版 padding，而非各區塊寬度不一的內容欄 */
   .project-back {
     padding: var(--sp-3) var(--sp-3) 0;
