@@ -51,8 +51,20 @@ sections:
       from colors to typography, everything works together.
     themes:
       - title: Display
+        description: >-
+          Paper, surface and three inks for the light side; a violet accent and
+          a night canvas for the dark. Four radii and a 6–24 spacing scale keep
+          every panel on the same rhythm.
       - title: Space Grotesk
+        description: >-
+          Space Grotesk takes display, headings and numerals. Inter carries
+          every line of interface copy, so its neutral tone lets the geometric
+          numerals do the expressive work.
       - title: Component
+        description: >-
+          The control kit in one sheet: buttons, ratio presets, the count
+          slider, six star shapes and an eyedropper palette — each specified
+          with the states it actually ships with.
     direction: vertical
   - type: flow
     eyebrow: FLOW
