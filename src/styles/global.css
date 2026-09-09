@@ -7,6 +7,7 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
 }
 
 h1,
@@ -14,7 +15,8 @@ h2,
 h3,
 h4 {
   font-family: var(--font-sans);
-  font-weight: var(--font-weight-bold);
+  /* 標題靠字級拉層級，不靠字重壓過去——字重留在 medium，整體看起來才透氣 */
+  font-weight: var(--font-weight-medium);
   line-height: 1.1;
 }
 

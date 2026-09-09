@@ -17,7 +17,13 @@
   --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
   /* [需確認] 是否需要中文 fallback（Noto Sans TC）— 目前內容全英文，尚未確認 */
 
-  /* 字重 */
+  /*
+    字重。原本階梯最輕只到 500，所以整站看起來偏厚——內文沒有 regular 可用，
+    只能落在 medium 或更重。補上 light 與 regular 之後，內文回到 400，
+    標題靠字級拉層級而不是靠字重壓過去。
+  */
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
@@ -106,6 +112,14 @@
     高度而變窄，同一段落裡的圖看起來就寬窄不一。
   */
   --media-stack-max-height: 900px;
+
+  /*
+    互動的過場。全站的 hover／focus／active 共用同一組時間與曲線，
+    不各自訂——不同元件用不同節奏，滑過整頁時會覺得每個東西脾氣不一樣。
+    160ms 是「感覺得到但不用等」的區間；曲線尾段慢，收得比較軟。
+  */
+  --motion-fast: 160ms;
+  --motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
 
   /*
     進場動畫（Reveal）。對應 Figma 的 Trigger: In view / Enter: Slide in top：

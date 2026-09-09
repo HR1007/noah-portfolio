@@ -48,7 +48,8 @@ const currentPath = Astro.url.pathname;
   }
 
   .nav__logo {
-    font-weight: var(--font-weight-black);
+    /* 100px 的字標用 light：這個尺寸下字重稍微一重就顯得笨，靠字級撐存在感就夠 */
+    font-weight: var(--font-weight-light);
     font-size: var(--font-size-hero);
     line-height: 1;
     letter-spacing: -0.02em;
@@ -73,10 +74,41 @@ const currentPath = Astro.url.pathname;
     color: var(--color-ink);
   }
 
+  /*
+    底線用 ::after 畫並以 scaleX 展開，而不是切換 text-decoration——
+    後者只能瞬間出現或消失，沒有中間狀態可以做過場。
+  */
+  .nav__link {
+    position: relative;
+  }
+
+  .nav__link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--sp-1) / -2);
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--motion-fast) var(--motion-ease);
+  }
+
+  .nav__link:hover::after {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav__link::after {
+      transition: none;
+    }
+  }
+
   .nav__link[aria-current='page'] {
     text-decoration: underline;
     text-underline-offset: calc(var(--sp-1) / 2);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-medium);
   }
 
   @media (max-width: 1199px) {
