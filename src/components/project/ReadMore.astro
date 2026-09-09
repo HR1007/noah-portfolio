@@ -1,0 +1,118 @@
+---
+/*
+  長段落的收合。只用在真正是大牆文字的段落（textSection 的起源段、
+  researchFramework 的研究方法段），不全站套用——案例頁的讀者是來讀那些字的，
+  把兩三句的段落也收起來只是多一次點擊。
+
+  文字完整留在 DOM 裡，只用 CSS 收合高度：SEO 與螢幕閱讀器讀到的都是全文，
+  收起來的只是視覺上的高度。
+*/
+import { getEntry } from 'astro:content';
+
+interface Props {
+  /** 超過幾行才收合。低於這個行數的段落不會出現按鈕 */
+  lines?: number;
+}
+
+const { lines = 6 } = Astro.props;
+const locale = Astro.currentLocale ?? 'en';
+const site = await getEntry('site', `main-${locale}`);
+const { more, less } = site!.data.readMore;
+---
+
+<div class="read-more" data-read-more style={`--lines: ${lines}`}>
+  <div class="read-more__body" data-read-more-body>
+    <slot />
+  </div>
+  {/* 按鈕預設藏著，量完真的有溢出才顯示 */}
+  <button class="read-more__btn" data-read-more-btn type="button" hidden data-more={more} data-less={less}>
+    <span data-read-more-label>{more}</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-read-more]').forEach((box) => {
+    const body = box.querySelector<HTMLElement>('[data-read-more-body]');
+    const btn = box.querySelector<HTMLButtonElement>('[data-read-more-btn]');
+    const label = box.querySelector<HTMLElement>('[data-read-more-label]');
+    if (!body || !btn || !label) return;
+
+    /*
+      只有真的被截到才給按鈕。短段落也掛一顆「閱讀更多」，點下去什麼都沒發生，
+      比沒有按鈕更糟。字型載入會改變行高，所以量測要等 fonts.ready。
+    */
+    const measure = () => {
+      const clipped = body.scrollHeight > body.clientHeight + 1;
+      btn.hidden = !clipped && !box.classList.contains('is-open');
+    };
+
+    (document.fonts?.ready ?? Promise.resolve()).then(measure);
+    window.addEventListener('resize', measure);
+
+    btn.addEventListener('click', () => {
+      const open = box.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', String(open));
+      label.textContent = open ? btn.dataset.less! : btn.dataset.more!;
+    });
+  });
+</script>
+
+<style>
+  .read-more__body {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--lines);
+    line-clamp: var(--lines);
+    overflow: hidden;
+  }
+
+  .read-more.is-open .read-more__body {
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    overflow: visible;
+  }
+
+  /* 按鈕靠右下角，跟著段落的右緣走 */
+  .read-more__btn {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--sp-1) / 2);
+    margin-left: auto;
+    margin-top: var(--sp-2);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-muted);
+    font-size: var(--font-size-label);
+    font-family: inherit;
+    cursor: pointer;
+    transition: color var(--motion-fast) var(--motion-ease);
+  }
+
+  .read-more__btn:hover {
+    color: var(--color-ink);
+  }
+
+  .read-more__btn svg {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform var(--motion-fast) var(--motion-ease);
+  }
+
+  .read-more.is-open .read-more__btn svg {
+    transform: rotate(180deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .read-more__btn,
+    .read-more__btn svg {
+      transition: none;
+    }
+  }
+</style>

@@ -2,6 +2,7 @@
 import type { ImageMetadata } from 'astro';
 import Media from '../Media.astro';
 import SectionCta from './SectionCta.astro';
+import ReadMore from './ReadMore.astro';
 
 interface Props {
   eyebrow?: string;
@@ -22,7 +23,10 @@ const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked', cta
   <div class="research-framework__intro">
     {eyebrow && <p class="research-framework__eyebrow">{eyebrow}</p>}
     <h2 class="research-framework__heading">{heading}</h2>
-    {paragraphs.map((paragraph) => <p class="research-framework__body">{paragraph}</p>)}
+    {/* 研究方法的段落同樣是大牆文字，收合處理 */}
+    <ReadMore>
+      {paragraphs.map((paragraph) => <p class="research-framework__body">{paragraph}</p>)}
+    </ReadMore>
   </div>
   <SectionCta label={ctaLabel} href={ctaHref} />
   <div class="research-framework__media">
