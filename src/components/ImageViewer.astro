@@ -202,6 +202,15 @@ const { close, prev, next, hint } = site!.data.viewer;
 </script>
 
 <style>
+  /*
+    這一條非寫不可：下面的 .viewer 設了 display: flex，而作者樣式的優先度高於
+    瀏覽器預設樣式，所以 hidden 屬性帶來的 display: none 會被蓋掉——檢視器會
+    永遠顯示，整片暗底蓋住全站。凡是對帶 hidden 的元素設 display 都要補這一條。
+  */
+  .viewer[hidden] {
+    display: none;
+  }
+
   .viewer {
     position: fixed;
     inset: 0;
