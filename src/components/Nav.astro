@@ -27,9 +27,11 @@ const currentPath = Astro.url.pathname;
         })
       }
     </ul>
-    <NavStatus />
-    <LangToggle />
-    <ThemeToggle />
+    <div class="nav__utils">
+      <NavStatus />
+      <LangToggle />
+      <ThemeToggle />
+    </div>
   </div>
 </nav>
 
@@ -56,10 +58,26 @@ const currentPath = Astro.url.pathname;
     color: var(--color-ink);
   }
 
+  /*
+    導覽列右側分兩組：連結一組、工具（時間天氣／語言／主題）一組。
+
+    原本全部平鋪、gap 一律 --sp-3，數值上是一致的，但看起來不是——EN 膠囊與
+    主題鈕自己有內距與外框，文字離自己的邊界還有 16px，所以「連結到連結」是
+    24px、「圖示到 EN 的字」卻變成 40px。同一個 gap 讀起來寬窄不一。
+
+    改成各組內部維持一致的節奏、組與組之間才拉開，間距就變成有意義的分隔，
+    而不是一串看起來忽寬忽窄的空白。
+  */
   .nav__right {
     display: flex;
     align-items: center;
-    gap: var(--sp-3);
+    gap: var(--sp-5);
+  }
+
+  .nav__utils {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
   }
 
   .nav__links {
@@ -125,6 +143,15 @@ const currentPath = Astro.url.pathname;
     .nav__links {
       gap: var(--sp-2);
       flex-wrap: wrap;
+    }
+
+    /* 手機上導覽列很窄，兩組之間不需要那麼大的分隔 */
+    .nav__right {
+      gap: var(--sp-3);
+    }
+
+    .nav__utils {
+      gap: var(--sp-1);
     }
 
     .nav__link {
