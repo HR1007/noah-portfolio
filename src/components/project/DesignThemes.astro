@@ -5,7 +5,9 @@ import SectionCta from './SectionCta.astro';
 
 interface Theme {
   title: string;
-  description: string;
+  // schema 是 z.string().optional()，這裡跟著選填。
+  // 元件也已經處理沒填的情況：沒有 description 就只出標題。
+  description?: string;
 }
 
 interface Props {

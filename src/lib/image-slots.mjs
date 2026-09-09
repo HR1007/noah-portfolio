@@ -409,9 +409,22 @@ export function getImageSlots(data) {
  * @param {any} data
  * @param {Record<number, any>} images 檔名編號對照表（00.png → 0）
  */
+/**
+ * 把圖片依版位分派出去：hero 單獨一張，其餘依所屬段落分組。
+ *
+ * 這裡的 JSDoc 是給型別檢查看的（執行期不受影響）。少了它，bySection 會被推論成
+ * 空物件 {}，呼叫端用 bySection[i] 取值就變成隱含 any，錯字或型別不合都不會被擋下。
+ *
+ * @template T
+ * @param {any} data 案例的 frontmatter
+ * @param {Record<number, T>} images 版位編號對圖片的對照表
+ * @returns {{ hero: T | undefined, bySection: Record<number, T[]> }}
+ */
 export function assignImages(data, images) {
   const slots = getImageSlots(data);
+  /** @type {Record<number, T[]>} */
   const bySection = {};
+  /** @type {T | undefined} */
   let hero;
 
   slots.forEach((slot) => {
