@@ -18,6 +18,21 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+  hidden 屬性必須真的隱藏。
+
+  瀏覽器預設樣式給 [hidden] 的 display: none 優先度最低，任何元件只要對自己設了
+  display（flex、grid、block…）就會蓋過它，hidden 就形同失效。這個站上已經因此
+  壞過三次：圖片檢視器整片蓋住畫面、「閱讀更多」在沒被截斷時照樣顯示、
+  天氣區塊在資料還沒回來前就佔位。
+
+  用 !important 是這裡少數正當的場合——hidden 的語意就是「不要顯示」，
+  沒有任何元件的 display 該贏過它。有了這條就不必在每個元件補一次 [hidden] 規則。
+*/
+[hidden] {
+  display: none !important;
+}
+
 img,
 picture,
 svg,

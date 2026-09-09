@@ -72,12 +72,25 @@ const currentPath = Astro.url.pathname;
     display: flex;
     align-items: center;
     gap: var(--sp-5);
+    /*
+      兩組都不換行。先前沒鎖，視窗一窄「中文」與主題鈕就會被擠到第二行，
+      跟上一行的時間天氣對不齊，導覽列看起來是散的。
+      空間不夠時讓連結那一組先縮（min-width: 0 才縮得動），工具組維持完整。
+    */
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  .nav__links {
+    min-width: 0;
   }
 
   .nav__utils {
     display: flex;
     align-items: center;
     gap: var(--sp-2);
+    flex-wrap: nowrap;
+    flex: none;
   }
 
   .nav__links {

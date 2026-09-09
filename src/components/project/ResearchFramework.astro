@@ -104,11 +104,5 @@ const { eyebrow, heading, paragraphs, image, ratio, alt, layout = 'stacked', cta
     line-height: 1.7;
     color: var(--color-muted);
     text-align: justify;
-    /*
-      收窄文字本身、靠左，不用 margin auto——置中會讓左緣又跑掉，等於白對齊。
-      這一行是上面那段註解一直在描述、但實際上從來沒有寫進去的東西：
-      段落原本攤在整個 1120px 欄寬上，中文一行五十幾個字，讀起來要一直找行首。
-    */
-    max-width: var(--text-measure);
   }
 </style>

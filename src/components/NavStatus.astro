@@ -223,8 +223,11 @@ const ICONS = ['clear', 'cloudy', 'overcast', 'fog', 'rain', 'snow', 'thunder'] 
     white-space: nowrap;
   }
 
-  /* 手機上導覽列已經很擠，這一塊是附加資訊，優先讓位 */
-  @media (max-width: 767px) {
+  /*
+    1199 以下就收起來。這一塊是附加資訊，而導覽列在那個寬度已經開始擠——
+    等到 767 才讓位太晚，中間那段會先把工具組擠到第二行。
+  */
+  @media (max-width: 1199px) {
     .nav-status {
       display: none;
     }
