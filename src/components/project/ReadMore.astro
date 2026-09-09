@@ -14,7 +14,12 @@ interface Props {
   lines?: number;
 }
 
-const { lines = 6 } = Astro.props;
+/*
+  預設 5 行。段落文字寬度是 65ch，中文一行約 32 字、英文約 65 字——
+  5 行的門檻剛好讓長段落（osce 的 203 字中文約 6.3 行）被截到，
+  短段落（star-overlay 的 88 字約 2.8 行）則不會冒出一顆沒有作用的按鈕。
+*/
+const { lines = 5 } = Astro.props;
 const locale = Astro.currentLocale ?? 'en';
 const site = await getEntry('site', `main-${locale}`);
 const { more, less } = site!.data.readMore;
@@ -43,8 +48,11 @@ const { more, less } = site!.data.readMore;
       比沒有按鈕更糟。字型載入會改變行高，所以量測要等 fonts.ready。
     */
     const measure = () => {
+      // 展開狀態下量不出截斷（max-height 已解除），維持現狀不要把按鈕收掉
+      if (box.classList.contains('is-open')) return;
       const clipped = body.scrollHeight > body.clientHeight + 1;
-      btn.hidden = !clipped && !box.classList.contains('is-open');
+      box.classList.toggle('is-clipped', clipped);
+      btn.hidden = !clipped;
     };
 
     (document.fonts?.ready ?? Promise.resolve()).then(measure);
@@ -59,18 +67,41 @@ const { more, less } = site!.data.readMore;
 </script>
 
 <style>
+  /*
+    不用 -webkit-line-clamp。它在 -webkit-box 裡是以「子元素」為單位計算，
+    不是以「行」——段落包在 <p> 裡，clamp: 6 等於「顯示 6 個 <p>」，
+    而這兩種段落各只有一兩個 <p>，等於完全沒有截到，這是先前的 bug。
+
+    改成直接算高度：行高 × 行數。font-size 明寫在這裡，em 才有穩定的基準，
+    不會因為外層某天換了字級而算錯。
+  */
   .read-more__body {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: var(--lines);
-    line-clamp: var(--lines);
+    --line-height: 1.7;
+    position: relative;
+    font-size: var(--font-size-body);
+    line-height: var(--line-height);
+    max-height: calc(var(--lines) * var(--line-height) * 1em);
     overflow: hidden;
   }
 
   .read-more.is-open .read-more__body {
-    -webkit-line-clamp: unset;
-    line-clamp: unset;
+    max-height: none;
     overflow: visible;
+  }
+
+  /*
+    截斷處的漸層。沒有它的話文字是被硬切一刀，看起來像壞掉而不是「還有更多」。
+    只在真的被截到時出現（is-clipped 由 JS 量完才加），展開後移除。
+  */
+  .read-more.is-clipped:not(.is-open) .read-more__body::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: calc(var(--line-height) * 2em);
+    background: linear-gradient(transparent, var(--color-bg));
+    pointer-events: none;
   }
 
   /* 按鈕靠右下角，跟著段落的右緣走 */
