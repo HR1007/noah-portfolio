@@ -26,9 +26,23 @@ const isExternal = /^https?:\/\//.test(href);
     display: inline-flex;
     align-items: center;
     font-size: var(--font-size-label);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-medium);
     padding: var(--sp-2) var(--sp-3);
     border-radius: var(--radius);
+    transition:
+      background var(--motion-fast) var(--motion-ease),
+      color var(--motion-fast) var(--motion-ease),
+      border-color var(--motion-fast) var(--motion-ease),
+      transform var(--motion-fast) var(--motion-ease);
+  }
+
+  /* 抬起一點點就夠。位移大一格就會變成「彈跳」，那不是這個站的語氣 */
+  .button:hover {
+    transform: translateY(-1px);
+  }
+
+  .button:active {
+    transform: translateY(0);
   }
 
   .button--primary {
@@ -36,9 +50,27 @@ const isExternal = /^https?:\/\//.test(href);
     color: var(--color-bg);
   }
 
+  .button--primary:hover {
+    opacity: 0.88;
+  }
+
   .button--secondary {
     background: transparent;
     color: var(--color-ink);
     border: 1px solid var(--color-border);
+  }
+
+  .button--secondary:hover {
+    border-color: currentColor;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button {
+      transition: none;
+    }
+
+    .button:hover {
+      transform: none;
+    }
   }
 </style>
