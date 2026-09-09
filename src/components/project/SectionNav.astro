@@ -199,17 +199,27 @@ const { items, toTopLabel } = Astro.props;
   */
   .section-nav__label {
     max-width: 0;
+    padding: 0;
     overflow: hidden;
     white-space: nowrap;
     opacity: 0;
+    /*
+      標籤要有自己的底色。這條鐵軌浮在內容之上，底下可能正好是一張深色的圖，
+      沒有底的話文字會整個埋進去。padding 跟著 max-width 一起過場，
+      收起來時才不會留下一塊空的色塊。
+    */
+    background: var(--color-surface);
+    border-radius: var(--radius-pill);
     transition:
       max-width var(--motion-fast) var(--motion-ease),
+      padding var(--motion-fast) var(--motion-ease),
       opacity var(--motion-fast) var(--motion-ease);
   }
 
   .section-nav:hover .section-nav__label,
   .section-nav__link:focus-visible .section-nav__label {
     max-width: var(--sp-9);
+    padding: calc(var(--sp-1) / 2) var(--sp-2);
     opacity: 1;
   }
 
@@ -233,7 +243,7 @@ const { items, toTopLabel } = Astro.props;
 
   /*
     1200 以下藏起來：內容欄兩側的留白不夠放這條鐵軌，硬擺會蓋到內容。
-    這是輔助navigation，不是唯一的到達方式——藏起來不影響任何人讀完整頁。
+    這是輔助性的導覽，不是唯一的到達方式——藏起來不影響任何人讀完整頁。
   */
   @media (max-width: 1199px) {
     .section-nav {

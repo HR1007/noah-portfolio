@@ -263,13 +263,14 @@ const { Content } = await render(project);
     章節錨點。scroll-margin-top 是必要的——導覽列是 sticky 的，
     不留這段空白，跳過去之後段落標題會被導覽列蓋住。
   */
-  .project-anchor {
-    scroll-margin-top: var(--sp-7);
+  .project-back {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: var(--sp-3) var(--content-gutter) 0;
   }
 
-  /* 返回鍵是全域導覽元件，對齊 Nav 的滿版 padding，而非各區塊寬度不一的內容欄 */
-  .project-back {
-    padding: var(--sp-3) var(--sp-3) 0;
+  .project-anchor {
+    scroll-margin-top: var(--sp-7);
   }
 
   .project-hero,

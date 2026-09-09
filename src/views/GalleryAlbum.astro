@@ -43,7 +43,9 @@ const images = getGalleryAlbumImages(slug);
 <style>
   /* 返回鍵是全域導覽元件，對齊 Nav 的滿版 padding，跟案例頁同一條線 */
   .gallery-album__back {
-    padding: var(--sp-3) var(--sp-3) 0;
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: var(--sp-3) var(--content-gutter) 0;
   }
 
   .gallery-album {
