@@ -67,20 +67,18 @@ const blocks = ARROW.flatMap((cells, row) =>
     display: inline-flex;
     align-items: center;
     gap: var(--sp-2);
+    /*
+      保留內距讓點擊範圍夠大，用負的左邊距把文字的視覺左緣拉回容器邊界——
+      不然按鈕看起來會比下方的內容往右縮一格。
+      沒有背景色：狀態一律由底線動畫表達，跟導覽列同一套語言。
+    */
     padding: var(--sp-1) var(--sp-2);
     margin-left: calc(var(--sp-2) * -1);
-    border-radius: var(--radius-pill);
     color: var(--color-ink);
     font-size: var(--font-size-label);
     font-weight: var(--font-weight-medium);
-    background: transparent;
-    transition: background var(--motion-fast) var(--motion-ease);
   }
 
-  .back-link:hover,
-  .back-link:focus-visible {
-    background: var(--color-surface);
-  }
 
   /* 箭頭與殘影共用同一個定位框，殘影疊在箭頭原本的位置上 */
   .back-link__sprite {
@@ -156,7 +154,12 @@ const blocks = ARROW.flatMap((cells, row) =>
   /* 文字讓出一點空間，底線由右往左收，方向與「返回」一致 */
   .back-link__label {
     position: relative;
-    transition: transform 260ms cubic-bezier(0.2, 0.9, 0.3, 1);
+    /*
+      行高設 1。預設行高（約 1.2）會在文字下方留出降部空間，flex 置中的是那個
+      行框而不是字身，結果文字看起來比箭頭低一截。貼齊字身之後兩者才真的對齊。
+    */
+    line-height: 1;
+    transition: transform var(--motion-fast) var(--motion-ease);
   }
 
   .back-link__label::after {
@@ -173,7 +176,8 @@ const blocks = ARROW.flatMap((cells, row) =>
     background: currentColor;
     transform: scaleX(0);
     transform-origin: right;
-    transition: transform 300ms cubic-bezier(0.2, 0.9, 0.3, 1);
+    /* 時間與曲線跟全站一致；方向維持由右往左，那跟「返回」的語意一致 */
+    transition: transform var(--motion-fast) var(--motion-ease);
   }
 
   .back-link:hover .back-link__label::after,
