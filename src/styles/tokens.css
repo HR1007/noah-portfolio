@@ -13,9 +13,23 @@
   /* [需確認] 沒有實測到明確的 hairline border 色，暫用 ink 的低透明度技術性替代，等設計師提供正式數值 */
   --color-border: rgba(51, 51, 51, 0.12);
 
-  /* 字體 */
-  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
-  /* [需確認] 是否需要中文 fallback（Noto Sans TC）— 目前內容全英文，尚未確認 */
+  /*
+    字體。字型的 fallback 是「逐字」生效的：Inter 沒有漢字，所以中文會自動往後找到
+    第一個有該字的字體，英數則留在 Inter。一組堆疊就能同時管好兩種語言。
+
+    中文用各平台的系統字體，不下載網頁字型。理由是站上的中文有 795 個不重複漢字：
+    完整的 Noto Sans TC 三個字重約 2–4MB，作品集不該為字體付這個代價；子集化雖然
+    能壓到 300–600KB，但內容是後台可編輯的——之後在後台打了不在子集裡的字，就會
+    靜默掉回系統字體，同一句話混兩種字型且不會有任何警告。那種失效比不一致更糟。
+
+    [需確認] 代價：各平台的中文長相不同，而且字重支援不一。
+    PingFang TC（Apple）有 100–600，本站用到的 300／400／500 都支援；
+    微軟正黑體（Windows）只有 300／400／700，500 會退到 400——Windows 上標題與
+    內文的字重會一樣，層級改由字級承擔。要完全一致就只能付網頁字型的代價。
+  */
+  --font-sans:
+    'Inter Variable', 'Inter', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC',
+    ui-sans-serif, system-ui, sans-serif;
 
   /*
     字重。原本階梯最輕只到 500，所以整站看起來偏厚——內文沒有 regular 可用，
