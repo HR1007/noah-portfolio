@@ -41,8 +41,14 @@ const { close, prev, next, hint } = site!.data.viewer;
   const spot = document.querySelector<HTMLElement>('[data-viewer-spot]');
 
   if (root && img && spot) {
-    // 只收案例頁與相簿裡的內容圖。導覽列圖示、佔位框都不該點開。
-    const targets = () => Array.from(document.querySelectorAll<HTMLImageElement>('main .media img'));
+    /*
+      只收內容圖，導覽列圖示與佔位框都不該點開。
+
+      .media 涵蓋案例頁；相簿的照片牆與跑馬燈沒有經過 Media 元件，所以要另外列出來——
+      先前漏了它們，相簿裡的照片點下去完全沒有反應。
+    */
+    const SOURCES = 'main .media img, main .photo-grid img, main .photo-marquee img';
+    const targets = () => Array.from(document.querySelectorAll<HTMLImageElement>(SOURCES));
 
     let list: HTMLImageElement[] = [];
     let at = 0;
@@ -113,7 +119,7 @@ const { close, prev, next, hint } = site!.data.viewer;
 
     // ---- 開啟 ----
     document.addEventListener('click', (e) => {
-      const el = (e.target as HTMLElement | null)?.closest?.('main .media img');
+      const el = (e.target as HTMLElement | null)?.closest?.(SOURCES);
       if (el) open(el as HTMLImageElement);
     });
 
