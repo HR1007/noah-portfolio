@@ -17,12 +17,13 @@ import sitemap from '@astrojs/sitemap';
 const devImageNoCache = {
   name: 'dev-image-no-cache',
   apply: 'serve',
+  /** @param {import('vite').ViteDevServer} server */
   configureServer(server) {
-    server.middlewares.use((req, res, next) => {
+    server.middlewares.use((/** @type {any} */ req, /** @type {any} */ res, /** @type {any} */ next) => {
       // 直接設 header 會被 Astro 的圖片處理器後蓋掉，所以改成攔截 setHeader 本身
       if (req.url?.startsWith('/_image')) {
         const original = res.setHeader.bind(res);
-        res.setHeader = (name, value) =>
+        res.setHeader = (/** @type {string} */ name, /** @type {any} */ value) =>
           original(name, String(name).toLowerCase() === 'cache-control' ? 'no-store, must-revalidate' : value);
       }
       next();
