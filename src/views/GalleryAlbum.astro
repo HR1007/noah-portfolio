@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionIntro from '../components/SectionIntro.astro';
 import Media from '../components/Media.astro';
 import BackLink from '../components/BackLink.astro';
-import PhotoGrid from '../components/gallery/PhotoGrid.astro';
+import PhotoMarquee from '../components/gallery/PhotoMarquee.astro';
 import { getGalleryImage, getGalleryAlbumImages } from '../lib/media';
 
 interface Props {
@@ -35,7 +35,7 @@ const images = getGalleryAlbumImages(slug);
     </div>
 
     <div data-reveal>
-      <PhotoGrid images={images} labelPrefix={title} />
+      <PhotoMarquee images={images} labelPrefix={title} />
     </div>
   </section>
 </BaseLayout>

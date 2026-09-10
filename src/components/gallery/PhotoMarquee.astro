@@ -1,0 +1,151 @@
+---
+/*
+  相簿內頁的直向跑馬燈：照片分成幾欄持續往上流動，滑鼠停在牆面上就整片停住，
+  讓人可以好好看那一張。
+
+  為什麼不用 JS 驅動位移：那要每一幀改 transform，長長一牆照片很容易掉幀。
+  純 CSS animation 交給合成執行緒跑，而且「暫停」只是 animation-play-state，
+  不需要記住進度、也不會在恢復時跳一下。
+
+  每一欄的內容重複兩次，位移到 -50% 時正好接回起點，所以看起來是無縫的。
+  項目之間用 margin-bottom 而不是 gap——gap 在頭尾的數量不對稱，
+  -50% 就會剛好差一個間距而出現接縫。
+*/
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Placeholder from '../Placeholder.astro';
+
+interface Props {
+  images: (ImageMetadata | undefined)[];
+  labelPrefix: string;
+  /** 沒有照片時顯示幾格佔位框 */
+  placeholderCount?: number;
+}
+
+const { images, labelPrefix, placeholderCount = 9 } = Astro.props;
+
+const items = images.length > 0
+  ? images.map((image, i) => ({ image, alt: `${labelPrefix} ${String(i + 1).padStart(2, '0')}` }))
+  : Array.from({ length: placeholderCount }, (_, i) => ({
+      image: undefined,
+      alt: `${labelPrefix} ${String(i + 1).padStart(2, '0')}`,
+    }));
+
+// 輪流分配到三欄，而不是切成連續三段：同一欄裡才不會整排都是直幅或整排都是橫幅
+const COLUMNS = 3;
+const columns: (typeof items)[] = Array.from({ length: COLUMNS }, () => []);
+items.forEach((item, i) => columns[i % COLUMNS].push(item));
+
+/*
+  每一欄的速度要一致，但欄高不一定一樣（照片比例不同）。用「長寬比的總和」當
+  內容高度的代理值——欄寬相同，所以高度就正比於比例總和——再乘上一個係數換成秒數。
+  這樣三欄看起來是同一個速度在流，而不是短的那欄跑得特別快。
+*/
+const duration = (column: typeof items) => {
+  const ratio = column.reduce(
+    (sum, item) => sum + (item.image ? item.image.height / item.image.width : 4 / 3),
+    0
+  );
+  return `${(ratio * 9).toFixed(1)}s`;
+};
+---
+
+<div class="photo-marquee" data-photo-marquee>
+  {
+    columns.map((column) => (
+      <div class="photo-marquee__col">
+        <div class="photo-marquee__track" style={`--duration: ${duration(column)}`}>
+          {/*
+            同一份內容排兩次。第二份對讀螢幕軟體是重複的雜訊，所以標成 aria-hidden，
+            視覺上則是接回起點用的那一半。
+          */}
+          {[false, true].map((isClone) =>
+            column.map((item) => (
+              <figure class="photo-marquee__item" aria-hidden={isClone ? 'true' : undefined}>
+                {item.image ? (
+                  <Image src={item.image} alt={isClone ? '' : item.alt} loading="lazy" />
+                ) : (
+                  <Placeholder ratio="3/4" label={item.alt} />
+                )}
+              </figure>
+            ))
+          )}
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .photo-marquee {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-2);
+    /*
+      固定高度才有「流動」可言。用 vh 而不是固定 px：這面牆的意義是佔滿一個視野，
+      在筆電與大螢幕上都該是差不多的比例。
+    */
+    height: 82vh;
+    overflow: hidden;
+    /* 上下淡出，照片才不是被硬切一刀 */
+    mask-image: linear-gradient(transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .photo-marquee__track {
+    display: flex;
+    flex-direction: column;
+    animation: photo-marquee-up var(--duration) linear infinite;
+    will-change: transform;
+  }
+
+  /* 滑到整片牆就停住——停的是動畫本身，不需要記進度，恢復時也不會跳一下 */
+  .photo-marquee:hover .photo-marquee__track,
+  .photo-marquee:focus-within .photo-marquee__track {
+    animation-play-state: paused;
+  }
+
+  @keyframes photo-marquee-up {
+    to {
+      transform: translateY(-50%);
+    }
+  }
+
+  .photo-marquee__item {
+    margin: 0 0 var(--sp-2);
+  }
+
+  .photo-marquee__item :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    cursor: zoom-in;
+  }
+
+  @media (max-width: 1199px) {
+    .photo-marquee {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /*
+    小螢幕與「減少動態」都退回一般的直向堆疊：手機上一欄流動的牆很難點中某一張，
+    而會動的內容對前庭敏感的人是實際的障礙。這時只顯示第一份，複本要藏起來。
+  */
+  @media (max-width: 767px), (prefers-reduced-motion: reduce) {
+    .photo-marquee {
+      grid-template-columns: 1fr;
+      height: auto;
+      overflow: visible;
+      mask-image: none;
+    }
+
+    .photo-marquee__track {
+      animation: none;
+    }
+
+    .photo-marquee__item[aria-hidden='true'] {
+      display: none;
+    }
+  }
+</style>
