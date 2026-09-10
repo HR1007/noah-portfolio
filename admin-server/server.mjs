@@ -302,13 +302,18 @@ app.post(
       sections = (tpl.sections || []).map((sec) => cloneSectionAsTemplate(sec));
     }
 
+    /*
+      文字欄位一律用 { en } 的中英對照形狀，跟既有案例一致。schema 雖然也接受
+      純字串（那是為了讓遷移可以逐步進行），但新建的案例沒有理由停在舊形狀——
+      不然後台編輯時這一個案例沒有中文欄位可以填，其他四個有。
+    */
     const data = {
-      title: String(title).trim(),
+      title: { en: String(title).trim() },
       order: maxOrder + 1,
-      summary: '[需確認] 案例摘要，待補',
-      ctaLabel: 'More Details',
+      summary: { en: '[需確認] 案例摘要，待補' },
+      ctaLabel: { en: 'More Details' },
       tags: [],
-      hero: { ctaLabel: 'Try it out', ctaHref: '#', gradient: 'slate' },
+      hero: { ctaLabel: { en: 'Try it out' }, ctaHref: '#', gradient: 'slate' },
       sections,
     };
 

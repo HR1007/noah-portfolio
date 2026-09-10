@@ -462,10 +462,49 @@ export function assignImages(data, images) {
 // ---------- 後台改結構用的純資料操作（不碰檔案，檔案重新編號由 server 負責） ----------
 
 /** 建立一個新區塊（文字先填 [需確認] 佔位）。型別不認得時丟錯，不憑空造一個。 */
+/*
+  會顯示在頁面上的文字欄位，要轉成 { en } 的中英對照形狀。
+
+  這份清單跟 content.config.ts 套用 localized() 的欄位、以及
+  scripts/localize-project.mjs 的遷移清單是同一組。ratio／layout／direction
+  這些不是給人讀的值不轉；persona 的 name 與 flow 的 step label 也不轉——
+  它們不輸出到頁面，只是後台辨識版位用的標籤。
+*/
+const LOCALIZED_KEYS = new Set([
+  'title', 'summary', 'ctaLabel', 'eyebrow', 'heading', 'body', 'alt', 'description', 'paragraphs',
+]);
+
+/**
+ * 把新建的區塊裡「給人看的」字串包成 { en: '…' }。
+ *
+ * 在這裡統一轉，而不是去改十幾個 create()：一來只有一個地方會錯，二來之後新增
+ * 段落型別時不必記得跟著包，忘記包的話那個段落在後台就沒有中文欄位可以填，
+ * 而且不會有任何錯誤——schema 為了讓遷移能逐步進行，純字串也是合法的。
+ *
+ * @param {any} node
+ * @returns {any}
+ */
+function toLocalized(node) {
+  if (Array.isArray(node)) return node.map(toLocalized);
+  if (!node || typeof node !== 'object') return node;
+
+  const out = {};
+  for (const [key, value] of Object.entries(node)) {
+    if (LOCALIZED_KEYS.has(key) && typeof value === 'string') {
+      out[key] = { en: value };
+    } else if (LOCALIZED_KEYS.has(key) && Array.isArray(value) && value.every((v) => typeof v === 'string')) {
+      out[key] = value.map((text) => ({ en: text }));
+    } else {
+      out[key] = toLocalized(value);
+    }
+  }
+  return out;
+}
+
 export function createSection(type) {
   const meta = SECTION_META[type];
   if (!meta) throw new Error(`未知的區塊型別：${type}`);
-  return meta.create();
+  return toLocalized(meta.create());
 }
 
 /**
@@ -482,7 +521,8 @@ export function addSectionItem(section) {
     throw new Error(`${meta.label} 最多只能有 ${list.max} 個${list.label}`);
   }
   if (list.counter) return { ...section, [list.key]: count + 1 };
-  return { ...section, [list.key]: [...(section[list.key] || []), list.create()] };
+  // 新加的項目同樣轉成中英對照形狀，跟 createSection 走同一套
+  return { ...section, [list.key]: [...(section[list.key] || []), toLocalized(list.create())] };
 }
 
 /**
