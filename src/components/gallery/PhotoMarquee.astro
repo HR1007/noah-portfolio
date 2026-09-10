@@ -87,8 +87,8 @@ const duration = (column: typeof items) => {
     */
     height: 82vh;
     overflow: hidden;
-    /* 上下淡出，照片才不是被硬切一刀 */
-    mask-image: linear-gradient(transparent, #000 8%, #000 92%, transparent);
+    /* 上下淡出，照片才不是被硬切一刀。範圍收窄，只在最邊緣收一下 */
+    mask-image: linear-gradient(transparent, #000 3%, #000 97%, transparent);
   }
 
   .photo-marquee__track {
@@ -96,6 +96,15 @@ const duration = (column: typeof items) => {
     flex-direction: column;
     animation: photo-marquee-up var(--duration) linear infinite;
     will-change: transform;
+  }
+
+  /*
+    偶數欄反向：用 animation-direction: reverse 讓它從 -50% 跑回 0，也就是往下流。
+    不必另外寫一組 keyframes，暫停與速度的邏輯也完全共用。
+    相鄰兩欄方向相反，牆面才有交錯感，不會整片像一塊布往上拉。
+  */
+  .photo-marquee__col:nth-child(even) .photo-marquee__track {
+    animation-direction: reverse;
   }
 
   /* 滑到整片牆就停住——停的是動畫本身，不需要記進度，恢復時也不會跳一下 */
