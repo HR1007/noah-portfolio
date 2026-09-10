@@ -323,7 +323,11 @@ const site = defineCollection({
       cta: z.object({
         heading: z.string(),
         body: z.string(),
-        ctaLabel: localized(),
+        /*
+          網站文案本來就是 main-en.json / main-zh.json 分檔，
+          欄位不需要再套一層中英對照——那是案例頁（單檔雙語）才需要的。
+        */
+        ctaLabel: z.string(),
         ctaHref: z.string().default('#'),
       }),
     }),
