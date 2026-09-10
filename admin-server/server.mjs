@@ -244,9 +244,12 @@ function summarizeSections(data) {
 // 但要看得出哪一項是哪一項，否則不知道自己按的「移除」會拿掉哪一段。
 function textItemPreviews(section, list) {
   return (section[list.key] || []).map((item) => {
-    const text = typeof item === 'string'
-      ? item
-      : plain(item.title) || plain(item.name) || plain(item.label);
+    /*
+      plain(item) 要放在最前面：中英對照的欄位本身就是 { en, zh }，
+      例如 paragraphs 的每一項。只找 item.title / name / label 的話，
+      這種項目三個都是 undefined，預覽會整排變空白。
+    */
+    const text = plain(item) || plain(item.title) || plain(item.name) || plain(item.label);
     return text.length > 60 ? `${text.slice(0, 60)}…` : text;
   });
 }
