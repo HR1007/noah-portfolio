@@ -136,10 +136,18 @@ const currentPath = Astro.url.pathname;
     }
   }
 
+  /*
+    當前頁面：底線用同一條 ::after，直接展開，不用 text-decoration。
+
+    先前兩者並存——text-decoration 畫一條、::after 在 hover 時再畫一條，
+    滑過當前頁面就會看到兩條位置略微不同的線。同一件事只該有一個機制。
+  */
   .nav__link[aria-current='page'] {
-    text-decoration: underline;
-    text-underline-offset: calc(var(--sp-1) / 2);
     font-weight: var(--font-weight-medium);
+  }
+
+  .nav__link[aria-current='page']::after {
+    transform: scaleX(1);
   }
 
   @media (max-width: 1199px) {
