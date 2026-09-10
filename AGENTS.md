@@ -17,10 +17,18 @@
 - 一次只做一個元件或一個頁面，不要批次產生。
 - 完成後回報：新增/修改了哪些檔案，以及有什麼我需要手動確認的地方。
 - 不確定的設計數值標記為 `[需確認]`，不要自己猜一個填進去。
+- commit 前跑 `npm run check`。`npm run build` 完全不驗型別，型別錯誤只會出現在
+  編輯器裡——曾經有好幾次是我在 IDE 看到才回報，那邊 build 一路全綠、無從發現。
+- 動過 `src/content.config.ts` 的 schema 或新增內容欄位之後，要重啟 dev server。
+  Astro 的內容快取（`.astro/data-store.json`）不會因為 schema 變更自動失效，
+  症狀會是「某個欄位莫名其妙是 undefined」，看起來很像程式碼寫錯。
 
 # commit 慣例
 
 `feat:` / `fix:` / `style:` / `content:` / `chore:`
+
+每個 commit 只做一件事。同一輪對話改了多件不相干的事，就分批 stage、分批 commit，
+即使它們動到同一個檔案——綁在一起的 commit 沒辦法單獨 revert。
 
 每個階段結束時提醒我 commit。
 
