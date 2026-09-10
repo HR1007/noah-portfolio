@@ -68,12 +68,14 @@ const blocks = ARROW.flatMap((cells, row) =>
     align-items: center;
     gap: var(--sp-2);
     /*
-      保留內距讓點擊範圍夠大，用負的左邊距把文字的視覺左緣拉回容器邊界——
-      不然按鈕看起來會比下方的內容往右縮一格。
+      整顆按鈕靠左：左右不留內距、也不用負邊距去補償。這樣按鈕的外框、箭頭圖示
+      與下方內容的左緣三者落在同一條線上。
+
+      先前是「左右各留 16px 內距 ＋ 負 16px 邊距」，箭頭雖然對得上，但按鈕本身
+      的框比容器邊界往左突出一格。上下的內距保留，點擊範圍才夠。
       沒有背景色：狀態一律由底線動畫表達，跟導覽列同一套語言。
     */
-    padding: var(--sp-1) var(--sp-2);
-    margin-left: calc(var(--sp-2) * -1);
+    padding: var(--sp-1) 0;
     color: var(--color-ink);
     font-size: var(--font-size-label);
     font-weight: var(--font-weight-medium);
