@@ -282,7 +282,7 @@ const site = defineCollection({
       connectIntro: z.array(z.string()),
       connectChannels: z.array(
         z.object({
-          icon: z.enum(['email', 'instagram']), // 決定圖示，跟 label 顯示文字脫鉤，label 可自由翻譯不影響圖示判斷
+          icon: z.enum(['email', 'instagram', 'blog']), // 決定圖示，跟 label 顯示文字脫鉤，label 可自由翻譯不影響圖示判斷
           label: z.string(),
           value: z.string(),
           href: z.string(),

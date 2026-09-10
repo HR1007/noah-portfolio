@@ -175,7 +175,7 @@
     要真正銳利就得重新輸出一張這個尺寸的圖，而不是靠 CSS 縮。
   */
   --home-hero-width: 78px;
-  --connect-grid-width: 560px; /* 首頁聯絡管道的雙欄格線 */
+  --connect-grid-width: 800px; /* 首頁聯絡管道那一排的寬度上限 */
   --hero-max-height: 675.66px; /* hero 圖高度上限，取自設計稿 */
 
   /*

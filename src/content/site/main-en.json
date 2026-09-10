@@ -104,6 +104,12 @@
         "label": "Instagram",
         "value": "lens.memo",
         "href": "https://www.instagram.com/lens.memo/"
+      },
+      {
+        "icon": "blog",
+        "label": "Blog",
+        "value": "Noah in Deutschland",
+        "href": "https://deutscheraustauschstudent.blogspot.com/"
       }
     ]
   },

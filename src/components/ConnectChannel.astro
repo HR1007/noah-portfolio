@@ -1,6 +1,6 @@
 ---
 interface Props {
-  icon: 'email' | 'instagram';
+  icon: 'email' | 'instagram' | 'blog';
   label: string;
   value: string;
   href: string;
@@ -11,20 +11,33 @@ const { icon, label, value, href } = Astro.props;
 
 <a href={href} class="connect-channel">
   <span class="connect-channel__icon" aria-hidden="true">
-    {
-      icon === 'email' ? (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+    {/*
+      三個以上就不再用巢狀三元運算——那種寫法每多一種圖示就多一層縮排，
+      而且看不出「有哪些選項」。改成一個 svg 殼加上分別的內容。
+    */}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      {icon === 'email' && (
+        <>
           <rect x="3" y="5" width="18" height="14" rx="2" />
           <path d="m4 7 8 6 8-6" />
-        </svg>
-      ) : (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        </>
+      )}
+      {icon === 'instagram' && (
+        <>
           <rect x="3" y="3" width="18" height="18" rx="5" />
           <circle cx="12" cy="12" r="4" />
           <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
-        </svg>
-      )
-    }
+        </>
+      )}
+      {/* 部落格：一篇有內文的文章。旁邊就有「Blog／部落格」標籤，圖示只要傳達
+          「這是一篇一篇寫的東西」，不必畫成某個平台的商標 */}
+      {icon === 'blog' && (
+        <>
+          <rect x="4" y="3" width="16" height="18" rx="2" />
+          <path d="M8 8h8M8 12h8M8 16h5" />
+        </>
+      )}
+    </svg>
   </span>
   <span class="connect-channel__text">
     <span class="connect-channel__label">{label}</span>

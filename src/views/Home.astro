@@ -267,19 +267,31 @@ const hobbyPhotos = getHomeImageSet('hobby');
     margin-bottom: var(--sp-4);
   }
 
+  /*
+    改用置中的 flex 而不是固定欄數的格線：管道從兩個變三個之後，1fr 1fr 會讓
+    第三個落單在第二列左邊，看起來像漏了一個。flex 讓它們依實際寬度排在一列，
+    放不下時整排往下折並維持置中，加第四個也不用再改欄數。
+  */
   .connect__channels {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--sp-2);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--sp-3) var(--sp-5);
     text-align: left;
     max-width: var(--connect-grid-width);
     margin: 0 auto;
   }
 
   @media (max-width: 767px) {
-    .about__grid,
-    .connect__channels {
+    .about__grid {
       grid-template-columns: 1fr;
+    }
+
+    /* 手機上一個一列，靠左對齊比置中好讀（值的長度差很多） */
+    .connect__channels {
+      flex-direction: column;
+      align-items: flex-start;
+      width: fit-content;
     }
 
     .beyond-grid__hobbies {
