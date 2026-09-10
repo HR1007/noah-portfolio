@@ -266,7 +266,12 @@ const { Content } = await render(project);
   .project-back {
     max-width: var(--content-width);
     margin: 0 auto;
-    padding: var(--sp-3) var(--content-gutter) 0;
+    /*
+      上下內距對稱。原本下方是 0，返回鍵整個貼在容器底部——上面有空、下面沒有，
+      按鈕看起來就不是置中的。當初設 0 是為了讓下方的 hero 緊接著，
+      但那讓返回鍵自己站得很奇怪，24px 的呼吸空間值得。
+    */
+    padding: var(--sp-3) var(--content-gutter);
   }
 
   .project-anchor {
