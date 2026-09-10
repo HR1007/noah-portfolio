@@ -32,7 +32,14 @@ const alternateURL = new URL(swapLocalePath(Astro.url.pathname, otherLocale), As
         document.documentElement.dataset.theme = savedTheme;
       }
     </script>
+    {/*
+      三個一組：SVG 給支援的瀏覽器（向量、任何尺寸都銳利），ICO 給 Safari 與舊瀏覽器
+      （它們不吃 SVG favicon），apple-touch-icon 給 iOS 加到主畫面時用。
+      只掛 SVG 的話，Safari 會去要 /favicon.ico，拿到什麼就顯示什麼。
+    */}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={canonicalURL} />
     <link rel="alternate" hreflang={locale} href={canonicalURL} />
     <link rel="alternate" hreflang={otherLocale} href={alternateURL} />
