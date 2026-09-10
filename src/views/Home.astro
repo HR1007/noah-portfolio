@@ -7,6 +7,7 @@ import Placeholder from '../components/Placeholder.astro';
 import PullQuote from '../components/PullQuote.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
 import ConnectChannel from '../components/ConnectChannel.astro';
+import ReadMore from '../components/ReadMore.astro';
 import { getHomeImage, getHomeImageSet } from '../lib/media';
 
 interface Props {
@@ -66,7 +67,10 @@ const hobbyPhotos = getHomeImageSet('hobby');
       </div>
       <div>
         <h3 class="about__subheading">{home.aboutSubheading}</h3>
-        <p class="about__intro">{home.aboutIntro}</p>
+        {/* 兩欄版面下這一段特別高，收合後照片與文字的高度才不會差太多 */}
+        <ReadMore lines={6}>
+          <p class="about__intro">{home.aboutIntro}</p>
+        </ReadMore>
       </div>
     </div>
   </section>
