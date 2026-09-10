@@ -2,7 +2,11 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// site: [需確認] — 正式網域確定後填入，@astrojs/sitemap 需要它才能產生完整 URL
+/*
+  Vercel 的正式網址。@astrojs/sitemap 用它產生絕對 URL，也是 og:url／canonical
+  的基準——先前留著 example.com 的佔位值，等於 sitemap 指向一個不存在的站。
+  之後若綁自訂網域，改這一行即可。
+*/
 // https://astro.build/config
 /*
   開發時關掉 /_image 的瀏覽器快取。
@@ -32,7 +36,7 @@ const devImageNoCache = {
 };
 
 export default defineConfig({
-  site: 'https://example.com',
+  site: 'https://noah-portfolio-tawny.vercel.app',
   integrations: [sitemap()],
   vite: { plugins: [devImageNoCache] },
   i18n: {
