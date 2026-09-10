@@ -131,18 +131,24 @@
       {
         "slug": "film-project",
         "title": "Film project",
-        "dateLabel": "2024 – 至今"
+        "dateLabel": "2024 – 至今",
+        "eyebrow": "底片",
+        "intro": "三十六張，拍完之前看不到結果。底片逼我慢下來，按下去之前先想清楚——留在這裡的大多值得那個等待。"
       },
       {
         "slug": "digital-cam-project",
         "title": "Digital Cam project",
-        "dateLabel": "2025 – 至今"
+        "dateLabel": "2025 – 至今",
+        "eyebrow": "數位",
+        "intro": "不知道今天會遇到什麼的時候，我帶這台。快一點、鬆一點，也更敢拍壞。"
       }
     ],
     "germany": {
       "title": "德國",
       "dateLabel": "2024",
-      "slug": "germany"
+      "slug": "germany",
+      "eyebrow": "符茲堡，2024",
+      "intro": "交換的那一年，邊走邊拍。那些每天經過的街，走到後來就不像異國了。"
     },
     "cta": {
       "heading": "想看更多，或想拍點什麼？",

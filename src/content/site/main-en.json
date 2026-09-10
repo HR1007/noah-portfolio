@@ -126,23 +126,29 @@
   "gallery": {
     "eyebrow": "Life, Framed",
     "headline": "Gallery",
-    "intro": "I believe every great photo starts with a good story. My photography journey is a constant switch between the timeless charm of a Film project and the fast-paced creativity of my Digital Cam. Welcome to my visual archive. Feel free to explore my ongoing Projects, dive into the sceneries of my Travels, or simply browse through the raw, unscripted moments of my Day Life :)",
+    "intro": "A good photo starts with a story. I move between film and digital — film makes me slow down, digital lets me take the extra frame. This is the archive: ongoing projects, places along the way, and days I did not edit much :)",
     "albums": [
       {
         "slug": "film-project",
         "title": "Film project",
-        "dateLabel": "2024-Now"
+        "dateLabel": "2024-Now",
+        "eyebrow": "Shot on film",
+        "intro": "Thirty-six frames, no screen to check. Film makes me slow down and decide before I press — most of what is here was worth the wait."
       },
       {
         "slug": "digital-cam-project",
         "title": "Digital Cam project",
-        "dateLabel": "2025-Now"
+        "dateLabel": "2025-Now",
+        "eyebrow": "Shot on digital",
+        "intro": "The camera I carry when I do not know what the day holds. Faster, looser, and more willing to be wrong."
       }
     ],
     "germany": {
       "title": "Germany",
       "dateLabel": "2024",
-      "slug": "germany"
+      "slug": "germany",
+      "eyebrow": "Würzburg, 2024",
+      "intro": "An exchange year, photographed as I went. Streets I walked every day until they stopped looking foreign."
     },
     "cta": {
       "heading": "Seen something you'd have shot?",

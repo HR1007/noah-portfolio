@@ -15,8 +15,18 @@ interface Props {
 
 const { locale, slug, title } = Astro.props;
 const site = await getEntry('site', `main-${locale}`);
-const { eyebrow, intro } = site!.data.gallery;
+const gallery = site!.data.gallery;
 const { backLabel } = site!.data.nav;
+
+/*
+  引言與說明優先用這個相簿自己的。先前一律讀 gallery 那一組，所以每個相簿頁都顯示
+  同一句 eyebrow 和同一段「介紹全部相簿」的長文——在單一相簿頁上讀起來像放錯了。
+
+  兩個欄位都是選填，沒填就退回 gallery 的那組，頁面不會開天窗。
+*/
+const album = [...gallery.albums, gallery.germany].find((a) => a.slug === slug);
+const eyebrow = album?.eyebrow ?? gallery.eyebrow;
+const intro = album?.intro ?? gallery.intro;
 
 const heroImage = getGalleryImage('hero');
 const images = getGalleryAlbumImages(slug);

@@ -305,6 +305,10 @@ const site = defineCollection({
       intro: z.string(),
       albums: z.array(
         z.object({
+          // 相簿內頁自己的引言與說明。選填——沒填就沿用藝廊首頁那一組，
+          // 不會讓頁面開天窗，但填了才不會每個相簿都顯示同一段介紹全部相簿的文字。
+          eyebrow: z.string().optional(),
+          intro: z.string().optional(),
           slug: z.string(),
           title: z.string(),
           dateLabel: z.string(),
@@ -313,6 +317,8 @@ const site = defineCollection({
       // Germany 在主頁是直接內嵌整組相片（非封面卡+連結），但同時也有自己的獨立相簿頁，
       // 所以一樣帶 slug，跟 albums 一起餵給 [slug].astro 的 getStaticPaths。
       germany: z.object({
+          eyebrow: z.string().optional(),
+          intro: z.string().optional(),
         slug: z.string(),
         title: z.string(),
         dateLabel: z.string(),
