@@ -1,11 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
   <!--
-    蝴蝶餅：左右兩個上環加一段底弧。由 scripts/make-favicon.mjs 產生，
-    要改形狀請改那支腳本再重跑，不要直接手改這裡——PNG 與 ICO 是同一組數字算出來的。
+    由 scripts/make-favicon.mjs 產生。要改形狀或粗細請改那支腳本再重跑，
+    不要直接手改這裡——PNG 與 ICO 是同一組數字算出來的。
   -->
-  <g stroke="rgb(208 138 46)" stroke-linecap="round">
-  <circle cx="48" cy="46" r="17" stroke-width="10" />
-  <circle cx="80" cy="46" r="17" stroke-width="10" />
-  <circle cx="64" cy="56" r="40" stroke-width="10" clip-path="inset(26px 0 0 0)" />
+  <g stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="36" y1="94" x2="36" y2="34" />
+    <line x1="36" y1="34" x2="92" y2="94" />
+    <line x1="92" y1="94" x2="92" y2="34" />
   </g>
+  <style>
+    g { stroke: rgb(51 51 51); }
+    @media (prefers-color-scheme: dark) {
+      g { stroke: #f2f2f2; }
+    }
+  </style>
 </svg>
