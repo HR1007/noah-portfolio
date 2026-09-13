@@ -31,10 +31,24 @@ const items = images.length > 0
       alt: `${labelPrefix} ${String(i + 1).padStart(2, '0')}`,
     }));
 
-// 輪流分配到三欄，而不是切成連續三段：同一欄裡才不會整排都是直幅或整排都是橫幅
-const COLUMNS = 3;
+// 輪流分配到各欄，而不是切成連續幾段：同一欄裡才不會整排都是直幅或整排都是橫幅
+const COLUMNS = 5;
 const columns: (typeof items)[] = Array.from({ length: COLUMNS }, () => []);
 items.forEach((item, i) => columns[i % COLUMNS].push(item));
+
+/*
+  每一欄至少要有這麼多張，不夠就把該欄的照片重複排到夠。
+
+  一個循環的高度必須超過容器高度，否則捲到一半會露出空白——相簿照片數不一定夠：
+  germany 只有 8 張，分成 5 欄之後每欄剩 1～2 張，一個循環根本填不滿畫面。
+  同一張照片在不同欄、不同捲動位置出現，視覺上不明顯；空隙則是一眼就看得出來。
+*/
+const MIN_PER_COLUMN = 5;
+const filled = columns.map((column) => {
+  if (column.length === 0 || column.length >= MIN_PER_COLUMN) return column;
+  const times = Math.ceil(MIN_PER_COLUMN / column.length);
+  return Array.from({ length: times }, () => column).flat();
+});
 
 /*
   每一欄的速度要一致，但欄高不一定一樣（照片比例不同）。用「長寬比的總和」當
@@ -52,7 +66,7 @@ const duration = (column: typeof items) => {
 
 <div class="photo-marquee" data-photo-marquee>
   {
-    columns.map((column) => (
+    filled.map((column) => (
       <div class="photo-marquee__col">
         <div class="photo-marquee__track" style={`--duration: ${duration(column)}`}>
           {/*
@@ -79,7 +93,7 @@ const duration = (column: typeof items) => {
 <style>
   .photo-marquee {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: var(--sp-2);
     /*
       固定高度才有「流動」可言。用 vh 而不是固定 px：這面牆的意義是佔滿一個視野，
@@ -131,9 +145,10 @@ const duration = (column: typeof items) => {
     cursor: zoom-in;
   }
 
+  /* 1199 以下收成三欄：五欄在那個寬度下每張只剩一百多 px，看不到東西 */
   @media (max-width: 1199px) {
     .photo-marquee {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 
