@@ -22,10 +22,15 @@ const { eyebrow, headline, body } = Astro.props;
     margin-bottom: var(--sp-6);
   }
 
+  /*
+    不設 max-width，跟同一塊裡的標題與內文一樣由容器決定邊界。
+
+    先前是 42ch，但英文的 portfolio eyebrow 有 69 個字元——在 1120px 寬的欄位裡
+    明明放得下一行，卻被硬折成兩行，而且右緣跟下方的標題對不齊。
+  */
   .section-intro__eyebrow {
     font-size: var(--font-size-body);
     color: var(--color-muted);
-    max-width: 42ch;
   }
 
   .section-intro__headline {
