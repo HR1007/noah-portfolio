@@ -71,6 +71,8 @@ const featureGridBlock = z.object({
   type: z.literal('featureGrid'),
   eyebrow: localized().optional(),
   heading: localized().optional(),
+  // horizontal：欄位並排（預設）；vertical：一欄一列往下排，圖片可以放大
+  direction: z.enum(['horizontal', 'vertical']).default('horizontal'),
   columns: z.array(
     z.object({
       heading: localized(),
@@ -89,6 +91,8 @@ const imageRowBlock = z.object({
   type: z.literal('imageRow'),
   eyebrow: localized().optional(),
   heading: localized().optional(),
+  // horizontal：圖片並排（預設）；vertical：一張一列，圖片可以放大
+  direction: z.enum(['horizontal', 'vertical']).default('horizontal'),
   images: z.array(z.object({ ratio: z.string(), alt: localized() })).min(1).max(3),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
   // 每種段落都支援，後台的「進階設定」可以逐段開關。

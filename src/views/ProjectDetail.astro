@@ -153,6 +153,7 @@ const { Content } = await render(project);
                   eyebrow={tr(section.eyebrow)}
                   heading={tr(section.heading)}
                   columns={trColumns(section.columns)}
+                  direction={section.direction}
                   images={imagesFor(sectionIndex)}
                   ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
@@ -162,6 +163,7 @@ const { Content } = await render(project);
               return anchor(
                 <ImageRow
                   rows={trAlt(section.images)}
+                  direction={section.direction}
                   images={imagesFor(sectionIndex)}
                   eyebrow={tr(section.eyebrow)}
                   heading={tr(section.heading)}

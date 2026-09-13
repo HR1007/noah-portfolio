@@ -13,15 +13,16 @@ interface Column {
 interface Props {
   eyebrow?: string;
   heading?: string;
+  direction?: 'horizontal' | 'vertical';
   columns: Column[];
   images: (ImageMetadata | undefined)[];  ctaLabel?: string;
   ctaHref?: string;
 }
 
-const { eyebrow, heading, columns, images, ctaLabel, ctaHref } = Astro.props;
+const { eyebrow, heading, columns, images, direction = 'horizontal', ctaLabel, ctaHref } = Astro.props;
 ---
 
-<section class="feature-grid">
+<section class="feature-grid" data-direction={direction}>
   {
     (eyebrow || heading) && (
       <div class="feature-grid__intro">
@@ -71,6 +72,13 @@ const { eyebrow, heading, columns, images, ctaLabel, ctaHref } = Astro.props;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--sp-4);
+  }
+
+  /* vertical：一欄一列往下排。三欄擠在一起時每張圖只剩三分之一寬，
+     需要看清楚細節的圖用這個版型 */
+  .feature-grid[data-direction='vertical'] .feature-grid__columns {
+    grid-template-columns: 1fr;
+    gap: var(--sp-6);
   }
 
   .feature-grid__column {

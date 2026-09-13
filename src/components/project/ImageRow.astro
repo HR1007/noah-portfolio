@@ -12,14 +12,15 @@ interface Props {
   rows: Row[];
   images: (ImageMetadata | undefined)[];
   eyebrow?: string;
-  heading?: string;  ctaLabel?: string;
+  heading?: string;
+  direction?: 'horizontal' | 'vertical';  ctaLabel?: string;
   ctaHref?: string;
 }
 
-const { rows, images, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
+const { rows, images, eyebrow, heading, direction = 'horizontal', ctaLabel, ctaHref } = Astro.props;
 ---
 
-<section class="image-row-section">
+<section class="image-row-section" data-direction={direction}>
   {
     (eyebrow || heading) && (
       <div class="section-intro-block">
@@ -65,6 +66,12 @@ const { rows, images, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
     display: grid;
     grid-template-columns: repeat(var(--columns), 1fr);
     gap: var(--sp-3);
+  }
+
+  /* vertical：一張一列，圖片放大到整個內容欄寬 */
+  .image-row-section[data-direction='vertical'] .image-row {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
   }
 
   @media (max-width: 767px) {
