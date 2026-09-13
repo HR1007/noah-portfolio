@@ -1261,6 +1261,20 @@ function renderContentNode(enVal, keyPath, container) {
 let projectSlugs = []; // [{slug, title}]
 let projectsData = {}; // slug -> frontmatter 物件
 
+/*
+  版型選項在選單上的說明文字。存進檔案的還是原本的英文值（horizontal、split…），
+  這裡只換顯示——後台的使用者是設計師，看到 split-reverse 沒辦法想像畫面長怎樣。
+*/
+const OPTION_LABELS = {
+  horizontal: 'horizontal — 並排（一列放多個）',
+  vertical: 'vertical — 直排（一列一個，內容比較大）',
+  stacked: 'stacked — 文字在上、圖片在下',
+  split: 'split — 文字在左、圖片在右',
+  'split-reverse': 'split-reverse — 圖片在左、文字在右',
+  left: 'left — 圖片在左',
+  right: 'right — 圖片在右',
+};
+
 function renderMonoRow(label, keyPath, dataObj, { readonly = false, select = null, isNumber = false } = {}) {
   const row = document.createElement('div');
   row.className = 'content-row';
@@ -1284,7 +1298,8 @@ function renderMonoRow(label, keyPath, dataObj, { readonly = false, select = nul
     select.forEach((opt) => {
       const o = document.createElement('option');
       o.value = opt;
-      o.textContent = opt;
+      // 選單上顯示看得懂的說明，存進檔案的仍然是原本的值
+      o.textContent = OPTION_LABELS[opt] ?? opt;
       if (opt === value) o.selected = true;
       el.appendChild(o);
     });
@@ -1315,18 +1330,6 @@ function renderMonoNode(val, keyPath, container, dataObj) {
   if (key === 'gradient') {
     container.appendChild(
       renderMonoRow('Hero 漸層底色', keyPath, dataObj, { select: heroGradients })
-    );
-    return;
-  }
-  if (key === 'direction') {
-    container.appendChild(
-      renderMonoRow('排列方向', keyPath, dataObj, { select: ['horizontal', 'vertical'] })
-    );
-    return;
-  }
-  if (key === 'layout') {
-    container.appendChild(
-      renderMonoRow('版面', keyPath, dataObj, { select: ['stacked', 'split'] })
     );
     return;
   }
@@ -1685,8 +1688,17 @@ function renderProjectCard(slug, title, form) {
     // 文案欄位直接顯示；type/ratio/alt 這類技術欄位收進「進階」，
     // 平常編輯文字時不需要看到，但仍然改得到。
     const TECHNICAL = new Set(['type', 'ratio', 'alt', 'imagePosition', 'count', 'ctaLabel', 'ctaHref']);
-    const plain = Object.keys(sec).filter((k) => !TECHNICAL.has(k));
-    const tech = Object.keys(sec).filter((k) => TECHNICAL.has(k));
+    /*
+      版型選項（direction、layout、imagePosition）排除在外，改由下面的
+      SECTION_OPTIONS 迴圈統一畫。
+
+      先前兩邊都畫，同一個段落會出現兩個一模一樣的「排列方向」下拉；而且這裡寫死的
+      layout 選項只有 stacked 與 split，少了 split-reverse——用那個下拉永遠選不到
+      左圖右文。選項清單只該有一個來源，就是 SECTION_OPTIONS。
+    */
+    const secOptionKeys = new Set(Object.keys(sectionOptions[sec.type] || {}));
+    const plain = Object.keys(sec).filter((k) => !TECHNICAL.has(k) && !secOptionKeys.has(k));
+    const tech = Object.keys(sec).filter((k) => TECHNICAL.has(k) && !secOptionKeys.has(k));
 
     plain.forEach((k) => renderMonoNode(sec[k], ['sections', i, k], cardBody, data));
 
