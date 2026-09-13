@@ -132,6 +132,24 @@ const pageImageTargets = (page) => {
   return [{ kind: 'dir', path: group.dir }];
 };
 
+/*
+  正式站台的網址。用正則從 astro.config.mjs 讀，而不是 import 那支設定檔——
+  import 會把 Astro 的整條 plugin 鏈拉進這個後台行程，為了一個字串不值得。
+  也不寫死在後台：綁自訂網域時只改 astro.config.mjs 一個地方。
+*/
+async function siteUrl() {
+  try {
+    const raw = await fs.readFile(path.join(ROOT, 'astro.config.mjs'), 'utf-8');
+    return raw.match(/site:\s*['"]([^'"]+)['"]/)?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+app.get('/api/site-url', async (req, res) => {
+  res.json({ url: await siteUrl() });
+});
+
 app.get('/api/history', async (req, res) => {
   try {
     res.json(await pendingUndo());

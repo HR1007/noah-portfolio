@@ -77,6 +77,18 @@ svg {
   align-items: center;
   justify-content: center;
   font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 160ms ease;
+}
+
+/* 只在真的有連結時才表現得可點——網址讀不到時它就只是一個標誌 */
+.sidebar__logo:not([href]) {
+  cursor: default;
+}
+
+.sidebar__logo[href]:hover {
+  opacity: 0.8;
 }
 
 .sidebar__nav {

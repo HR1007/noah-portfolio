@@ -2123,3 +2123,20 @@ undoBtn.addEventListener('click', async () => {
 });
 
 refreshUndoButton();
+
+// ---------- 側邊欄標誌連到正式站台 ----------
+/*
+  網址由 server 從 astro.config.mjs 讀出來，後台不自己存一份——綁自訂網域時
+  只改那一個地方。讀不到就不掛 href，標誌維持原樣、不會變成一個點了沒反應的連結。
+  開新分頁：後台是工作中的工具，不該把人從編輯到一半的畫面帶走。
+*/
+fetch(`${API}/api/site-url`)
+  .then((r) => r.json())
+  .then(({ url }) => {
+    if (!url) return;
+    const el = document.getElementById('siteLink');
+    if (!el) return;
+    el.href = url;
+    el.title = `前往正式站台 ${url}`;
+  })
+  .catch(() => {});
