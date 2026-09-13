@@ -2,6 +2,7 @@
 import type { ImageMetadata } from 'astro';
 import Media from '../Media.astro';
 import Button from '../Button.astro';
+import ReadMore from '../ReadMore.astro';
 
 interface Props {
   eyebrow?: string;
@@ -22,7 +23,9 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = '
   <div class="experience-demo__intro">
     {eyebrow && <p class="experience-demo__eyebrow">{eyebrow}</p>}
     <h2 class="experience-demo__heading">{heading}</h2>
-    <p class="experience-demo__body">{body}</p>
+    <ReadMore>
+      <p class="experience-demo__body">{body}</p>
+    </ReadMore>
     {ctaLabel && ctaHref && <Button label={ctaLabel} href={ctaHref} variant="primary" />}
   </div>
   <div class="experience-demo__media">

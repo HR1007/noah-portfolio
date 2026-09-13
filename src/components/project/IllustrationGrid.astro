@@ -2,6 +2,7 @@
 import type { ImageMetadata } from 'astro';
 import Media from '../Media.astro';
 import SectionCta from './SectionCta.astro';
+import ReadMore from '../ReadMore.astro';
 
 interface Props {
   eyebrow?: string;
@@ -19,7 +20,11 @@ const { eyebrow, heading, body, alt, images, ctaLabel, ctaHref } = Astro.props;
   <div class="illustration-grid__intro">
     {eyebrow && <p class="illustration-grid__eyebrow">{eyebrow}</p>}
     <h2 class="illustration-grid__heading">{heading}</h2>
-    {body && <p class="illustration-grid__body">{body}</p>}
+    {body && (
+      <ReadMore>
+        <p class="illustration-grid__body">{body}</p>
+      </ReadMore>
+    )}
   </div>
   <SectionCta label={ctaLabel} href={ctaHref} />
   <div class="illustration-grid__tiles">
