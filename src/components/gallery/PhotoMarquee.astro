@@ -37,20 +37,6 @@ const columns: (typeof items)[] = Array.from({ length: COLUMNS }, () => []);
 items.forEach((item, i) => columns[i % COLUMNS].push(item));
 
 /*
-  每一欄至少要有這麼多張，不夠就把該欄的照片重複排到夠。
-
-  一個循環的高度必須超過容器高度，否則捲到一半會露出空白——相簿照片數不一定夠：
-  germany 只有 8 張，分成 5 欄之後每欄剩 1～2 張，一個循環根本填不滿畫面。
-  同一張照片在不同欄、不同捲動位置出現，視覺上不明顯；空隙則是一眼就看得出來。
-*/
-const MIN_PER_COLUMN = 5;
-const filled = columns.map((column) => {
-  if (column.length === 0 || column.length >= MIN_PER_COLUMN) return column;
-  const times = Math.ceil(MIN_PER_COLUMN / column.length);
-  return Array.from({ length: times }, () => column).flat();
-});
-
-/*
   每一欄的速度要一致，但欄高不一定一樣（照片比例不同）。用「長寬比的總和」當
   內容高度的代理值——欄寬相同，所以高度就正比於比例總和——再乘上一個係數換成秒數。
   這樣三欄看起來是同一個速度在流，而不是短的那欄跑得特別快。
@@ -66,29 +52,63 @@ const duration = (column: typeof items) => {
 
 <div class="photo-marquee" data-photo-marquee>
   {
-    filled.map((column) => (
-      <div class="photo-marquee__col">
-        <div class="photo-marquee__track" style={`--duration: ${duration(column)}`}>
-          {/*
-            同一份內容排兩次。第二份對讀螢幕軟體是重複的雜訊，所以標成 aria-hidden，
-            視覺上則是接回起點用的那一半。
-          */}
-          {[false, true].map((isClone) =>
-            column.map((item) => (
-              <figure class="photo-marquee__item" aria-hidden={isClone ? 'true' : undefined}>
-                {item.image ? (
-                  <Image src={item.image} alt={isClone ? '' : item.alt} loading="lazy" />
-                ) : (
-                  <Placeholder ratio="3/4" label={item.alt} />
-                )}
-              </figure>
-            ))
-          )}
+    columns.map((column) => (
+      <div class="photo-marquee__col" data-marquee-col>
+        {/*
+          每張照片只輸出一次。接循環所需的複本由瀏覽器端複製——需要幾份取決於
+          「一個循環的高度」對上「容器高度」，而容器是 82vh，建置時量不到。
+        */}
+        <div class="photo-marquee__track" data-marquee-track style={`--duration: ${duration(column)}`}>
+          {column.map((item) => (
+            <figure class="photo-marquee__item">
+              {item.image ? (
+                <Image src={item.image} alt={item.alt} loading="lazy" />
+              ) : (
+                <Placeholder ratio="3/4" label={item.alt} />
+              )}
+            </figure>
+          ))}
         </div>
       </div>
     ))
   }
 </div>
+
+<script>
+  /*
+    在瀏覽器裡量完再決定要複製幾份。
+
+    無縫循環的條件是「一份內容的高度 ≥ 容器高度」，否則捲到一半會露出空白。
+    建置時量不到容器高度（82vh 取決於視窗），而照片數也不一定夠——germany 只有
+    16 張分到五欄，每欄 3～4 張，一份大約 500px，在 1080p 螢幕上的 740px 容器裡
+    就會開天窗。
+
+    先前是在建置時用一個猜的常數（每欄至少五張）補足，結果照片夠多的相簿也被
+    補了一輪，牆上出現重複的照片。改成量了再補：不夠才補，補到剛好夠為止。
+  */
+  document.querySelectorAll<HTMLElement>('[data-marquee-col]').forEach((col) => {
+    const track = col.querySelector<HTMLElement>('[data-marquee-track]');
+    if (!track || !track.children.length) return;
+
+    const originals = Array.from(track.children);
+
+    // 補到一份內容超過容器高度。設上限避免量到 0 時無限迴圈（例如容器還沒排版好）
+    for (let i = 0; i < 12 && track.scrollHeight < col.clientHeight; i++) {
+      originals.forEach((node) => track.appendChild(node.cloneNode(true)));
+    }
+
+    // 再整份複製一次，translateY(-50%) 才會正好接回起點。
+    // 複本對讀螢幕軟體是重複的雜訊，標成 aria-hidden 並清掉 alt。
+    Array.from(track.children).forEach((node) => {
+      const clone = node.cloneNode(true) as HTMLElement;
+      clone.setAttribute('aria-hidden', 'true');
+      clone.querySelector('img')?.setAttribute('alt', '');
+      track.appendChild(clone);
+    });
+
+    col.closest('[data-photo-marquee]')?.setAttribute('data-ready', '');
+  });
+</script>
 
 <style>
   .photo-marquee {
@@ -105,9 +125,16 @@ const duration = (column: typeof items) => {
     mask-image: linear-gradient(transparent, #000 3%, #000 97%, transparent);
   }
 
+  /*
+    動畫只在複製完成後才跑（data-ready 由上面的腳本掛上）。
+    沒有 JS 時就是一面靜態的照片牆——總比內容捲走之後留下一片空白好。
+  */
   .photo-marquee__track {
     display: flex;
     flex-direction: column;
+  }
+
+  .photo-marquee[data-ready] .photo-marquee__track {
     animation: photo-marquee-up var(--duration) linear infinite;
     will-change: transform;
   }
@@ -117,13 +144,13 @@ const duration = (column: typeof items) => {
     不必另外寫一組 keyframes，暫停與速度的邏輯也完全共用。
     相鄰兩欄方向相反，牆面才有交錯感，不會整片像一塊布往上拉。
   */
-  .photo-marquee__col:nth-child(even) .photo-marquee__track {
+  .photo-marquee[data-ready] .photo-marquee__col:nth-child(even) .photo-marquee__track {
     animation-direction: reverse;
   }
 
   /* 滑到整片牆就停住——停的是動畫本身，不需要記進度，恢復時也不會跳一下 */
-  .photo-marquee:hover .photo-marquee__track,
-  .photo-marquee:focus-within .photo-marquee__track {
+  .photo-marquee[data-ready]:hover .photo-marquee__track,
+  .photo-marquee[data-ready]:focus-within .photo-marquee__track {
     animation-play-state: paused;
   }
 
