@@ -45,7 +45,13 @@ const germanyImages = getGalleryAlbumImages('germany');
     </div>
 
     <div class="gallery__germany" data-reveal>
-      <PhotoGrid images={germanyImages} labelPrefix={germany.title} />
+      {/*
+        首頁只放六張當合輯預覽，整片可以點進相簿看完整的。這一區的作用是
+        「讓人挑一個相簿點進去」，把整本攤在首頁反而沒有點進去的理由。
+      */}
+      <a class="gallery__germany-link" href={`/${locale}/gallery/${germany.slug}`}>
+        <PhotoGrid images={germanyImages.slice(0, 6)} labelPrefix={germany.title} />
+      </a>
       <AlbumHeading
         title={germany.title}
         dateLabel={germany.dateLabel}
@@ -93,6 +99,10 @@ const germanyImages = getGalleryAlbumImages('germany');
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--sp-4);
+  }
+
+  .gallery__germany-link {
+    display: block;
   }
 
   .gallery__germany {
