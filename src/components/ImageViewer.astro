@@ -48,7 +48,17 @@ const { close, prev, next, hint } = site!.data.viewer;
       先前漏了它們，相簿裡的照片點下去完全沒有反應。
     */
     const SOURCES = 'main .media img, main .photo-grid img, main .photo-marquee img';
-    const targets = () => Array.from(document.querySelectorAll<HTMLImageElement>(SOURCES));
+
+    /*
+      圖片包在連結裡時，連結優先——那張圖是「進去看這個相簿」的入口，
+      不是要放大的內容。藝廊首頁的相簿封面就是這種：點下去應該進相簿，
+      先前卻會跳出放大檢視，等於把入口擋掉了。
+    */
+    const zoomable = (el: Element | null): el is HTMLImageElement =>
+      el instanceof HTMLImageElement && !el.closest('a');
+
+    const targets = () =>
+      Array.from(document.querySelectorAll<HTMLImageElement>(SOURCES)).filter(zoomable);
 
     let list: HTMLImageElement[] = [];
     let at = 0;
@@ -119,8 +129,8 @@ const { close, prev, next, hint } = site!.data.viewer;
 
     // ---- 開啟 ----
     document.addEventListener('click', (e) => {
-      const el = (e.target as HTMLElement | null)?.closest?.(SOURCES);
-      if (el) open(el as HTMLImageElement);
+      const el = (e.target as HTMLElement | null)?.closest?.(SOURCES) ?? null;
+      if (zoomable(el)) open(el);
     });
 
     // ---- 關閉與換圖 ----
