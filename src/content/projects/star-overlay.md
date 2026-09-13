@@ -133,6 +133,10 @@ sections:
         ratio: 3/4
         alt:
           en: '[需確認] Flow step'
+      - label: '[需確認] Step'
+        ratio: 3/4
+        alt:
+          en: '[需確認] Flow step'
     direction: vertical
   - type: experienceDemo
     eyebrow:
