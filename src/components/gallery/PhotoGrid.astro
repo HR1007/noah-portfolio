@@ -1,6 +1,13 @@
 ---
-// 相片牆用每張照片原始比例排版（масonry），不強制裁切成統一比例，
-// 讓橫幅／直幅照片都能自然呈現，比較貼近真實攝影作品集的排版方式。
+/*
+  藝廊首頁的合輯預覽：統一比例的格線，不是瀑布流。
+
+  先前用 CSS columns 保留每張的原始比例。那個做法在「整本相簿」上是對的——
+  但那個情境現在由 PhotoMarquee 承擔，而且它本來就不裁切。這裡只放六張當預覽，
+  底緣參差會讀成壞掉而不是刻意的錯落，尤其上方的相簿封面是整齊的方格。
+
+  所以裁成統一比例。3:2 對應 35mm 底片，剛好是這些照片的來源。
+*/
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import Placeholder from '../Placeholder.astro';
@@ -34,32 +41,35 @@ const items = images.length > 0 ? images : Array.from({ length: placeholderCount
 
 <style>
   .photo-grid {
-    columns: 3;
-    column-gap: var(--sp-2);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-2);
   }
 
   .photo-grid__item {
-    break-inside: avoid;
-    margin-bottom: var(--sp-2);
+    aspect-ratio: 3 / 2;
     border-radius: var(--radius);
     overflow: hidden;
   }
 
-  .photo-grid__item :global(img) {
+  /* 裁切而不是壓扁：object-fit 讓直幅照片也能填滿同一個框而不變形 */
+  .photo-grid__item :global(img),
+  .photo-grid__item :global(.placeholder) {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 1199px) {
+    .photo-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   @media (max-width: 767px) {
     .photo-grid {
-      columns: 1;
-    }
-  }
-
-  @media (min-width: 768px) and (max-width: 1199px) {
-    .photo-grid {
-      columns: 2;
+      grid-template-columns: 1fr;
     }
   }
 </style>
