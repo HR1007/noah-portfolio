@@ -129,6 +129,10 @@ sections:
         alt:
           en: Upload step
           zh: 上傳步驟
+      - label: '[需確認] Step'
+        ratio: 3/4
+        alt:
+          en: '[需確認] Flow step'
     direction: horizontal
   - type: experienceDemo
     eyebrow:
