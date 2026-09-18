@@ -191,7 +191,7 @@ sections:
   - type: featureSplit
     heading:
       en: 'Built for the Corridor, Not the Desk'
-      zh: 為走廊設計，不是為辦公桌
+      zh: 為現場而設計，而不只是為辦公桌而設計
     body:
       en: >-
         The mobile path assumes someone standing in a school corridor with one

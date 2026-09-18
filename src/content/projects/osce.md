@@ -25,20 +25,20 @@ sections:
       zh: OSCE 醫學考評平台
     paragraphs:
       - en: >-
-          This is my master's thesis, built on the "AR + OSCE"
-          teaching-assessment platform from the Department of Pharmacy at Taipei
-          University of Science and Technology, developed alongside OSCE domain
+          This is my master's thesis, built on the "AR + OSCE" teaching and
+          assessment platform from the Department of Pharmacy at Tajen
+          University of Technology, developed in collaboration with OSCE domain
           experts. OSCE is a rigorously designed assessment method — stations,
           rubrics, standardized patients, all of it specified. Its information
           system, on the other hand, had never really been treated as something
           that needed designing. The line that stuck with me from the interviews
-          was a coordinator's aside: they had to open ten separate tabs just to
-          place one exam seat. Which means the structure of the exam lived in
+          was a coordinator's aside: she had to open ten separate tabs just to
+          assign one exam seat. Which meant the structure of the exam lived in
           her head, not in the interface. That gap is where this project
           started.
         zh: >-
-          這是我的碩士論文，以北科大藥學系的「AR + OSCE」教學考評平台為基礎，與 OSCE 領域專家一起發展。OSCE
-          本身是一套設計得很嚴謹的考評方法——考站、評分表、標準化病人，全都有規格。但它的資訊系統，從來沒有被當成一件需要設計的事。訪談裡讓我記到現在的，是一位承辦人隨口說的一句話：光是排一個考位，她就得開十個分頁。那代表這場考試的結構是長在她腦袋裡，不是長在介面裡。這個落差，就是這個專案的起點。
+          這是我的碩士論文，以大仁科技大學藥學系的「AR + OSCE」教學考評平台為基礎，並與 OSCE 領域專家合作發展。OSCE
+          本身是一套設計得相當嚴謹的考評方法——考站、評分表、標準化病人，全部都有明確規格。但另一方面，它的資訊系統，過去從來沒有真正被當成一件需要設計的事。訪談裡讓我一直記得的，是一位承辦人隨口提到：光是安排一個考位，她就得開十個不同的分頁。這代表整場考試的結構，其實是存在她的腦袋裡，而不是存在介面裡。這個落差，就是這個專案的起點。
   - type: deviceShowcase
     ratio: 16/10
     alt:
@@ -82,9 +82,9 @@ sections:
       zh: 所有考試收在同一個資料夾
     body:
       en: >-
-        Sessions are filed by name and date, each card carrying its own
-        completion state — so an examiner sees what is still outstanding without
-        opening anything.
+        Sessions are filed by name and date, with each card carrying its own
+        completion status—so an examiner can see what remains outstanding
+        without opening anything.
       zh: 測驗依姓名與日期歸檔，每張卡片自己帶著完成狀態——考官不用點開任何一個，就知道還有哪些沒結束。
     imagePosition: right
     ratio: 3/4
