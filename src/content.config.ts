@@ -282,6 +282,11 @@ const site = defineCollection({
       experience: z.array(
         z.object({ title: z.string(), period: z.string(), description: z.string() })
       ),
+      /* 研討會發表與校內外服務，接在工作經歷下面，用同一個 title／period／description 結構 */
+      activitiesHeading: z.string(),
+      activities: z.array(
+        z.object({ title: z.string(), period: z.string(), description: z.string() })
+      ),
       connectHeading: z.string(),
       connectIntro: z.array(z.string()),
       connectChannels: z.array(

@@ -97,6 +97,17 @@ const hobbyPhotos = getHomeImageSet('hobby');
     ))}
   </section>
 
+  {/*
+    研討會與服務。跟上面的工作經歷用同一個 ExperienceItem，只是多一個標題把兩類分開——
+    工作經歷是「受僱做什麼」，這一區是「主動參與了什麼」，混在一起讀者分不出來。
+  */}
+  <section class="activities">
+    <h2 class="activities__heading">{home.activitiesHeading}</h2>
+    {home.activities.map((item) => (
+      <ExperienceItem title={item.title} period={item.period} description={item.description} />
+    ))}
+  </section>
+
   <section class="connect">
     <h2>{home.connectHeading}</h2>
     <div class="connect__intro">
@@ -252,6 +263,17 @@ const hobbyPhotos = getHomeImageSet('hobby');
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--sp-2);
+  }
+
+  .activities {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: 0 var(--content-gutter) var(--sp-7);
+  }
+
+  .activities__heading {
+    font-size: var(--font-size-h2);
+    margin-bottom: var(--sp-3);
   }
 
   .connect {

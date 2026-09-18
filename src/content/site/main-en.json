@@ -86,6 +86,39 @@
         "description": "e-Excellence Inc., Applied Information Architecture (IA) and Visual Hierarchy to transform complex datasets into intuitive, user-friendly visual stories for management."
       }
     ],
+    "activitiesHeading": "Conferences & Service",
+    "activities": [
+      {
+        "title": "Conference Talk · Chinese Institute of Industrial Engineers",
+        "period": "2025",
+        "description": "Presented an ergonomics-led redesign of the OSCE assessment interface."
+      },
+      {
+        "title": "Study Buddy · NKUST Office of International Affairs",
+        "period": "2025",
+        "description": "Paired with international students to help them settle into study and life in Taiwan."
+      },
+      {
+        "title": "AACSB Accreditation Interviewee · NKUST College of Management",
+        "period": "2025",
+        "description": "Represented the MIS master's programme in the Peer Review Team's on-site visit."
+      },
+      {
+        "title": "Conference Talk · Japan Human Factors and Ergonomics Society",
+        "period": "2025",
+        "description": "Presented a user-centred approach to hospital medication recognition at the 66th annual meeting."
+      },
+      {
+        "title": "Ergonomics Society of Taiwan Annual Conference",
+        "period": "2025",
+        "description": "Attended the annual meeting and international conference."
+      },
+      {
+        "title": "International Volunteer · University of Würzburg",
+        "period": "2024",
+        "description": "Ran a self-built booth at the International Evening, introducing exchange routes to Taiwan."
+      }
+    ],
     "connectHeading": "Connect with me",
     "connectIntro": [
       "Want to work on something together?",
