@@ -36,18 +36,6 @@ const COLUMNS = 5;
 const columns: (typeof items)[] = Array.from({ length: COLUMNS }, () => []);
 items.forEach((item, i) => columns[i % COLUMNS].push(item));
 
-/*
-  每一欄的速度要一致，但欄高不一定一樣（照片比例不同）。用「長寬比的總和」當
-  內容高度的代理值——欄寬相同，所以高度就正比於比例總和——再乘上一個係數換成秒數。
-  這樣三欄看起來是同一個速度在流，而不是短的那欄跑得特別快。
-*/
-const duration = (column: typeof items) => {
-  const ratio = column.reduce(
-    (sum, item) => sum + (item.image ? item.image.height / item.image.width : 4 / 3),
-    0
-  );
-  return `${(ratio * 9).toFixed(1)}s`;
-};
 ---
 
 <div class="photo-marquee" data-photo-marquee>
@@ -58,7 +46,7 @@ const duration = (column: typeof items) => {
           每張照片只輸出一次。接循環所需的複本由瀏覽器端複製——需要幾份取決於
           「一個循環的高度」對上「容器高度」，而容器是 82vh，建置時量不到。
         */}
-        <div class="photo-marquee__track" data-marquee-track style={`--duration: ${duration(column)}`}>
+        <div class="photo-marquee__track" data-marquee-track>
           {column.map((item) => (
             <figure class="photo-marquee__item">
               {item.image ? (
@@ -105,6 +93,18 @@ const duration = (column: typeof items) => {
       clone.querySelector('img')?.setAttribute('alt', '');
       track.appendChild(clone);
     });
+
+    /*
+      秒數等複製完才算，而且是由「固定的每秒像素」換算，不是每欄各給一個數字。
+
+      先前是在建置時依原始照片的長寬比總和算秒數，但要複製幾份是執行期才知道的——
+      複製三份的欄位內容長三倍、秒數卻沒變，等於跑三倍快。這就是各欄速度不一致的原因。
+
+      translateY(-50%) 移動的距離正好是「一半的軌道高度」，所以
+      秒數 = 一半的高度 ÷ 每秒像素，各欄自然就同速。
+    */
+    const SPEED = 28; // px／秒
+    track.style.setProperty('--duration', `${(track.scrollHeight / 2 / SPEED).toFixed(1)}s`);
 
     col.closest('[data-photo-marquee]')?.setAttribute('data-ready', '');
   });
