@@ -277,6 +277,8 @@ const site = defineCollection({
       aboutHeading: z.string(), // 巨大標題，例如 "About me"
       aboutSubheading: z.string(), // 次標題，例如 "Shaping Intuitive Solutions"
       aboutIntro: z.string(),
+      /* About 的第二段：研究主軸。跟 aboutIntro 分開存，版面上是獨立一段 */
+      aboutResearch: z.string(),
       beyondGridHeading: z.string(),
       beyondGridParagraphs: z.array(z.string()),
       experience: z.array(

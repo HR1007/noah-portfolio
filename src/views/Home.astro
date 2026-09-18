@@ -70,6 +70,7 @@ const hobbyPhotos = getHomeImageSet('hobby');
         {/* 兩欄版面下這一段特別高，收合後照片與文字的高度才不會差太多 */}
         <ReadMore lines={6}>
           <p class="about__intro">{home.aboutIntro}</p>
+          <p class="about__intro">{home.aboutResearch}</p>
         </ReadMore>
       </div>
     </div>
@@ -233,6 +234,11 @@ const hobbyPhotos = getHomeImageSet('hobby');
   .about__subheading {
     font-size: var(--font-size-h2);
     margin-bottom: var(--sp-2);
+  }
+
+  /* 兩段之間要有間距，收合時看起來才是「還有下一段」而不是斷掉 */
+  .about__intro + .about__intro {
+    margin-top: var(--sp-2);
   }
 
   .about__intro {

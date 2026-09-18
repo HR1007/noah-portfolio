@@ -64,6 +64,7 @@
     "aboutHeading": "About me",
     "aboutSubheading": "Shaping Intuitive Solutions",
     "aboutIntro": "Hi there! I'm an Information Management graduate student at NKUST with a heart for UI/UX and Human Factors. My journey has taken me from analyzing data at e-Excellence Inc. to exploring new perspectives during an exchange at THWS in Germany, all of which fuels my focus on creating accessible and beautifully structured interfaces. These days, I'm pouring my energy into optimizing OSCE medical system backends through User-Centered Design (UCD) — striving to turn complex technical logic into an intuitive experience that truly serves its users.",
+    "aboutResearch": "My research thread is putting ergonomics into clinical settings. It started in 2023 with an AR ordering interface driven by gesture control, and led to using eye tracking and usability testing on hospital medication recognition — the same question throughout: in a high-pressure, low-tolerance environment, can the interface prevent one more mistake?",
     "beyondGridHeading": "Beyond the Grid",
     "beyondGridParagraphs": [
       "When I'm not refining pixels or analyzing datasets, I immerse myself in illustration and digital art. My love for visual storytelling often translates into my web projects, where I enjoy integrating unique character designs.",
@@ -73,7 +74,7 @@
       {
         "title": "Human Factors Researcher",
         "period": "2025 - Present",
-        "description": "Showcased medical UI/UX optimizations using UCD at international conferences (JSES & CIIE)."
+        "description": "Evaluate clinical interfaces with eye tracking and usability testing, turning what happens on the ward into decisions a team can build."
       },
       {
         "title": "Teaching Assistant",
