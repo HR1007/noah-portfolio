@@ -89,6 +89,11 @@
     "activitiesHeading": "Conferences & Service",
     "activities": [
       {
+        "title": "Student Ambassador · NKUST Office of International Affairs",
+        "period": "2026",
+        "description": "Hosted international guests at the university sports meet, accompanying them through the day."
+      },
+      {
         "title": "Conference Talk · Chinese Institute of Industrial Engineers",
         "period": "2025",
         "description": "Presented an ergonomics-led redesign of the OSCE assessment interface."

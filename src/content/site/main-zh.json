@@ -89,6 +89,11 @@
     "activitiesHeading": "研討會與服務",
     "activities": [
       {
+        "title": "學生大使 · 高科大國際事務處",
+        "period": "2026",
+        "description": "校運會期間接待國際來賓，陪同參與活動並協助交流。"
+      },
+      {
         "title": "研討會發表 · 中國工業工程學會",
         "period": "2025",
         "description": "發表以人因工程為設計導向的 OSCE 評量系統介面優化。"
