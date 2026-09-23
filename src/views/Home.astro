@@ -8,6 +8,7 @@ import PullQuote from '../components/PullQuote.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
 import ConnectChannel from '../components/ConnectChannel.astro';
 import ReadMore from '../components/ReadMore.astro';
+import SectionNav from '../components/project/SectionNav.astro';
 import { getHomeImage, getHomeImageSet } from '../lib/media';
 
 interface Props {
@@ -22,6 +23,18 @@ const heroImage = getHomeImage('hero');
 const avatarImage = getHomeImage('avatar');
 const aboutImage = getHomeImage('about');
 const hobbyPhotos = getHomeImageSet('hobby');
+
+/*
+  側邊章節導覽項目，跟案例頁（ProjectDetail.astro）用同一顆 SectionNav、同一條規則：
+  只收有標題文字的段落，才有東西可以當目錄的字。hero／quote 都沒有標題
+  （案例頁的 hero 同樣不列入 navItems），略過。
+*/
+const navItems = [
+  { id: 'about', label: home.aboutHeading },
+  { id: 'beyond-grid', label: home.beyondGridHeading },
+  { id: 'activities', label: home.activitiesHeading },
+  { id: 'connect', label: home.connectHeading },
+];
 ---
 
 <BaseLayout
@@ -50,7 +63,7 @@ const hobbyPhotos = getHomeImageSet('hobby');
     </div>
   </section>
 
-  <section class="about">
+  <section class="about" id="about">
     <h2 class="about__heading">{home.aboutHeading}</h2>
     <div class="about__grid">
       <div
@@ -76,7 +89,7 @@ const hobbyPhotos = getHomeImageSet('hobby');
     </div>
   </section>
 
-  <section class="beyond-grid">
+  <section class="beyond-grid" id="beyond-grid">
     <div class="beyond-grid__text">
       <h2>{home.beyondGridHeading}</h2>
       {home.beyondGridParagraphs.map((paragraph) => <p>{paragraph}</p>)}
@@ -102,14 +115,14 @@ const hobbyPhotos = getHomeImageSet('hobby');
     研討會與服務。跟上面的工作經歷用同一個 ExperienceItem，只是多一個標題把兩類分開——
     工作經歷是「受僱做什麼」，這一區是「主動參與了什麼」，混在一起讀者分不出來。
   */}
-  <section class="activities">
+  <section class="activities" id="activities">
     <h2 class="activities__heading">{home.activitiesHeading}</h2>
     {home.activities.map((item) => (
       <ExperienceItem title={item.title} period={item.period} description={item.description} />
     ))}
   </section>
 
-  <section class="connect">
+  <section class="connect" id="connect">
     <h2>{home.connectHeading}</h2>
     <div class="connect__intro">
       {home.connectIntro.map((line) => <p>{line}</p>)}
@@ -125,6 +138,8 @@ const hobbyPhotos = getHomeImageSet('hobby');
       ))}
     </div>
   </section>
+
+  <SectionNav items={navItems} toTopLabel={site!.data.nav.toTop} />
 </BaseLayout>
 
 <style>
@@ -190,6 +205,18 @@ const hobbyPhotos = getHomeImageSet('hobby');
     font-size: var(--font-size-body);
     color: var(--color-muted);
     text-align: left;
+  }
+
+  /*
+    scroll-margin-top：導覽列是 sticky 的，不留這段空白，側邊導覽跳過去之後
+    段落標題會被蓋住。數值跟案例頁的 .project-anchor 用同一個 token（--sp-7），
+    是側邊導覽（SectionNav）這個元件在本站的固定搭配值，不是這裡另外調的。
+  */
+  .about,
+  .beyond-grid,
+  .activities,
+  .connect {
+    scroll-margin-top: var(--sp-7);
   }
 
   .about {
