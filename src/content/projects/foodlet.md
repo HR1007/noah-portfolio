@@ -2,7 +2,7 @@
 title:
   en: Foodlet
   zh: 食錢包 Foodlet
-order: 5
+order: 6
 summary:
   en: >-
     Redefining Taiwan's F&B landscape by merging seamless digital payments with

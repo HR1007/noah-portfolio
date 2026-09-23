@@ -2,7 +2,7 @@
 title:
   en: Talk German
   zh: Talk German
-order: 4
+order: 5
 summary:
   en: >-
     Inspired by my exchange at THWS Würzburg. Talk German bridges the gap

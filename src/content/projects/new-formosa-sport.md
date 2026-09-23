@@ -2,7 +2,7 @@
 title:
   en: New Formosa Sport — Sports Platform Website Design
   zh: 新台灣運動——運動用品平台網站設計
-order: 2
+order: 3
 summary:
   en: >-
     A modern sports website designed to deliver clear information, engaging
