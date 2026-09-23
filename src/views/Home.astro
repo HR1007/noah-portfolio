@@ -8,8 +8,9 @@ import PullQuote from '../components/PullQuote.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
 import ConnectChannel from '../components/ConnectChannel.astro';
 import ReadMore from '../components/ReadMore.astro';
+import ScrollVideo from '../components/ScrollVideo.astro';
 import SectionNav from '../components/project/SectionNav.astro';
-import { getHomeImage, getHomeImageSet } from '../lib/media';
+import { getHomeImage, getHomeImageSet, getHomeVideo } from '../lib/media';
 
 interface Props {
   locale: 'en' | 'zh';
@@ -23,10 +24,12 @@ const heroImage = getHomeImage('hero');
 const avatarImage = getHomeImage('avatar');
 const aboutImage = getHomeImage('about');
 const hobbyPhotos = getHomeImageSet('hobby');
+const reachVideo = getHomeVideo('character-reach');
+const reachPoster = getHomeImage('character-reach-poster');
 
 /*
   側邊章節導覽項目，跟案例頁（ProjectDetail.astro）用同一顆 SectionNav、同一條規則：
-  只收有標題文字的段落，才有東西可以當目錄的字。hero／quote 都沒有標題
+  只收有標題文字的段落，才有東西可以當目錄的字。hero／quote／捲動影片都沒有標題
   （案例頁的 hero 同樣不列入 navItems），略過。
 */
 const navItems = [
@@ -41,6 +44,66 @@ const navItems = [
   title={`${home.heroName} — ${home.heroRoles[0]}`}
   description={home.aboutIntro}
 >
+  {/*
+    捲動驅動的伸手互動：貼在頂欄正下方，訪客一進站先看到這個。往下捲，角色慢慢把手
+    伸向螢幕；往回捲就縮回去，停下就停在當下那一幀。獨立一個滿版 section，不透明、
+    不疊加任何內容——細節見 ScrollVideo.astro。
+
+    裝飾用取景框角標＋捲動提示：純圖示、不含文字（文案要走 content，這兩個是裝飾
+    不是文案）。角標讓滿版影片有個「畫面邊界」而不是隨機被裁切的一塊，呼應本人是
+    做人因工程／手勢互動研究的背景；捲動提示只在剛進站、還沒開始捲的時候看得到——
+    使用者一開始捲，捲動舞台本身就是最清楚的提示，這顆圖示的任務就結束了。
+  */}
+  {reachVideo && (
+    <ScrollVideo src={reachVideo} ratio="1280/654" poster={reachPoster?.src}>
+      {/*
+        取景框：呼應「觀景窗」的概念——角色像是被鏡頭注視著，同時也在注視訪客。
+        網格格距用 --sp-6（8 的 8 倍）不是隨手選的：首頁引言那句「My life is an
+        8px grid」就是本人自己的梗，格線放大 8 倍剛好在滿版尺度上看得出來是格線，
+        又還是同一套間距階梯，不是另外發明的數字。
+      */}
+      <div class="reach-frame">
+        <div class="reach-frame__grid" />
+        <span class="reach-frame__corner reach-frame__corner--tl" aria-hidden="true" />
+        <span class="reach-frame__corner reach-frame__corner--tr" aria-hidden="true" />
+        <span class="reach-frame__corner reach-frame__corner--bl" aria-hidden="true" />
+        <span class="reach-frame__corner reach-frame__corner--br" aria-hidden="true" />
+        {/*
+          錄製中的提示點＋一句招呼：暗示「這一段正在被記錄、角色注意到你了」，呼應
+          觀景窗的概念。文字來自 home.reachCaption，不是裝飾圖形，所以不掛 aria-hidden——
+          螢幕閱讀器唸得到，這句招呼才不會只有看得到畫面的人收到。
+        */}
+        <div class="reach-frame__rec">
+          <span class="reach-frame__rec-dot" aria-hidden="true" />
+          <span class="reach-frame__rec-label">{home.reachCaption}</span>
+        </div>
+        {/*
+          像素貼圖：呼應首頁 hero 本來就有的像素風插畫（hero.png），手繪的一顆像素愛心，
+          不是另外生成的圖檔——SVG rect 畫格子，縮放不失真，也不用多帶一個圖片請求。
+        */}
+        <svg class="reach-frame__sticker" viewBox="0 0 7 6" aria-hidden="true">
+          <rect x="1" y="0" width="2" height="1" />
+          <rect x="4" y="0" width="2" height="1" />
+          <rect x="0" y="1" width="7" height="1" />
+          <rect x="0" y="2" width="7" height="1" />
+          <rect x="1" y="3" width="5" height="1" />
+          <rect x="2" y="4" width="3" height="1" />
+          <rect x="3" y="5" width="1" height="1" />
+        </svg>
+        {/* 中央準星：呼應本人做手勢互動／AR 介面研究的背景，緩緩呼吸，暗示鏡頭正對準訪客 */}
+        <span class="reach-frame__reticle" aria-hidden="true">
+          <svg viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="13" />
+            <path d="M24 2v9M24 37v9M2 24h9M37 24h9" />
+          </svg>
+        </span>
+        <span class="reach-frame__cue" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg>
+        </span>
+      </div>
+    </ScrollVideo>
+  )}
+
   <section class="hero">
     <div class="hero__media">
       <Media image={heroImage} ratio="157/378" alt={`${home.heroName} pixel-art portrait`} />
@@ -147,6 +210,174 @@ const navItems = [
     max-width: var(--content-width);
     margin: 0 auto;
     padding: var(--sp-7) var(--content-gutter);
+  }
+
+  /*
+    頂欄正下方伸手影片的裝飾層：觀景窗角標、細格線、錄製提示＋招呼文字、像素貼圖、
+    中央準星、捲動提示。全部用 --color-on-hero——那個 token 就是為「疊在照片／背景圖
+    上的標記，深色模式不跟著翻」而設的，跟這裡的用途完全一致（影片本身不隨主題反轉，
+    疊在上面的裝飾也不該反轉）。.reach-frame 這層先內縮 --sp-3，角標跟著貼在它的邊界，
+    不用每個角再各自重複一次內縮值。
+  */
+  .reach-frame {
+    position: absolute;
+    inset: var(--sp-3);
+    color: var(--color-on-hero);
+  }
+
+  /*
+    細格線。格距用 --sp-6（8 的 8 倍）——首頁引言那句「My life is an 8px grid」
+    是本人自己的梗，格線放大 8 倍剛好在滿版尺度上看得出來是格線，又還是同一套
+    間距階梯，不是另外發明的數字。
+  */
+  .reach-frame__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(to right, currentColor 0 1px, transparent 1px var(--sp-6)),
+      repeating-linear-gradient(to bottom, currentColor 0 1px, transparent 1px var(--sp-6));
+    opacity: 0.08;
+  }
+
+  .reach-frame__corner {
+    position: absolute;
+    width: var(--sp-4);
+    height: var(--sp-4);
+    border-color: currentColor;
+    border-style: solid;
+    border-width: 0;
+  }
+
+  .reach-frame__corner--tl {
+    top: 0;
+    left: 0;
+    border-top-width: 1px;
+    border-left-width: 1px;
+  }
+
+  .reach-frame__corner--tr {
+    top: 0;
+    right: 0;
+    border-top-width: 1px;
+    border-right-width: 1px;
+  }
+
+  .reach-frame__corner--bl {
+    bottom: 0;
+    left: 0;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+  }
+
+  .reach-frame__corner--br {
+    bottom: 0;
+    right: 0;
+    border-bottom-width: 1px;
+    border-right-width: 1px;
+  }
+
+  /* 錄製提示點＋招呼文字，貼在左上角標旁邊 */
+  .reach-frame__rec {
+    position: absolute;
+    top: var(--sp-2);
+    left: var(--sp-2);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-1);
+  }
+
+  .reach-frame__rec-dot {
+    flex: none;
+    width: var(--sp-1);
+    height: var(--sp-1);
+    border-radius: var(--radius-pill);
+    background: currentColor;
+    animation: reach-rec-pulse 1.8s var(--motion-ease) infinite;
+  }
+
+  .reach-frame__rec-label {
+    font-size: var(--font-size-meta);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  @keyframes reach-rec-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  /* 像素愛心貼圖，貼在右上角標旁邊，跟左上的錄製提示左右呼應 */
+  .reach-frame__sticker {
+    position: absolute;
+    top: var(--sp-2);
+    right: var(--sp-2);
+    width: var(--sp-4);
+    height: auto;
+    fill: currentColor;
+    shape-rendering: crispEdges;
+  }
+
+  /* 中央準星：緩緩呼吸，暗示鏡頭正對準訪客 */
+  .reach-frame__reticle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--sp-6);
+    height: var(--sp-6);
+    animation: reach-reticle-pulse 2.4s var(--motion-ease) infinite;
+  }
+
+  .reach-frame__reticle svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+
+  @keyframes reach-reticle-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: translate(-50%, -50%) scale(0.92);
+    }
+    50% {
+      opacity: 0.8;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  /* 捲動提示：靜置時輕輕上下彈，暗示「這裡可以捲」 */
+  .reach-frame__cue {
+    position: absolute;
+    bottom: var(--sp-2);
+    left: 50%;
+    animation: reach-cue-bounce 1.6s var(--motion-ease) infinite;
+  }
+
+  .reach-frame__cue svg {
+    width: var(--icon-lg);
+    height: var(--icon-lg);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @keyframes reach-cue-bounce {
+    0%,
+    100% {
+      transform: translate(-50%, 0);
+    }
+    50% {
+      transform: translate(-50%, var(--sp-1));
+    }
   }
 
   .hero {
@@ -335,6 +566,14 @@ const navItems = [
     text-align: left;
     max-width: var(--connect-grid-width);
     margin: 0 auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reach-frame__cue,
+    .reach-frame__reticle,
+    .reach-frame__rec-dot {
+      animation: none;
+    }
   }
 
   @media (max-width: 767px) {

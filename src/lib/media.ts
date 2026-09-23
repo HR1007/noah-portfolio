@@ -22,6 +22,18 @@ const homeImageModules = import.meta.glob<ImageModule>(
   { eager: true }
 );
 
+/*
+  首頁影片（例如 About 區塊的捲動互動影片）。副檔名不在 astro:assets 認得的圖片格式裡，
+  所以不能用 ImageModule／Image 元件；改用 Vite 內建的 asset pipeline——mp4／webm
+  是 Vite 預設就會處理的靜態資源型別，import 進來的預設匯出就是「帶內容雜湊的正式網址」
+  （例如 /_astro/character-reach.C3x9F2ab.mp4），跟圖片的長期快取待遇一致，
+  只是沒有寬高／格式轉換這些 astro:assets 才有的加值處理。
+*/
+const homeVideoModules = import.meta.glob<{ default: string }>(
+  '/src/assets/home/*.{mp4,webm}',
+  { eager: true }
+);
+
 const portfolioImageModules = import.meta.glob<ImageModule>(
   '/src/assets/portfolio/*.{png,jpg,jpeg,webp,avif}',
   { eager: true }
@@ -97,6 +109,15 @@ export function getHomeImage(name: string): ImageMetadata | undefined {
     return filename.replace(/\.[^.]+$/, '') === name;
   });
   return match?.[1];
+}
+
+/** 依語意檔名（不含副檔名）取單支首頁影片，例如 getHomeVideo('character-reach')；找不到時回傳 undefined。 */
+export function getHomeVideo(name: string): string | undefined {
+  const match = Object.entries(homeVideoModules).find(([path]) => {
+    const filename = path.split('/').pop() ?? '';
+    return filename.replace(/\.[^.]+$/, '') === name;
+  });
+  return match?.[1].default;
 }
 
 /**

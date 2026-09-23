@@ -188,6 +188,21 @@
   --viewer-spot: rgba(242, 242, 242, 0.1);
   --viewer-spot-size: 320px;
 
+  /*
+    首頁的捲動驅動影片（ScrollVideo，About 前面那段伸手互動）。
+
+    --scrub-distance：訪客要捲多長，影片才從第一幀走到最後一幀。影片 121 幀，
+    1200px 約每 10px 走一幀——滑鼠滾輪一格約 100px，整段動作十幾格滾完，
+    比正常播放（5 秒）稍快，捲的時候手會明顯「跟著你的手指」。
+    [需確認] 想更慢、更有「伸過來」的份量就加大這個值。
+
+    --nav-height：預設 0，由 ScrollVideo 的 script 量到 <nav> 的實際高度後覆寫。
+    sticky 的舞台要貼在 nav 正下方，而 nav 的高度來自字級與內距，沒有單一 token
+    可以引用；用 JS 量而不是 calc 拼湊，nav 改版時這裡不會悄悄錯位。
+  */
+  --scrub-distance: 1200px;
+  --nav-height: 0px;
+
   /* 圓角 */
   --radius: 16px;
   --radius-pill: 999px; /* [需確認] 目前站上沒有藥丸形元件，先保留備用 */

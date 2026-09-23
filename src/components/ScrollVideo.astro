@@ -1,0 +1,256 @@
+---
+/*
+  獨立一個 section 的捲動驅動影片：訪客捲多少，影片就走到哪一幀；停下來就停在那一幀，
+  往回捲就倒退。不會自己播、不會循環——不是背景影片，是一段由捲軸控制的逐幀動畫，
+  滿版、不透明，本身就是內容（不是墊在別的內容底下的裝飾層）。
+
+  結構是元件自己包好的「軌道 + 舞台」：
+
+    <section data-scrub-track>          軌道：舞台的自然高度 + --scrub-distance 的空白
+      <div data-scrub-stage>            舞台：sticky，貼在 nav 正下方，撐滿以下視窗
+        <video>                         滿版鋪在舞台裡
+      </div>
+    </section>
+
+  進度 = 舞台在軌道裡走了多遠 ÷ 軌道比舞台多出來的那段空白。純幾何，不需要知道
+  nav 高度或捲軸位置。
+
+  影片本身要先轉成「每一幀都是 keyframe」（ffmpeg -g 1）。一般影片幾秒才一個 keyframe，
+  seek 到中間任一幀都得從前一個 keyframe 一路解碼過來，捲動會一頓一頓、倒退更慘。
+
+  三種情況下退回一般版面（不 sticky、沒有捲動距離、影片一個 byte 都不下載，只在原生
+  文件流裡用影片原始比例佔一格空間，停在第一幀）：
+    - 系統開啟「減少動態」
+    - JS 沒跑到
+    - 影片載入失敗
+  作法比照 SectionReveal：預設就是一般版面，由行內 script 在確認可以動之後才在軌道上
+  掛 data-scrub-active，CSS 只在有這個旗標時套舞台版面。
+*/
+interface Props {
+  /** 影片網址（帶內容雜湊，見 lib/media.ts 的 getHomeVideo） */
+  src: string;
+  /** 影片的原始寬高比，例如 "1280/654"。用來在一般版面（未套用捲動舞台）時佔位，避免版面跳動 */
+  ratio: string;
+  /**
+   * 第一幀的靜態圖，選填。瀏覽器一解析到 <video> 就會抓這張圖，不等 preload——
+   * 減少動態／JS 沒跑到／影片還沒 seek 完成這幾種情況下，畫面不會是空的。
+   */
+  poster?: string;
+  /**
+   * 影片的每秒幀數。捲動位置會先量化到幀，同一幀不重複 seek——
+   * 每次 seek 都要走一趟解碼，捲軸每動一像素就 seek 一次是白做工。
+   */
+  fps?: number;
+}
+
+const { src, ratio, poster, fps = 24 } = Astro.props;
+---
+
+<section class="scroll-video" data-scrub-track data-fps={fps}>
+  <div class="scroll-video__stage" data-scrub-stage>
+    {/*
+      沒有 controls／autoplay／loop：播放位置只由捲軸決定。
+      preload="none"：要不要下載由 script 依距離決定，首屏不用先扛這幾 MB。
+    */}
+    <video
+      class="scroll-video__video"
+      src={src}
+      poster={poster}
+      muted
+      playsinline
+      preload="none"
+      disablepictureinpicture
+      aria-hidden="true"
+      style={`aspect-ratio: ${ratio}`}
+    ></video>
+    {/*
+      裝飾層：呼叫端可以傳裝飾用的標記進來（取景框角標、捲動提示之類），蓋在影片
+      上面。留空插槽而不是元件自己內建裝飾，是因為這是特定用法的裝飾，不是每個
+      用到 ScrollVideo 的地方都要有——裝飾內容由呼叫端決定，元件只負責給個定位錨點。
+    */}
+    <div class="scroll-video__overlay"><slot /></div>
+  </div>
+
+  {/*
+    這支 is:inline script 要留在 section 裡面（不能當它的 sibling）：靠
+    document.currentScript.closest('[data-scrub-track]') 找到自己所屬的軌道，
+    script 標籤必須是軌道的子孫節點，closest() 才找得到——當 sibling 只會往上找
+    到更外層的祖先，永遠碰不到軌道本身。下面那支打包後的 script 改用
+    querySelectorAll 全域找軌道，不依賴 DOM 位置，留在 section 外面沒關係。
+  */}
+  <script is:inline>
+    // 解析到這裡時軌道（自己的父層）已經在 DOM 裡，可以直接掛旗標，版面在第一次
+    // 繪製前就定案，不會先畫一般版面再跳成舞台。
+    // 系統開啟「減少動態」時整段跳過，維持一般版面。
+    (() => {
+      const track = document.currentScript?.closest('[data-scrub-track]');
+      if (track && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        track.dataset.scrubActive = '';
+      }
+    })();
+  </script>
+</section>
+
+<script>
+  const tracks = document.querySelectorAll<HTMLElement>('[data-scrub-track][data-scrub-active]');
+
+  /*
+    舞台要貼在 nav 正下方。nav 的高度來自字級與內距，沒有 token 可引用，量實際值最準；
+    掛 ResizeObserver 是因為視窗變窄時 nav 可能折行變高。只在頁面真的有舞台時才量。
+  */
+  const nav = document.querySelector('nav');
+  if (nav && tracks.length > 0) {
+    const publish = () =>
+      document.documentElement.style.setProperty('--nav-height', `${nav.offsetHeight}px`);
+    publish();
+    new ResizeObserver(publish).observe(nav);
+  }
+
+  for (const track of tracks) {
+    const stage = track.querySelector<HTMLElement>('[data-scrub-stage]');
+    const video = track.querySelector('video');
+    if (!stage || !video) continue;
+
+    const fps = Number(track.dataset.fps ?? 24);
+    let totalFrames = 0; // loadedmetadata 之後才知道；0 代表還不能 seek
+    let lastFrame = -1;
+    let dirty = false;
+    let rafId = 0;
+
+    const render = () => {
+      rafId = 0;
+      if (!dirty || !totalFrames) return;
+      dirty = false;
+
+      const t = track.getBoundingClientRect();
+      const s = stage.getBoundingClientRect();
+      const range = t.height - s.height; // 軌道比舞台多出來的空白，就是 --scrub-distance
+      if (range <= 0) return;
+
+      const progress = Math.min(1, Math.max(0, (s.top - t.top) / range));
+      const frame = Math.round(progress * (totalFrames - 1));
+      if (frame === lastFrame) return;
+      lastFrame = frame;
+      video.currentTime = frame / fps;
+    };
+
+    // scroll 事件裡只立旗標，量測與 seek 集中在一個 rAF 做：一幀之內捲了好幾次也只算一次
+    const schedule = () => {
+      dirty = true;
+      if (!rafId) rafId = requestAnimationFrame(render);
+    };
+
+    const listen = () => {
+      window.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule);
+      schedule();
+    };
+    const unlisten = () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+    };
+
+    // 只在軌道還看得到的時候才聽 scroll；捲到別處就拆掉，不留一個常駐的 listener
+    const visibility = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) listen();
+      else unlisten();
+    });
+
+    // 快進到視窗（上下各留一個螢幕高）才開始下載，首屏不用先扛這幾 MB
+    const loader = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        loader.disconnect();
+        video.preload = 'auto';
+        video.load();
+      },
+      { rootMargin: '100% 0px' }
+    );
+
+    // 影片壞了就把旗標拿掉，CSS 退回一般版面；observer 與 listener 一併收掉
+    const fail = () => {
+      delete track.dataset.scrubActive;
+      visibility.disconnect();
+      loader.disconnect();
+      unlisten();
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+
+    video.addEventListener('error', fail, { once: true });
+
+    video.addEventListener(
+      'loadedmetadata',
+      () => {
+        if (!Number.isFinite(video.duration) || video.duration <= 0) return fail();
+        /*
+          iOS Safari 的預熱：沒真正播過的影片，光設 currentTime 有時畫不出第一幀（一片空白）。
+          靜音影片可以不經手勢 play()，播到第一幀立刻 pause——肉眼看不出來，之後 seek 就
+          都正常。桌面瀏覽器不需要但也無害；被擋下就算了，直接進入 seek。
+        */
+        video
+          .play()
+          .then(() => video.pause())
+          .catch(() => {})
+          .finally(() => {
+            totalFrames = Math.round(video.duration * fps);
+            lastFrame = -1;
+            schedule();
+          });
+      },
+      { once: true }
+    );
+
+    visibility.observe(track);
+    loader.observe(track);
+  }
+</script>
+
+<style>
+  /*
+    一般版面（未套用捲動舞台）：影片就在文件流裡正常佔一格，用自己的原始比例
+    （行內 style 的 aspect-ratio）撐出空間，不裁切、不跳動。
+  */
+  .scroll-video {
+    line-height: 0; /* video 是 inline 元素，沒有這行容器底部會多出幾 px 的行高空隙 */
+  }
+
+  .scroll-video__video {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* 插槽內容（裝飾層）的定位錨點。active 模式下舞台是 sticky，本身就是錨點，這裡補的是一般版面 */
+  .scroll-video__stage {
+    position: relative;
+  }
+
+  .scroll-video__overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /*
+    捲動舞台版面：軌道用 ::after 撐出捲動距離；舞台 sticky 貼在 nav 下方、撐滿以下視窗；
+    影片滿版鋪在舞台裡、裁成 cover——訪客捲動時看到的一直是撐滿螢幕的畫面，不留白邊。
+  */
+  .scroll-video[data-scrub-active]::after {
+    content: '';
+    display: block;
+    height: var(--scrub-distance);
+  }
+
+  .scroll-video[data-scrub-active] .scroll-video__stage {
+    position: sticky;
+    top: var(--nav-height);
+    height: calc(100svh - var(--nav-height));
+    overflow: hidden;
+  }
+
+  .scroll-video[data-scrub-active] .scroll-video__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>
