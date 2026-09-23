@@ -274,6 +274,8 @@ const site = defineCollection({
       heroTagline: z.string(),
       heroRoles: z.array(z.string()),
       heroQuote: z.string(),
+      /* 頂欄下方伸手互動影片的裝飾文字，跟著「錄製中」圖示一起顯示，一句短短的招呼 */
+      reachCaption: z.string(),
       aboutHeading: z.string(), // 巨大標題，例如 "About me"
       aboutSubheading: z.string(), // 次標題，例如 "Shaping Intuitive Solutions"
       aboutIntro: z.string(),
