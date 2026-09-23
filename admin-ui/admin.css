@@ -244,7 +244,8 @@ svg {
   參考到圖片本身的原始比例，撐爆這個本來該固定 4:3 的裁切框。
   這是 admin 管理縮圖 grid 專用的裁切邏輯，跟正式網站的 PhotoGrid（保留照片原始比例、不裁切）無關。
 */
-.tile__image-wrap img {
+.tile__image-wrap img,
+.tile__image-wrap video {
   position: absolute;
   inset: 0;
   width: 100%;

@@ -37,9 +37,13 @@ const SITE_EN = path.join(SITE_CONTENT_DIR, 'main-en.json');
 const SITE_ZH = path.join(SITE_CONTENT_DIR, 'main-zh.json');
 
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif']);
+// 目前只有首頁的伸手互動影片這一個位置用得到，先開一個小集合，不是通用影片上傳。
+const VIDEO_EXT = new Set(['.mp4']);
+// slot 沒標 kind 就當圖片位置——原本清單全部都是圖，補這個 helper 之後舊 slot 不用逐一補 kind。
+const slotExtSet = (slot) => (slot.kind === 'video' ? VIDEO_EXT : IMAGE_EXT);
 /*
-  頁面上「位置固定、用語意檔名」的圖片：一個蘿蔔一個坑，換圖就是覆蓋同一個檔名，
-  跟相簿／案例頁那種編號序列不同（那些靠檔名編號決定順序與版位）。
+  頁面上「位置固定、用語意檔名」的圖片（或影片）：一個蘿蔔一個坑，換檔就是覆蓋
+  同一個檔名，跟相簿／案例頁那種編號序列不同（那些靠檔名編號決定順序與版位）。
 
   以前這份清單只有 Home 一組，Gallery 與 Portfolio 的頁面大圖只能手動把檔案丟進
   資料夾，後台看不到也換不了——同樣是「頁面上的一張固定圖」，卻有兩套規則。
@@ -54,6 +58,12 @@ const PAGE_IMAGES = {
       { name: 'hero', label: 'Hero（首頁最上方全身照）' },
       { name: 'avatar', label: 'Avatar（引言旁的圓形頭像）' },
       { name: 'about', label: 'About（About me 區塊照片）' },
+      /*
+        捲動控制播放位置，所以要先轉成「每一幀都是 keyframe」再上傳（ffmpeg -g 1），
+        不然捲動時會頓、倒退更明顯——後台不會幫忙轉檔，上傳前自己處理好。
+      */
+      { name: 'character-reach', label: 'Reach 影片（頂欄下方的伸手互動）', kind: 'video' },
+      { name: 'character-reach-poster', label: 'Reach 影片封面（影片載入前／減少動態時顯示的靜態幀）' },
     ],
   },
   gallery: {
@@ -932,14 +942,17 @@ function pageImageSlot(page, name) {
 }
 
 /*
-  找「檔名剛好等於這個語意名」的圖，副檔名不限——同一個位置可以從 png 換成 webp，
+  找「檔名剛好等於這個語意名」的檔案，副檔名不限——同一個位置可以從 png 換成 webp，
   網站端也是用同一條規則（media.ts 的 getHomeImage/getGalleryImage/getPortfolioImage）。
   Gallery 目錄底下還有相簿子資料夾，靠副檔名過濾自然會略過。
+
+  extSet 預設 IMAGE_EXT：絕大多數 slot 是圖片，呼叫端不用每次都傳；影片 slot
+  呼叫端會帶 slotExtSet(slot) 換成 VIDEO_EXT。
 */
-async function findPageImage(dir, name) {
+async function findPageImage(dir, name, extSet = IMAGE_EXT) {
   const files = await fs.readdir(dir);
   return files.find(
-    (f) => IMAGE_EXT.has(path.extname(f).toLowerCase()) && path.basename(f, path.extname(f)) === name
+    (f) => extSet.has(path.extname(f).toLowerCase()) && path.basename(f, path.extname(f)) === name
   );
 }
 
@@ -949,7 +962,7 @@ app.get('/api/page-images', async (req, res) => {
       Object.entries(PAGE_IMAGES).map(async ([page, group]) => {
         const slots = await Promise.all(
           group.slots.map(async (slot) => {
-            const match = await findPageImage(group.dir, slot.name);
+            const match = await findPageImage(group.dir, slot.name, slotExtSet(slot));
             if (!match) return { ...slot, page, filename: null };
             const info = await describeFile(path.join(group.dir, match), `${group.urlBase}/${match}`);
             return { ...slot, page, ...info };
@@ -974,12 +987,13 @@ app.post(
   async (req, res) => {
   try {
     const { page, name } = req.params;
-    const { group } = pageImageSlot(page, name);
+    const { group, slot } = pageImageSlot(page, name);
+    const extSet = slotExtSet(slot);
     const ext = path.extname(String(req.query.filename || '')).toLowerCase();
-    if (!IMAGE_EXT.has(ext)) return res.status(400).json({ error: 'unsupported extension' });
+    if (!extSet.has(ext)) return res.status(400).json({ error: 'unsupported extension' });
 
-    // 同一個位置可能已經有別種副檔名的舊圖，先清掉再寫，否則兩個檔案會搶同一個位置
-    const old = await findPageImage(group.dir, name);
+    // 同一個位置可能已經有別種副檔名的舊檔，先清掉再寫，否則兩個檔案會搶同一個位置
+    const old = await findPageImage(group.dir, name, extSet);
     if (old) await fs.unlink(path.join(group.dir, old));
 
     const filename = `${name}${ext}`;
@@ -999,8 +1013,8 @@ app.delete(
   async (req, res) => {
   try {
     const { page, name } = req.params;
-    const { group } = pageImageSlot(page, name);
-    const match = await findPageImage(group.dir, name);
+    const { group, slot } = pageImageSlot(page, name);
+    const match = await findPageImage(group.dir, name, slotExtSet(slot));
     if (match) await fs.unlink(path.join(group.dir, match));
     res.json({ ok: true });
   } catch (err) {
