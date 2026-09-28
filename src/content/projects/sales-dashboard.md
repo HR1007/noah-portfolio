@@ -281,21 +281,15 @@ sections:
       en: RESPONSIVE
       zh: 三個斷點
     heading:
-      en: On a phone the three levels just stack into one column
-      zh: 手機只是把三層疊成一欄
+      en: One screen, three breakpoints at once
+      zh: 同一個畫面，三個斷點同時成立
     images:
-      - ratio: 648/1356
+      - ratio: 5920/2480
         alt:
-          en: 'Mobile at 375 in a device mockup — bottom tab bar, KPIs two by two, table becomes cards'
-          zh: 手機 375 裝置模擬圖：底部五分頁、KPI 二乘二、表格改成卡片列
-      - ratio: 1336/764
-        alt:
-          en: Tablet at 768 in a device mockup — icon rail and two columns
-          zh: 平板 768 裝置模擬圖：72px 圖示導覽軌與兩欄
-      - ratio: 3200/2084
-        alt:
-          en: Desktop at 1200 and up in a browser-window mockup — full sidebar and four columns
-          zh: 桌機 1200 以上瀏覽器視窗模擬圖：完整側欄與四欄
+          en: >-
+            Desktop, tablet and phone device mockups side by side, all showing
+            the same overview screen
+          zh: 桌機、平板、手機三個裝置 mockup 並排，都是同一個總覽畫面
     direction: horizontal
   - type: featureSplit
     eyebrow:
