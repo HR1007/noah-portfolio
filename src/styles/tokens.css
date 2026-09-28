@@ -203,6 +203,27 @@
   --scrub-distance: 1200px;
   --nav-height: 0px;
 
+  /*
+    DeviceShowcase 的瀏覽器視窗外框（macOS 風格：三顆視窗按鈕 + 網址列）。
+    數值取自 Figma「COVER 三件式合照」frame 的實測：mockup/desktop 容器
+    圓角、視窗按鈕直徑與紅黃綠、網址列的底色／圓角／高度、頂部金屬高光。
+
+    這組色刻意不隨站台的淺色／深色主題反轉——道理跟 --viewer-backdrop 一樣：
+    這是在「模擬一個真實的瀏覽器視窗」，瀏覽器外框的深淺不該被作品集自己的
+    主題切換牽動，跟 viewer 對話框同一類「刻意不反轉」。
+  */
+  --mockup-chrome-bg: #26282b;
+  --mockup-chrome-radius: 14px;
+  --mockup-dot-size: 11px;
+  --mockup-dot-red: #e5484d;
+  --mockup-dot-yellow: #e0a526;
+  --mockup-dot-green: #1fa971;
+  --mockup-url-bg: #17181a;
+  --mockup-url-radius: 12px;
+  --mockup-url-height: 24px;
+  --mockup-url-ink: #7c8288;
+  --mockup-favicon-size: 14px;
+
   /* 圓角 */
   --radius: 16px;
   --radius-pill: 999px; /* [需確認] 目前站上沒有藥丸形元件，先保留備用 */

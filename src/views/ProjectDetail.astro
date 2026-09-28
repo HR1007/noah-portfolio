@@ -17,7 +17,7 @@ import Persona from '../components/project/Persona.astro';
 import DesignThemes from '../components/project/DesignThemes.astro';
 import Flow from '../components/project/Flow.astro';
 import ProjectQuote from '../components/project/ProjectQuote.astro';
-import { getProjectImageMap } from '../lib/media';
+import { getProjectImageMap, getProjectLogo } from '../lib/media';
 import { t, type LocalizedText } from '../lib/i18n';
 import SectionNav from '../components/project/SectionNav.astro';
 import { assignImages } from '../lib/image-slots.mjs';
@@ -39,6 +39,7 @@ const { backLabel } = site!.data.nav;
 // 版位規則集中在 lib/image-slots.mjs，後台顯示「第 N 格是哪個區塊」也是讀同一支，
 // 兩邊不會各自算一套而失去同步。資料夾沒圖時取值為 undefined，Media 會顯示佔位框。
 const images = getProjectImageMap(project.id);
+const projectLogo = getProjectLogo(project.id);
 const { hero: heroImage, bySection } = assignImages(project.data, images);
 const imagesFor = (i: number) => bySection[i] ?? [];
 
@@ -118,6 +119,7 @@ const { Content } = await render(project);
                   heading={tr(section.heading)}
                   ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
+                  logo={projectLogo}
                 />);
             case 'experienceDemo':
               return anchor(

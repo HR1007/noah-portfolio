@@ -1,5 +1,6 @@
 ---
 import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
 import Media from '../Media.astro';
 import SectionCta from './SectionCta.astro';
 
@@ -10,9 +11,11 @@ interface Props {
   eyebrow?: string;
   heading?: string;  ctaLabel?: string;
   ctaHref?: string;
+  /** 專案專屬 logo，顯示在瀏覽器視窗網址列左側；沒有時 fallback 成純色圓角方塊。 */
+  logo?: ImageMetadata | undefined;
 }
 
-const { image, ratio, alt, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
+const { image, ratio, alt, eyebrow, heading, ctaLabel, ctaHref, logo } = Astro.props;
 ---
 
 <section class="device-showcase">
@@ -25,7 +28,31 @@ const { image, ratio, alt, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
     )
   }
   <SectionCta label={ctaLabel} href={ctaHref} />
-  <Media fit="natural" image={image} ratio={ratio} alt={alt} />
+  {/*
+    瀏覽器視窗外框：三顆視窗按鈕 + 網址列，跟下面的畫面截圖包在同一個圓角容器裡，
+    看起來是一整個視窗、不是「一條裝飾色塊疊在圖片上面」。網址列左側放專案自己的
+    logo（沒有就顯示一個純色圓角方塊佔位，不放文字站台名稱——截圖本身才是案例的
+    主角，外框只是「這是一個網頁」的視覺提示，不該喧賓奪主）。
+  */}
+  <div class="device-showcase__window">
+    <div class="device-showcase__chrome">
+      <div class="device-showcase__dots" aria-hidden="true">
+        <span class="device-showcase__dot device-showcase__dot--red"></span>
+        <span class="device-showcase__dot device-showcase__dot--yellow"></span>
+        <span class="device-showcase__dot device-showcase__dot--green"></span>
+      </div>
+      <div class="device-showcase__url" aria-hidden="true">
+        {
+          logo ? (
+            <Image class="device-showcase__favicon" src={logo} width={14} height={14} alt="" loading="eager" />
+          ) : (
+            <span class="device-showcase__favicon device-showcase__favicon--placeholder"></span>
+          )
+        }
+      </div>
+    </div>
+    <Media fit="natural" image={image} ratio={ratio} alt={alt} />
+  </div>
 </section>
 
 <style>
@@ -52,5 +79,79 @@ const { image, ratio, alt, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
     max-width: var(--content-width);
     margin: 0 auto;
     padding: 0 var(--content-gutter) var(--sp-6);
+  }
+
+  /*
+    整個視窗（外框＋截圖）共用同一個圓角，overflow hidden 讓下面的 Media
+    貼齊裁掉自己的圓角——不然截圖會在視窗外框裡面又多一層圓角，變成雙重圓角。
+  */
+  .device-showcase__window {
+    border-radius: var(--mockup-chrome-radius);
+    overflow: hidden;
+  }
+
+  /*
+    !important 是必要的：Media 元件自己的 scoped 樣式（.media { border-radius:
+    var(--radius) }）在特異度上贏過從外面用 :global 蓋的同名 class，不加就蓋不掉，
+    截圖的四個角會在視窗外框的直角旁邊多冒出一圈圓角，看起來像沒裁乾淨。
+  */
+  .device-showcase__window :global(.media) {
+    border-radius: 0 !important;
+  }
+
+  .device-showcase__chrome {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-3);
+    background: var(--mockup-chrome-bg);
+  }
+
+  .device-showcase__dots {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .device-showcase__dot {
+    width: var(--mockup-dot-size);
+    height: var(--mockup-dot-size);
+    border-radius: 50%;
+  }
+
+  .device-showcase__dot--red {
+    background: var(--mockup-dot-red);
+  }
+
+  .device-showcase__dot--yellow {
+    background: var(--mockup-dot-yellow);
+  }
+
+  .device-showcase__dot--green {
+    background: var(--mockup-dot-green);
+  }
+
+  .device-showcase__url {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--mockup-url-height);
+    border-radius: var(--mockup-url-radius);
+    background: var(--mockup-url-bg);
+  }
+
+  .device-showcase__favicon {
+    width: var(--mockup-favicon-size);
+    height: var(--mockup-favicon-size);
+    border-radius: 4px;
+    object-fit: cover;
+  }
+
+  /* 沒有專案 logo 時的佔位：純色圓角方塊，不畫問號或文字——安靜地佔著位置就好 */
+  .device-showcase__favicon--placeholder {
+    display: block;
+    background: var(--mockup-url-ink);
+    opacity: 0.4;
   }
 </style>

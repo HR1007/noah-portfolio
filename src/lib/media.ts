@@ -94,6 +94,23 @@ export function getPortfolioImage(name: string): ImageMetadata | undefined {
   return match?.[1];
 }
 
+/**
+ * 取該專案的瀏覽器視窗 mockup 用小 logo（DeviceShowcase 網址列左側的分頁圖示）。
+ * 檔名固定為 logo.png（或其他 astro:assets 支援的副檔名），跟版位用的數字編號圖
+ * 放在同一個資料夾、共用同一份 glob 掃描——因為檔名不是純數字，getProjectImageMap
+ * 依 /^\d+$/ 篩選時會自動略過它，不會佔用或打亂任何版位編號。
+ * 沒有這張圖時回傳 undefined，元件自己 fallback 成純色圓角方塊，不影響 build。
+ */
+export function getProjectLogo(slug: string): ImageMetadata | undefined {
+  const prefix = `/src/assets/projects/${slug}/`;
+  const match = sortedByFilename(projectImageModules).find(([path]) => {
+    if (!path.startsWith(prefix)) return false;
+    const filename = path.split('/').pop() ?? '';
+    return filename.replace(/\.[^.]+$/, '') === 'logo';
+  });
+  return match?.[1];
+}
+
 /** 依檔名序號（00, 01, 02...）回傳指定相簿資料夾內所有照片；資料夾不存在或無圖時回傳空陣列。 */
 export function getGalleryAlbumImages(slug: string): ImageMetadata[] {
   const prefix = `/src/assets/gallery/${slug}/`;
