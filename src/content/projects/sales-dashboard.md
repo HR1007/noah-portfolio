@@ -13,7 +13,6 @@ hero:
   ctaLabel:
     en: Open the Figma prototype
     zh: 打開 Figma Prototype
-  # [需確認] 待貼上 Figma prototype 的分享連結（Share → Copy link，權限設成「知道連結的人可檢視」）
   ctaHref: '#'
   gradient: slate
 sections:
@@ -27,15 +26,16 @@ sections:
     paragraphs:
       - en: >-
           During my internship I built a sales dashboard for a cloud-office SaaS
-          company: filter by year and month, look at regions and
-          counties, rank the hot products and the top clerks. It answered "what
-          is the number right now" but never "so what should I do next". This
-          case is that same analytical structure, redesigned from the ground up.
-          The company, the real figures and the product names are all confidential,
-          so everything here is anonymised and fabricated — but every number ties
+          company: filter by year and month, look at regions and counties, rank
+          the hot products and the top clerks. It answered "what is the number
+          right now" but never "so what should I do next". This case is that
+          same analytical structure, redesigned from the ground up. The company,
+          the real figures and the product names are all confidential, so
+          everything here is anonymised and fabricated — but every number ties
           out against the others.
         zh: >-
-          實習時我為某家雲端辦公 SaaS 公司建了一份銷售儀表板：篩年月、看地區與縣市、排出熱銷品與業績最好的業務員。它能回答「現在數字多少」，卻回答不了「所以我現在該做什麼」。這個案子是把同一套分析架構重新設計一次——公司、實際數據與產品名稱皆保密，這裡全部匿名並換成虛構資料，但每個數字都彼此對得起來。
+          實習時我為某家雲端辦公 SaaS
+          公司建了一份銷售儀表板：篩年月、看地區與縣市、排出熱銷品與業績最好的業務員。它能回答「現在數字多少」，卻回答不了「所以我現在該做什麼」。這個案子是把同一套分析架構重新設計一次——公司、實際數據與產品名稱皆保密，這裡全部匿名並換成虛構資料，但每個數字都彼此對得起來。
       - en: >-
           The original was a neon-purple template: wave backgrounds, ribbon
           cards, a scatter plot, a donut. It looked full. But a regional manager
@@ -64,7 +64,7 @@ sections:
       en: THE SCREEN
       zh: 主畫面
     heading:
-      en: One screen, three levels
+      en: 'One screen, three levels'
       zh: 一個畫面，三層資訊
     ratio: 16/10
     alt:
@@ -75,7 +75,7 @@ sections:
       en: FRAMEWORK
       zh: 架構
     heading:
-      en: Seven principles, turned into rules you can check
+      en: 'Seven principles, turned into rules you can check'
       zh: 七個原則，變成可以逐條檢查的硬規則
     layout: split
     paragraphs:
@@ -88,7 +88,8 @@ sections:
           colour means one thing and only one thing, and all four data states
           have their own screen.
         zh: >-
-          資訊層級、KPI 選擇、圖表適配、篩選互動、視覺清楚、數據脈絡、操作回饋——這七件事聽起來都對，也正因為都對而最容易被跳過。所以我把每一條都變成可以拿來檢查的規則：一個畫面最多九塊、每個數字都要有單位與比較基準、一個語意色只有一種意思、四種資料狀態各自有畫面。
+          資訊層級、KPI
+          選擇、圖表適配、篩選互動、視覺清楚、數據脈絡、操作回饋——這七件事聽起來都對，也正因為都對而最容易被跳過。所以我把每一條都變成可以拿來檢查的規則：一個畫面最多九塊、每個數字都要有單位與比較基準、一個語意色只有一種意思、四種資料狀態各自有畫面。
       - en: >-
           Three breakpoints only — 375, 768, 1200 — because there are three real
           situations: at the desk seeing everything, in a meeting with a tablet,
@@ -117,11 +118,11 @@ sections:
         description:
           en: >-
             The base and accent come straight from the client's own brand:
-            charcoal from the site navigation, orange from the product
-            wordmark. Orange is reserved for the interface — logo, primary
-            button, selected nav, current month. Charts get a separate
-            five-colour palette, because red, amber and green are already spoken
-            for by "declining", "needs attention" and "growing".
+            charcoal from the site navigation, orange from the product wordmark.
+            Orange is reserved for the interface — logo, primary button,
+            selected nav, current month. Charts get a separate five-colour
+            palette, because red, amber and green are already spoken for by
+            "declining", "needs attention" and "growing".
           zh: >-
             底色與強調色直接取自客戶品牌：炭灰來自官網導覽，橘來自產品字標。橘色只管介面——logo、主按鈕、側欄選取、目前月份。圖表另外給一組五色，因為紅、黃、綠已經被「衰退、需注意、成長」徵用了。
       - title:
@@ -135,8 +136,7 @@ sections:
             component is defined together with the states it actually ships
             with: loading, empty, stale, failed.
           zh: >-
-            三段式命名「類別 / 元件 /
-            變體」，九個類別各管一件事。Figma 的元件名就是前端的 component
+            三段式命名「類別 / 元件 / 變體」，九個類別各管一件事。Figma 的元件名就是前端的 component
             名，兩邊只有一份真相。每個元件都連它真正會用到的狀態一起定義：載入中、沒有資料、資料延遲、載入失敗。
       - title:
           en: Screens that interrupt
@@ -149,7 +149,8 @@ sections:
             when it takes effect. Reversible things don't ask; they just happen,
             with an undo.
           zh: >-
-            七種對話框、三種 toast。標題就是問題本身，破壞性動作用紅色而且永遠不是預設焦點，按下去之前先說清楚範圍：匯出幾筆、影響幾人、什麼時候生效。可逆的事不問，直接做，然後給「復原」。
+            七種對話框、三種
+            toast。標題就是問題本身，破壞性動作用紅色而且永遠不是預設焦點，按下去之前先說清楚範圍：匯出幾筆、影響幾人、什麼時候生效。可逆的事不問，直接做，然後給「復原」。
     direction: vertical
   - type: flow
     eyebrow:
@@ -170,7 +171,12 @@ sections:
         alt:
           en: Operation flow from login to assigning a follow-up
           zh: 從登入到指派跟進的操作動線
-    direction: horizontal
+      - label: Mobile flow
+        ratio: 1920/992
+        alt:
+          en: Mobile flow from push notification to closing a follow-up task
+          zh: 從推播通知到結案跟進任務的手機動線
+    direction: vertical
   - type: experienceDemo
     eyebrow:
       en: THE MOMENT
@@ -204,12 +210,13 @@ sections:
     body:
       en: >-
         Tasks can't come from nowhere. The rules page closes the chain: sync at
-        00:10, evaluate every rule at 01:00, a hit produces the insight card, the
-        manager assigns it, the task writes its outcome back. A rule is built
-        from four fields — metric, operator, threshold, consecutive periods — and
-        can't be saved without a backtest first. Fewer than three hits in twelve
-        months means the threshold is too loose to catch anything; more than
-        eight means it's noisy and managers start ignoring it.
+        00:10, evaluate every rule at 01:00, a hit produces the insight card,
+        the manager assigns it, the task writes its outcome back. A rule is
+        built from four fields — metric, operator, threshold, consecutive
+        periods — and can't be saved without a backtest first. Fewer than three
+        hits in twelve months means the threshold is too loose to catch
+        anything; more than eight means it's noisy and managers start ignoring
+        it.
       zh: >-
         任務不能憑空出現。規則頁把鏈路補完：每日 00:10 同步、01:00
         逐條評估、命中就產生洞察卡、主管指派後變成任務、完成後回寫命中紀錄。規則用「指標 ＋ 運算子 ＋ 門檻 ＋
@@ -277,18 +284,18 @@ sections:
       en: On a phone the three levels just stack into one column
       zh: 手機只是把三層疊成一欄
     images:
-      - ratio: 3/4
+      - ratio: 648/1356
         alt:
-          en: Mobile at 375 — bottom tab bar, KPIs two by two, table becomes cards
-          zh: 手機 375：底部五分頁、KPI 二乘二、表格改成卡片列
-      - ratio: 16/9
+          en: 'Mobile at 375 in a device mockup — bottom tab bar, KPIs two by two, table becomes cards'
+          zh: 手機 375 裝置模擬圖：底部五分頁、KPI 二乘二、表格改成卡片列
+      - ratio: 1336/764
         alt:
-          en: Tablet at 768 — icon rail and two columns
-          zh: 平板 768：72px 圖示導覽軌與兩欄
-      - ratio: 16/9
+          en: Tablet at 768 in a device mockup — icon rail and two columns
+          zh: 平板 768 裝置模擬圖：72px 圖示導覽軌與兩欄
+      - ratio: 3200/2084
         alt:
-          en: Desktop at 1200 and up — full sidebar and four columns
-          zh: 桌機 1200 以上：完整側欄與四欄
+          en: Desktop at 1200 and up in a browser-window mockup — full sidebar and four columns
+          zh: 桌機 1200 以上瀏覽器視窗模擬圖：完整側欄與四欄
     direction: horizontal
   - type: featureSplit
     eyebrow:
@@ -300,16 +307,15 @@ sections:
     body:
       en: >-
         The core containers are rebuilt as real auto layout: direction, gap,
-        padding and resizing behaviour all set, so adding content reflows instead
-        of breaking. Spacing only ever comes from seven steps — 4, 8, 12, 16, 24,
-        32, 40 — so no 13 or 18 ever appears. Fifty-two screens, two themes,
-        three breakpoints, and a naming convention that matches the front end, so
-        whoever picks this up knows what to call the next component without
-        asking me.
+        padding and resizing behaviour all set, so adding content reflows
+        instead of breaking. Spacing only ever comes from seven steps — 4, 8,
+        12, 16, 24, 32, 40 — so no 13 or 18 ever appears. Fifty-two screens, two
+        themes, three breakpoints, and a naming convention that matches the
+        front end, so whoever picks this up knows what to call the next
+        component without asking me.
       zh: >-
-        核心容器用原生 auto layout
-        重建：方向、間距、內距與縮放行為都設好，加內容時版面會自己重排而不是散掉。間距只取 4、8、12、16、24、32、40
-        這七階，所以不會冒出 13 或 18。整份檔案 52
+        核心容器用原生 auto layout 重建：方向、間距、內距與縮放行為都設好，加內容時版面會自己重排而不是散掉。間距只取
+        4、8、12、16、24、32、40 這七階，所以不會冒出 13 或 18。整份檔案 52
         張畫面、兩套主題、三個斷點，命名規則與前端對齊——接手的人不用問我，就知道下一個元件該叫什麼。
     imagePosition: left
     ratio: 4/3
@@ -317,3 +323,4 @@ sections:
       en: Core components rebuilt with real auto layout
       zh: 用原生 auto layout 重建的核心元件
 ---
+
