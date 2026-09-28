@@ -1,7 +1,6 @@
 ---
 import type { ImageMetadata } from 'astro';
 import Media from './Media.astro';
-import Button from './Button.astro';
 
 interface Props {
   title: string;
@@ -10,21 +9,48 @@ interface Props {
   href: string;
   image: ImageMetadata | undefined;
   reverse?: boolean;
+  /**
+   * 開場作品：獨立一整排、單欄、圖放大，視覺份量明顯高於其餘作品。
+   * 目前只給排在第一順位的案例用（見 Portfolio.astro）。
+   */
+  featured?: boolean;
 }
 
-const { title, summary, ctaLabel, href, image, reverse = false } = Astro.props;
+const { title, summary, ctaLabel, href, image, reverse = false, featured = false } = Astro.props;
 ---
 
-<article class:list={['portfolio-card', { 'portfolio-card--reverse': reverse }]}>
+{/*
+  整張卡片就是一個連結（先前只有裡面的按鈕可點，圖片與標題點下去沒反應）。
+  圖片包進 <a> 之後，ImageViewer 的「圖片在連結裡時連結優先」規則會自動生效，
+  不會誤觸全螢幕放大檢視——跟藝廊封面卡是同一條規則，不用另外處理。
+*/}
+<a
+  class:list={[
+    'portfolio-card',
+    { 'portfolio-card--reverse': reverse, 'portfolio-card--featured': featured },
+  ]}
+  href={href}
+>
   <div class="portfolio-card__media">
-    <Media image={image} ratio="16/10" alt={title} />
+    <Media image={image} ratio={featured ? '21/9' : '16/10'} alt={title} />
   </div>
   <div class="portfolio-card__body">
     <h2 class="portfolio-card__title">{title}</h2>
     <p class="portfolio-card__summary">{summary}</p>
-    <Button label={ctaLabel} href={href} variant="primary" />
+    {/*
+      文字連結＋底線動畫，取代原本每張卡片都重複一次的實心按鈕——六張卡六顆
+      一模一樣的按鈕會讀成樣板產生器，換成比較輕的 CTA 語氣更符合「這是內容
+      清單」而不是「這是六個等待被按下的動作」。動畫語言跟 BackLink 同一套
+      （底線用 scaleX 展開），方向相反：那裡是「返回」，這裡是「前進」。
+    */}
+    <span class="portfolio-card__cta">
+      <span class="portfolio-card__cta-label">{ctaLabel}</span>
+      <svg class="portfolio-card__cta-arrow" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </span>
   </div>
-</article>
+</a>
 
 <style>
   .portfolio-card {
@@ -34,6 +60,7 @@ const { title, summary, ctaLabel, href, image, reverse = false } = Astro.props;
     align-items: center;
     padding: var(--sp-6) 0;
     border-bottom: 1px solid var(--color-border);
+    color: inherit;
   }
 
   .portfolio-card--reverse {
@@ -42,6 +69,22 @@ const { title, summary, ctaLabel, href, image, reverse = false } = Astro.props;
 
   .portfolio-card--reverse > * {
     direction: ltr;
+  }
+
+  /* 開場作品：單欄、圖在上，份量明顯大一截，不跟其餘案例走同一套左右交錯節奏 */
+  .portfolio-card--featured {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+    padding: var(--sp-7) 0;
+  }
+
+  /* 圖片跟著卡片 hover 微幅放大，訊號「這是可以點的」；裁切框是 Media 元件自己的 .media 已經有的 overflow:hidden */
+  .portfolio-card__media :global(img) {
+    transition: transform calc(var(--motion-fast) * 3) var(--motion-ease);
+  }
+
+  .portfolio-card:hover .portfolio-card__media :global(img) {
+    transform: scale(1.04);
   }
 
   .portfolio-card__body {
@@ -55,9 +98,82 @@ const { title, summary, ctaLabel, href, image, reverse = false } = Astro.props;
     font-size: var(--font-size-h2);
   }
 
+  .portfolio-card--featured .portfolio-card__title {
+    font-size: var(--font-size-h1);
+  }
+
   .portfolio-card__summary {
     font-size: var(--font-size-body);
     color: var(--color-muted);
+  }
+
+  .portfolio-card--featured .portfolio-card__summary {
+    max-width: 65ch;
+  }
+
+  .portfolio-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    margin-top: var(--sp-1);
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .portfolio-card__cta-label {
+    position: relative;
+  }
+
+  /* 底線預設收起（scaleX(0)），從左邊長出來——跟 BackLink 用同一套 ::after 展開手法 */
+  .portfolio-card__cta-label::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--motion-fast) var(--motion-ease);
+  }
+
+  .portfolio-card:hover .portfolio-card__cta-label::after,
+  .portfolio-card:focus-visible .portfolio-card__cta-label::after {
+    transform: scaleX(1);
+  }
+
+  .portfolio-card__cta-arrow {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform var(--motion-fast) var(--motion-ease);
+  }
+
+  .portfolio-card:hover .portfolio-card__cta-arrow,
+  .portfolio-card:focus-visible .portfolio-card__cta-arrow {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .portfolio-card__media :global(img),
+    .portfolio-card__cta-label::after,
+    .portfolio-card__cta-arrow {
+      transition: none;
+    }
+
+    .portfolio-card:hover .portfolio-card__media :global(img) {
+      transform: none;
+    }
+
+    .portfolio-card:hover .portfolio-card__cta-arrow,
+    .portfolio-card:focus-visible .portfolio-card__cta-arrow {
+      transform: none;
+    }
   }
 
   @media (max-width: 767px) {
