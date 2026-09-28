@@ -1174,7 +1174,14 @@ app.use('/home-src', express.static(HOME_DIR));
 app.use('/portfolio-src', express.static(PORTFOLIO_DIR));
 
 const PORT = 5174;
-app.listen(PORT, () => {
+/*
+  明講綁定 127.0.0.1。省略 host 時 Node 預設監聽所有網路介面（等同 0.0.0.0），
+  而這支後台完全沒有密碼或任何驗證——每支 API 都能改內容，/api/publish 更是
+  直接幫你 commit + push。在非私人網路（咖啡廳、公司 Wi-Fi）開著 `npm run admin`
+  的話，同網段的人原本就打得到這些端點。綁死本機位址，才真的符合「本機專用」
+  這個既有的設計假設。
+*/
+app.listen(PORT, '127.0.0.1', () => {
   console.log(`後台介面與 API： http://localhost:${PORT}`);
   console.log('Preview 功能另需 `npm run dev`（http://localhost:4321）');
 });
