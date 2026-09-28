@@ -41,8 +41,9 @@ const isExternal = /^https?:\/\//.test(href);
     transform: translateY(-1px);
   }
 
+  /* 按下去要比原位再低一點、縮一點點，才有「壓下去」的力度感，不只是回到原位 */
   .button:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.97);
   }
 
   .button--primary {

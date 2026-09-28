@@ -53,6 +53,10 @@ const { icon, label, value, href } = Astro.props;
     color: var(--color-ink);
   }
 
+  /*
+    站上其他每個可點擊元件（Button、BackLink、ThemeToggle…）都有 hover 回饋，
+    這裡先前漏了——圖示底色略深一點、上抬一點點，跟 Button 的力度一致。
+  */
   .connect-channel__icon {
     flex: none;
     width: var(--control-size-lg);
@@ -63,6 +67,18 @@ const { icon, label, value, href } = Astro.props;
     align-items: center;
     justify-content: center;
     color: var(--color-ink);
+    transition:
+      background var(--motion-fast) var(--motion-ease),
+      transform var(--motion-fast) var(--motion-ease);
+  }
+
+  .connect-channel:hover .connect-channel__icon {
+    background: var(--color-surface);
+    transform: translateY(-1px);
+  }
+
+  .connect-channel:active .connect-channel__icon {
+    transform: translateY(0) scale(0.97);
   }
 
   .connect-channel__icon svg {
@@ -85,5 +101,21 @@ const { icon, label, value, href } = Astro.props;
   .connect-channel__value {
     font-size: var(--font-size-body);
     font-weight: var(--font-weight-medium);
+    transition: color var(--motion-fast) var(--motion-ease);
+  }
+
+  .connect-channel:hover .connect-channel__value {
+    color: var(--color-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .connect-channel__icon,
+    .connect-channel__value {
+      transition: none;
+    }
+
+    .connect-channel:hover .connect-channel__icon {
+      transform: none;
+    }
   }
 </style>
