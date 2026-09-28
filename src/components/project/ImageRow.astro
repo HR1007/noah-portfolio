@@ -61,10 +61,18 @@ const { rows, images, eyebrow, heading, direction = 'horizontal', ctaLabel, ctaH
     font-size: var(--font-size-h2);
   }
 
+  /*
+    align-items: end——這一排的圖片長寬比不一定相同（例如手機 3:4 直幅對平板/桌機
+    16:9 橫幅），natural 模式不裁切，各自依原始比例算高度，高度自然差很多。
+    不對齊的話矮的那幾張會浮在頂端、跟高的那張留出一截不對稱的空白，讀起來
+    像沒排好；統一貼齊底部，就像裝置一起放在同一條地平線上，是這類混合尺寸
+    裝置圖常見的處理方式。
+  */
   .image-row {
     padding: 0 var(--content-gutter) var(--sp-6);
     display: grid;
     grid-template-columns: repeat(var(--columns), 1fr);
+    align-items: end;
     gap: var(--sp-3);
   }
 
