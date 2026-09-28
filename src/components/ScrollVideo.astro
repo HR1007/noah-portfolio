@@ -50,7 +50,12 @@ const { src, ratio, poster, fps = 24 } = Astro.props;
   <div class="scroll-video__stage" data-scrub-stage>
     {/*
       沒有 controls／autoplay／loop：播放位置只由捲軸決定。
-      preload="none"：要不要下載由 script 依距離決定，首屏不用先扛這幾 MB。
+
+      preload="metadata"，不是 "auto"：影片是全 keyframe＋faststart，瀏覽器只要
+      抓到檔案開頭的 moov atom（幾十 KB）就能知道每一幀在檔案裡的位置，不用先
+      下載整支影片才能開始。之後捲動 seek 到哪一幀，瀏覽器會用 HTTP Range
+      request 只抓那一幀需要的位元組——真正的下載量取決於訪客實際捲了多少，
+      不是一進站就強迫扛下整支影片。
     */}
     <video
       class="scroll-video__video"
@@ -58,7 +63,7 @@ const { src, ratio, poster, fps = 24 } = Astro.props;
       poster={poster}
       muted
       playsinline
-      preload="none"
+      preload="metadata"
       disablepictureinpicture
       aria-hidden="true"
       style={`aspect-ratio: ${ratio}`}
@@ -156,22 +161,10 @@ const { src, ratio, poster, fps = 24 } = Astro.props;
       else unlisten();
     });
 
-    // 快進到視窗（上下各留一個螢幕高）才開始下載，首屏不用先扛這幾 MB
-    const loader = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        loader.disconnect();
-        video.preload = 'auto';
-        video.load();
-      },
-      { rootMargin: '100% 0px' }
-    );
-
     // 影片壞了就把旗標拿掉，CSS 退回一般版面；observer 與 listener 一併收掉
     const fail = () => {
       delete track.dataset.scrubActive;
       visibility.disconnect();
-      loader.disconnect();
       unlisten();
       if (rafId) cancelAnimationFrame(rafId);
     };
@@ -201,7 +194,6 @@ const { src, ratio, poster, fps = 24 } = Astro.props;
     );
 
     visibility.observe(track);
-    loader.observe(track);
   }
 </script>
 
