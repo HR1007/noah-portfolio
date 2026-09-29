@@ -1,7 +1,7 @@
 ---
 title:
-  en: A sales war room for a regional manager
-  zh: 給區域銷售主管的銷售戰情室
+  en: Signal & Action
+  zh: 訊號與行動
 order: 1
 summary:
   en: >-

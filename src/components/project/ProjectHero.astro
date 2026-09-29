@@ -29,15 +29,22 @@ const PLACEHOLDER_RATIO = '1040 / 675.66';
   <div class="project-hero__inner">
     <h1 class="project-hero__title">{title}</h1>
     <Button label={ctaLabel} href={ctaHref} variant="secondary" />
-    <div class="project-hero__frame">
-      {
-        image ? (
-          <Image src={image} alt={`${title} hero`} loading="eager" fetchpriority="high" quality={90} />
-        ) : (
-          <Placeholder ratio={PLACEHOLDER_RATIO} label={`${title} hero`} />
-        )
-      }
-    </div>
+  </div>
+  {/*
+    滿版圖：刻意放在 __inner 外面、自己撐開到整個視窗寬——裡面那層有
+    --content-width 的上限，圖片放在裡面永遠到不了滿版。用負 margin 把
+    section 自己的左右內距（--content-gutter）抵消掉，圖才會真正貼齊
+    視窗左右邊，不是「比較寬的置中容器」。高度固定、object-fit: cover，
+    寬螢幕或窄螢幕都會裁切——設計師已確認裁切無妨，比例不必完整保留。
+  */}
+  <div class="project-hero__frame">
+    {
+      image ? (
+        <Image src={image} alt={`${title} hero`} loading="eager" fetchpriority="high" quality={90} />
+      ) : (
+        <Placeholder ratio={PLACEHOLDER_RATIO} label={`${title} hero`} />
+      )
+    }
   </div>
 </section>
 
@@ -94,27 +101,25 @@ const PLACEHOLDER_RATIO = '1040 / 675.66';
   }
 
   .project-hero__frame {
-    width: 100%;
-    border-radius: var(--radius);
+    position: relative;
+    z-index: 1;
+    margin-top: var(--sp-4);
+    /* 抵消 .project-hero 自己的左右內距，圖片才會貼齊視窗邊緣、不是置中的寬容器 */
+    margin-inline: calc(-1 * var(--content-gutter));
+    width: calc(100% + 2 * var(--content-gutter));
     overflow: hidden;
-    /* 圖片比容器窄時置中，不要靠左 */
-    display: flex;
-    justify-content: center;
   }
 
   /*
-    用 max-* 而非 width/height：圖片維持原始尺寸，只有超出容器寬度或高度上限
-    時才縮小，不會被放大到超過原始解析度而變糊。
-
-    width/height 同時保持 auto 是關鍵——只鎖一邊（例如只給 max-height）會讓
-    另一邊維持原值，圖片就被壓扁或拉長。兩邊都 auto，瀏覽器才會等比例縮放。
+    滿版模式：寬度鎖 100%、高度固定、object-fit: cover——裁切是刻意的，
+    不像 natural 模式要完整保留原圖比例。高度沿用 --hero-max-height，
+    跟這個 token 原本「hero 視覺區的高度」的意義一致，不另外發明新數字。
   */
   .project-hero__frame :global(img) {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: var(--hero-max-height);
     display: block;
+    width: 100%;
+    height: var(--hero-max-height);
+    object-fit: cover;
   }
 
   /*
