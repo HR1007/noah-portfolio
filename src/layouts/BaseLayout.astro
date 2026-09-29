@@ -31,6 +31,15 @@ const alternateURL = new URL(swapLocalePath(Astro.url.pathname, otherLocale), As
       if (savedTheme === 'light' || savedTheme === 'dark') {
         document.documentElement.dataset.theme = savedTheme;
       }
+
+      /*
+        iOS Safari 只有在頁面上真的掛了 touchstart 監聽器時，才會即時套用 :active
+        樣式——沒有的話，:hover/:active 這類回饋在觸控裝置上會延遲甚至整個不出現，
+        因為 WebKit 要先確認「這不是要拿去捲動的手勢」才決定要不要顯示。這支監聽器
+        什麼都不做，純粹讓 WebKit 願意把 :active 當一回事，全站的按下即時回饋
+        （Button、PortfolioCard、ConnectChannel…）才會在手機上跟桌機一樣即時。
+      */
+      document.addEventListener('touchstart', () => {}, { passive: true });
     </script>
     {/*
       三個一組：SVG 給支援的瀏覽器（向量、任何尺寸都銳利），ICO 給 Safari 與舊瀏覽器

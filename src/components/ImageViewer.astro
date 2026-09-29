@@ -41,6 +41,9 @@ const { close, prev, next, hint } = site!.data.viewer;
   const spot = document.querySelector<HTMLElement>('[data-viewer-spot]');
 
   if (root && img && spot) {
+    // 慣性滑行是 JS 逐幀算的，CSS 的 prefers-reduced-motion 管不到，要自己查一次
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     /*
       只收內容圖，導覽列圖示與佔位框都不該點開。
 
@@ -63,8 +66,13 @@ const { close, prev, next, hint } = site!.data.viewer;
     let list: HTMLImageElement[] = [];
     let at = 0;
     let scale = 1;
+    // x／y 是實際畫出來的位置（超出邊界時已經套過阻尼）；rawX／rawY 是手指真正
+    // 移動的總量，不套阻尼——阻尼要一直從「真實位移」重新算，而不是疊加在
+    // 已經被阻尼過的值上面，不然越拖阻力會越算越不準。
     let x = 0;
     let y = 0;
+    let rawX = 0;
+    let rawY = 0;
     let opener: HTMLElement | null = null;
 
     const MIN = 1;
@@ -91,10 +99,38 @@ const { close, prev, next, hint } = site!.data.viewer;
       img.style.cursor = scale > 1 ? 'grab' : 'zoom-in';
     };
 
+    /*
+      單一軸可以平移多遠，才不會讓圖片邊緣離開容器、露出空白。放大 s 倍後，
+      圖比容器多出來的量的一半，就是每個方向能平移的上限——s=1 時是 0
+      （完全不能拖），這跟現有「scale<=MIN 時直接不啟動拖曳」的邏輯一致。
+    */
+    const boundsFor = (s: number) => ({
+      x: Math.max(0, (img.offsetWidth * s - img.offsetWidth) / 2),
+      y: Math.max(0, (img.offsetHeight * s - img.offsetHeight) / 2),
+    });
+
+    /*
+      橡皮筋阻尼：超出邊界的部分不是硬夾住，而是隨著超出量遞增阻力——拖得越
+      過界，畫面跟著手指移動的比例越低。公式來自 Apple「Designing Fluid
+      Interfaces」的 rubber-banding 範例，constant 越小阻力越強。
+    */
+    const rubberband = (overshoot: number, dimension: number, k = 0.55) =>
+      (overshoot * dimension * k) / (dimension + k * Math.abs(overshoot));
+
+    const clampAxis = (raw: number, limit: number, dimension: number) => {
+      if (limit <= 0) return 0;
+      if (Math.abs(raw) <= limit) return raw;
+      const overshoot = Math.abs(raw) - limit;
+      return Math.sign(raw) * (limit + rubberband(overshoot, dimension));
+    };
+
     const reset = () => {
+      cancelAnimationFrame(momentumId); // 上一張圖若還在慣性滑行，換圖時要先停下，不然舊的滑行會接著算到新圖上
       scale = 1;
       x = 0;
       y = 0;
+      rawX = 0;
+      rawY = 0;
       draw();
     };
 
@@ -150,12 +186,26 @@ const { close, prev, next, hint } = site!.data.viewer;
       else if (e.key === 'ArrowRight') load(at + 1);
     });
 
+    /*
+      「校正跳接」用的 class：只在放開後回彈、或雙擊縮放這種離散的目標位置
+      改變時才加上，讓那一下有個過渡而不是瞬間跳過去。拖曳與滾輪縮放全程
+      不會加這個 class——那兩種是連續手勢，畫面要跟著輸入即時跑，加了
+      transition 反而會拖出一截延遲，體感就不是「黏著手指」了。
+    */
+    let snapTimer = 0;
+    const snap = () => {
+      img.classList.add('viewer__image--snap');
+      clearTimeout(snapTimer);
+      snapTimer = window.setTimeout(() => img.classList.remove('viewer__image--snap'), 400);
+    };
+
     // ---- 縮放：以游標為錨點，放大時游標底下的那一點不會跑掉 ----
     root.addEventListener(
       'wheel',
       (e) => {
         if (root.hidden) return;
         e.preventDefault();
+        cancelAnimationFrame(momentumId); // 正在滑行時開始縮放，先中斷慣性，兩種手勢不要疊在一起
         const box = img.getBoundingClientRect();
         const cx = e.clientX - (box.left + box.width / 2);
         const cy = e.clientY - (box.top + box.height / 2);
@@ -168,44 +218,117 @@ const { close, prev, next, hint } = site!.data.viewer;
           x = 0;
           y = 0;
         }
+        // 縮小後邊界跟著變小，目前位置可能已經超出新的邊界——重新夾一次，
+        // rawX／rawY 也跟著校正，不然放大回去時會從一個過期的超出量繼續算
+        const bounds = boundsFor(scale);
+        x = clampAxis(x, bounds.x, img.offsetWidth);
+        y = clampAxis(y, bounds.y, img.offsetHeight);
+        rawX = x;
+        rawY = y;
         draw();
       },
       { passive: false }
     );
 
-    // ---- 拖曳平移 ----
+    // ---- 拖曳平移：邊界有橡皮筋阻尼，放開時視情況回彈或帶慣性滑行 ----
     let dragging = false;
     let px = 0;
     let py = 0;
+    // 拖曳速度（px/ms），用來源與目的地兩點的時間差算，放開時決定要不要滑行
+    let vx = 0;
+    let vy = 0;
+    let lastMoveAt = 0;
+    let momentumId = 0;
 
     img.addEventListener('pointerdown', (e) => {
       if (scale <= MIN) return;
+      cancelAnimationFrame(momentumId); // 正在慣性滑行時被抓住：立刻停下、從當下位置繼續，不是等滑完
       dragging = true;
       px = e.clientX;
       py = e.clientY;
+      vx = 0;
+      vy = 0;
+      lastMoveAt = performance.now();
       img.setPointerCapture(e.pointerId);
       img.style.cursor = 'grabbing';
+      img.classList.remove('viewer__image--snap');
     });
     img.addEventListener('pointermove', (e) => {
       if (!dragging) return;
-      x += e.clientX - px;
-      y += e.clientY - py;
+      const now = performance.now();
+      const dt = Math.max(1, now - lastMoveAt);
+      const dx = e.clientX - px;
+      const dy = e.clientY - py;
+      vx = dx / dt;
+      vy = dy / dt;
+      lastMoveAt = now;
+      rawX += dx;
+      rawY += dy;
       px = e.clientX;
       py = e.clientY;
+      const bounds = boundsFor(scale);
+      x = clampAxis(rawX, bounds.x, img.offsetWidth);
+      y = clampAxis(rawY, bounds.y, img.offsetHeight);
       draw();
     });
+
+    // 放開後若在邊界外，回彈到邊界內；在邊界內則不動，交給 glide／endDrag 判斷要不要滑行
+    const settle = () => {
+      const bounds = boundsFor(scale);
+      const clampedX = Math.max(-bounds.x, Math.min(bounds.x, rawX));
+      const clampedY = Math.max(-bounds.y, Math.min(bounds.y, rawY));
+      if (clampedX !== x || clampedY !== y) snap();
+      x = clampedX;
+      y = clampedY;
+      rawX = clampedX;
+      rawY = clampedY;
+      draw();
+    };
+
+    /*
+      慣性滑行：放開時若還有速度，不是立刻停住，而是用摩擦力讓速度逐幀衰減，
+      畫面跟著繼續滑一小段再停下——放開時的手感才不會是硬切。滑到邊界外時
+      clampAxis 的阻尼會自然把它「壓」住，速度歸零或超出太多就收尾回彈。
+    */
+    const FRICTION = 0.93;
+    const glide = () => {
+      vx *= FRICTION;
+      vy *= FRICTION;
+      rawX += vx * 16;
+      rawY += vy * 16;
+      const bounds = boundsFor(scale);
+      x = clampAxis(rawX, bounds.x, img.offsetWidth);
+      y = clampAxis(rawY, bounds.y, img.offsetHeight);
+      draw();
+
+      const overshoot = Math.max(Math.abs(rawX) - bounds.x, Math.abs(rawY) - bounds.y);
+      const settled = Math.hypot(vx, vy) < 0.02;
+      if (settled || overshoot > 24) {
+        settle();
+        return;
+      }
+      momentumId = requestAnimationFrame(glide);
+    };
+
     const endDrag = () => {
+      if (!dragging) return;
       dragging = false;
       draw();
+      if (!reduceMotion && Math.hypot(vx, vy) > 0.02) momentumId = requestAnimationFrame(glide);
+      else settle();
     };
     img.addEventListener('pointerup', endDrag);
     img.addEventListener('pointercancel', endDrag);
 
-    // 連點兩下在「原尺寸」與「放大兩倍」之間切換
+    // 連點兩下在「原尺寸」與「放大兩倍」之間切換——離散的目標改變，用過渡動畫銜接
     img.addEventListener('dblclick', () => {
+      cancelAnimationFrame(momentumId);
       scale = scale > MIN ? MIN : 2;
       x = 0;
       y = 0;
+      rawX = 0;
+      rawY = 0;
+      snap();
       draw();
     });
 
@@ -262,6 +385,22 @@ const { close, prev, next, hint } = site!.data.viewer;
     object-fit: contain;
     user-select: none;
     touch-action: none;
+  }
+
+  /*
+    只在「校正跳接」（放開後回彈、雙擊縮放）時才加這個 class，拖曳與滾輪縮放
+    全程不掛，那兩種連續手勢要跟著輸入逐幀即時更新，多了 transition 反而會
+    拖出一截延遲。時長比按鈕（--motion-fast）長，是圖片這種比較大面積的
+    移動本來就該比小控制項的回饋慢一點，跟 PortfolioCard 圖片 hover 用同一個倍數。
+  */
+  .viewer__image--snap {
+    transition: transform calc(var(--motion-fast) * 3) var(--motion-ease);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .viewer__image--snap {
+      transition: none;
+    }
   }
 
   .viewer__btn {
