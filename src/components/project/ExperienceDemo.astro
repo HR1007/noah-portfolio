@@ -20,7 +20,14 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = '
 ---
 
 <section class="experience-demo" data-layout={layout}>
-  <div class="experience-demo__intro">
+  {/*
+    兩塊都掛 data-reveal，改讓 SectionReveal 把它們當成各自獨立的區塊來播，
+    而不是整個 section 一起滑入（見 SectionReveal.astro 的選擇器邏輯：
+    section 一旦有 [data-reveal] 子節點，就不再整塊套用預設動畫）。
+    文字沿用全站標準的滑入；圖片是這一段案例的「關鍵畫面」，
+    給它自己的 materialize（見下方樣式），兩者錯開時間，讀起來是「先講、後現」。
+  */}
+  <div class="experience-demo__intro" data-reveal>
     {eyebrow && <p class="experience-demo__eyebrow">{eyebrow}</p>}
     <h2 class="experience-demo__heading">{heading}</h2>
     <ReadMore>
@@ -28,7 +35,7 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = '
     </ReadMore>
     {ctaLabel && ctaHref && <Button label={ctaLabel} href={ctaHref} variant="primary" />}
   </div>
-  <div class="experience-demo__media">
+  <div class="experience-demo__media" data-reveal>
     <Media fit="natural" image={image} ratio={ratio} alt={alt} />
   </div>
 </section>
@@ -101,5 +108,52 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = '
     font-size: var(--font-size-body);
     line-height: 1.7;
     color: var(--color-muted);
+  }
+
+  /*
+    這張圖是整段案例的「關鍵畫面」（heading 講的就是這一下），值得比全站預設的
+    滑入更有登場感。SectionReveal 的全域規則已經把它當一般 [data-reveal] 處理
+    （opacity 0 → 1、translateY 滑入），這裡疊加更高特異性的選擇器
+    （class + attribute，見下方註解的推導）蓋掉 transform，換成從「縮小、模糊」
+    長成正常大小、對焦——縮放終點是原始大小（scale 不超過 1），不會有溢出或裁切
+    的疑慮。延遲比文字晚一點點，讀起來是「先講、後現」而不是兩塊同時彈出來。
+
+    特異性推導：SectionReveal 的全域規則是
+    `html[data-reveal-ready] main [data-reveal]`（2 型別 + 2 屬性）；
+    這裡的 `.experience-demo__media[data-reveal]` 經 Astro 加上 scoped
+    屬性選擇器後是 3 個屬性/class、0 個型別——屬性/class 這一階 3 > 2，
+    不需要 !important 就能蓋過去。
+  */
+  .experience-demo__media[data-reveal] {
+    transform: scale(0.94);
+    filter: blur(6px);
+    transition:
+      opacity calc(var(--reveal-duration) * 1.3) var(--reveal-easing),
+      transform calc(var(--reveal-duration) * 1.3) var(--reveal-easing),
+      filter calc(var(--reveal-duration) * 1.3) var(--reveal-easing);
+    transition-delay: 80ms;
+  }
+
+  /*
+    filter: blur(0) 而非 none：建置時的 CSS 壓縮器會把 blur(0) 的參數整個吃掉，
+    變成不合法的 blur()，瀏覽器會直接整條宣告放棄，模糊就永遠回不去——用 none
+    沒有這個壓縮踩雷的空間。
+  */
+  .experience-demo__media[data-reveal].is-revealed {
+    transform: scale(1);
+    filter: none;
+  }
+
+  /*
+    比照 SectionReveal 自己的減少動態規則：不只是把終點值換回原樣，連 transition
+    本身也要拿掉，不然設定「減少動態」那一刻，畫面還是會用完整時長跑一次縮放模糊
+    的動畫才定住——那正是使用者剛剛要求不要看到的東西。
+  */
+  @media (prefers-reduced-motion: reduce) {
+    .experience-demo__media[data-reveal] {
+      transform: none;
+      filter: none;
+      transition: none;
+    }
   }
 </style>
