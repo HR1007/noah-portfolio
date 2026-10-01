@@ -926,60 +926,6 @@ app.put(
   }
 });
 
-/*
-  專案的瀏覽器視窗 mockup logo（DeviceShowcase 網址列左側那個小圖示）。
-  檔名固定是語意名 logo，不是編號序列，跟 swap／reorder 那組邏輯無關——
-  這裡刻意獨立一組簡單的 GET／POST／DELETE，比照 page-images 的寫法
-  （先找同名不同副檔名的舊檔刪掉，再寫新檔，避免兩個副檔名的 logo 同時存在）。
-  網站端讀取邏輯見 lib/media.ts 的 getProjectLogo。
-*/
-app.get('/api/projects/:slug/logo', async (req, res) => {
-  try {
-    const dir = slugDir('projects', req.params.slug);
-    const match = await findPageImage(dir, 'logo');
-    if (!match) return res.json({ filename: null });
-    const info = await describeFile(path.join(dir, match), `/projects-src/${req.params.slug}/${match}`);
-    res.json(info);
-  } catch (err) {
-    res.status(500).json({ error: String(err) });
-  }
-});
-
-app.post(
-  '/api/projects/:slug/logo',
-  express.raw({ type: '*/*', limit: '25mb' }),
-  undoable((req) => ({ label: `更換專案 logo（${req.params.slug}）`, targets: projectTargets(req.params.slug) })),
-  async (req, res) => {
-  try {
-    const dir = slugDir('projects', req.params.slug);
-    const ext = path.extname(String(req.query.filename || '')).toLowerCase();
-    if (!IMAGE_EXT.has(ext)) return res.status(400).json({ error: 'unsupported extension' });
-
-    const old = await findPageImage(dir, 'logo');
-    if (old) await fs.unlink(path.join(dir, old));
-
-    const filename = `logo${ext}`;
-    await fs.writeFile(path.join(dir, filename), req.body);
-    res.json({ filename });
-  } catch (err) {
-    res.status(400).json({ error: String(err.message || err) });
-  }
-});
-
-app.delete(
-  '/api/projects/:slug/logo',
-  undoable((req) => ({ label: `刪除專案 logo（${req.params.slug}）`, targets: projectTargets(req.params.slug) })),
-  async (req, res) => {
-  try {
-    const dir = slugDir('projects', req.params.slug);
-    const match = await findPageImage(dir, 'logo');
-    if (match) await fs.unlink(path.join(dir, match));
-    res.json({ ok: true });
-  } catch (err) {
-    res.status(400).json({ error: String(err.message || err) });
-  }
-});
-
 // ---------- 頁面固定圖片（語意檔名，不是編號序列，不用排序） ----------
 
 function pageImageGroup(page) {
