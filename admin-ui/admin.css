@@ -655,8 +655,16 @@ svg {
   position: absolute;
   inset: 0;
   background: rgba(20, 20, 22, 0.72);
+  opacity: 0;
+  transition: opacity 200ms ease;
 }
 
+/*
+  面板從「稍微縮小、透明」materialize 到正常大小，而不是用 display 直接跳出來——
+  開關都走同一條路徑，只是方向相反（apple-design 的空間一致性）。
+  hidden 這個 boolean attribute 沒辦法轉場，實際的顯示/收合時機由 admin.js 的
+  revealPanel／hidePanel 控制：先拿掉 hidden 再等一個畫面才加 is-open，收合則相反。
+*/
 .lightbox__panel {
   position: relative;
   z-index: 1;
@@ -667,6 +675,18 @@ svg {
   max-width: min(1000px, 100%);
   max-height: 100%;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 200ms ease, transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.lightbox.is-open .lightbox__backdrop {
+  opacity: 1;
+}
+
+.lightbox.is-open .lightbox__panel {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .lightbox__close {
@@ -838,12 +858,21 @@ svg {
 .publish-btn--go { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .publish-btn--go:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* 開合動畫的原理跟 lightbox 一樣，見 .lightbox__panel 的註解 */
 .publish-panel {
   margin: 0 0 20px;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--surface);
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 180ms ease, transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.publish-panel.is-open {
+  opacity: 1;
+  transform: translateY(0);
 }
 .publish-panel__head,
 .publish-panel__foot {
@@ -1278,4 +1307,104 @@ svg {
   width: 15px;
   height: 15px;
   cursor: pointer;
+}
+
+/* ---------- 互動回饋 ---------- */
+/*
+  這些按鈕原本只有 :hover 換色，滑鼠移過去的瞬間直接跳色，觸控裝置上更是完全沒有
+  按下的回饋（:hover 不存在，要等 click 完成才看到反應）。集中在這裡一次補齊，
+  而不是在上面幾十條規則裡各自加一行——同一個模式散落各處以後很難一眼看出
+  「這裡有沒有回饋」，收在一起之後這個問題本身就是可稽核的。
+  按下的瞬間就要有反應（apple-design：response），不等放開；
+  已經存在的 hover 換色也補上 transition，不要用跳的。
+*/
+.publish-btn,
+.undo-btn,
+.tab,
+.sidebar__item,
+.sec-btn,
+.sec-move__btn,
+.preview__btn,
+.lightbox__close,
+.tile__delete,
+.tile__expand,
+.tile__slot-remove,
+.sec-add button,
+.publish-panel__close,
+.content-savebar button,
+.content-search,
+.tile--add,
+.tile--empty-slot .tile__image-wrap,
+.tile__image-wrap.tile--empty-slot,
+.slot-cell {
+  transition: transform 100ms ease, background-color 150ms ease, border-color 150ms ease,
+    color 150ms ease, opacity 150ms ease;
+}
+
+.publish-btn:active,
+.undo-btn:not(:disabled):active,
+.tab:active,
+.sidebar__item:not(:disabled):active,
+.sec-btn:not(:disabled):active,
+.sec-move__btn:not(:disabled):active,
+.preview__btn:active,
+.lightbox__close:active,
+.tile__delete:active,
+.tile__expand:active,
+.tile__slot-remove:active,
+.sec-add button:active,
+.publish-panel__close:active,
+.content-savebar button:active,
+.tile--add:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightbox__backdrop,
+  .lightbox__panel,
+  .publish-panel,
+  .publish-btn,
+  .undo-btn,
+  .tab,
+  .sidebar__item,
+  .sec-btn,
+  .sec-move__btn,
+  .preview__btn,
+  .lightbox__close,
+  .tile__delete,
+  .tile__expand,
+  .tile__slot-remove,
+  .sec-add button,
+  .publish-panel__close,
+  .content-savebar button,
+  .content-search,
+  .tile--add,
+  .tile--empty-slot .tile__image-wrap,
+  .tile__image-wrap.tile--empty-slot,
+  .slot-cell {
+    transition-duration: 60ms;
+  }
+
+  .lightbox__panel,
+  .publish-panel {
+    transform: none;
+  }
+
+  .publish-btn:active,
+  .undo-btn:not(:disabled):active,
+  .tab:active,
+  .sidebar__item:not(:disabled):active,
+  .sec-btn:not(:disabled):active,
+  .sec-move__btn:not(:disabled):active,
+  .preview__btn:active,
+  .lightbox__close:active,
+  .tile__delete:active,
+  .tile__expand:active,
+  .tile__slot-remove:active,
+  .sec-add button:active,
+  .publish-panel__close:active,
+  .content-savebar button:active,
+  .tile--add:active {
+    transform: none;
+  }
 }

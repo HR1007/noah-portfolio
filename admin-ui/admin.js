@@ -76,6 +76,31 @@ function imgUrl(img) {
   return `${API}${img.url}?t=${encodeURIComponent(img.modifiedAt || '')}`;
 }
 
+/*
+  彈出面板（lightbox、publish panel）共用的開關動畫。hidden 這個 boolean attribute
+  沒辦法轉場（display:none 沒有中間值），所以開的時候先拿掉 hidden，
+  等下一輪繪製才加 is-open 去觸發 CSS transition；關的時候先拿掉 is-open
+  播放收合動畫，動畫結束（或逾時保底，怕 transitionend 沒觸發）才真的補回 hidden。
+  finish() 用 is-open 還在不在判斷——如果收合動畫還沒播完面板就被重新打開，
+  這裡就不會誤殺剛打開的畫面。
+*/
+function revealPanel(el) {
+  el.hidden = false;
+  el.classList.remove('is-open');
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-open')));
+}
+
+function hidePanel(el, onSettled) {
+  el.classList.remove('is-open');
+  const finish = () => {
+    if (el.classList.contains('is-open')) return;
+    el.hidden = true;
+    onSettled?.();
+  };
+  el.addEventListener('transitionend', finish, { once: true });
+  setTimeout(finish, 260);
+}
+
 function openLightbox(img, label) {
   lightboxImageEl.src = imgUrl(img);
   lightboxImageEl.alt = img.filename;
@@ -87,12 +112,11 @@ function openLightbox(img, label) {
     <div><dt>上傳日期</dt><dd>${formatDate(img.uploadedAt)}</dd></div>
     <div><dt>最後修改</dt><dd>${formatDate(img.modifiedAt)}</dd></div>
   `;
-  lightboxEl.hidden = false;
+  revealPanel(lightboxEl);
 }
 
 function closeLightbox() {
-  lightboxEl.hidden = true;
-  lightboxImageEl.src = '';
+  hidePanel(lightboxEl, () => { lightboxImageEl.src = ''; });
 }
 
 lightboxCloseEl.addEventListener('click', closeLightbox);
@@ -2021,7 +2045,7 @@ async function refreshPublishBadge() {
 }
 
 async function openPublishPanel() {
-  publishPanel.hidden = false;
+  revealPanel(publishPanel);
   publishBody.innerHTML = '<p class="publish-empty">檢查中…</p>';
   publishHint.textContent = '';
   publishConfirm.disabled = true;
@@ -2067,7 +2091,7 @@ async function openPublishPanel() {
 }
 
 publishBtn.addEventListener('click', openPublishPanel);
-document.getElementById('publishClose').addEventListener('click', () => { publishPanel.hidden = true; });
+document.getElementById('publishClose').addEventListener('click', () => hidePanel(publishPanel));
 
 publishConfirm.addEventListener('click', async () => {
   publishConfirm.disabled = true;
@@ -2081,7 +2105,7 @@ publishConfirm.addEventListener('click', async () => {
         (data.log ? `<pre class="publish-msg">${data.log}</pre>` : '');
       return;
     }
-    publishPanel.hidden = true;
+    hidePanel(publishPanel);
     showToast(`已發布 ${data.sha}，Vercel 建置中`);
     await refreshPublishBadge();
   } catch (err) {
