@@ -5,6 +5,8 @@ import SectionCta from './SectionCta.astro';
 
 interface Props {
   image: ImageMetadata | undefined;
+  /** 深色模式變體，選填。沒有時一律顯示淺色版本，見 lib/media.ts 的 getDeviceShowcaseDarkImage */
+  imageDark?: ImageMetadata | undefined;
   ratio: string;
   alt: string;
   eyebrow?: string;
@@ -13,7 +15,7 @@ interface Props {
   ctaHref?: string;
 }
 
-const { image, ratio, alt, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
+const { image, imageDark, ratio, alt, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
 ---
 
 <section class="device-showcase">
@@ -26,7 +28,20 @@ const { image, ratio, alt, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
     )
   }
   <SectionCta label={ctaLabel} href={ctaHref} />
-  <Media fit="natural" image={image} ratio={ratio} alt={alt} />
+  {/*
+    有深色版本時兩張圖疊在一起：淺色版正常排版撐出容器大小，深色版絕對定位
+    蓋在上面，用網站既有的 :root[data-theme] 機制（跟 ThemeToggle／tokens.css
+    同一套，不是另外發明的）切換透明度顯示哪一張——純 CSS，不需要 JS。
+    沒有深色版本時就是原本的單張圖，完全不受影響。
+  */}
+  <div class="device-showcase__media">
+    <Media fit="natural" image={image} ratio={ratio} alt={alt} />
+    {imageDark && (
+      <div class="device-showcase__media-dark">
+        <Media fit="natural" image={imageDark} ratio={ratio} alt={`${alt}（深色模式）`} />
+      </div>
+    )}
+  </div>
 </section>
 
 <style>
@@ -53,5 +68,37 @@ const { image, ratio, alt, eyebrow, heading, ctaLabel, ctaHref } = Astro.props;
     max-width: var(--content-width);
     margin: 0 auto;
     padding: 0 var(--content-gutter) var(--sp-6);
+  }
+
+  .device-showcase__media {
+    position: relative;
+  }
+
+  /*
+    深色版絕對定位蓋滿淺色版撐出來的框——兩張圖假設尺寸一致（同一張截圖的
+    深色變體），所以直接 inset:0 貼滿即可，不需要另外量尺寸。
+  */
+  .device-showcase__media-dark {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--motion-fast) var(--motion-ease);
+  }
+
+  .device-showcase__media-dark :global(.media) {
+    width: 100%;
+    height: 100%;
+  }
+
+  :root[data-theme='dark'] .device-showcase__media-dark {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .device-showcase__media-dark {
+      transition: none;
+    }
   }
 </style>

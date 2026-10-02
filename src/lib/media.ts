@@ -76,6 +76,23 @@ export function getProjectImageMap(slug: string): Record<number, ImageMetadata> 
   return map;
 }
 
+/**
+ * deviceShowcase 的深色模式變體（主畫面截圖的深色版本）。
+ * 檔名固定為語意名 dark（例如 dark.png），跟版位用的數字編號圖放在同一個
+ * 資料夾、共用同一份 glob 掃描——因為檔名不是純數字，getProjectImageMap
+ * 依 /^\d+$/ 篩選時會自動略過它，不會佔用或打亂任何版位編號。
+ * 沒有這張圖時回傳 undefined，DeviceShowcase 就只顯示淺色版本，不受影響。
+ */
+export function getDeviceShowcaseDarkImage(slug: string): ImageMetadata | undefined {
+  const prefix = `/src/assets/projects/${slug}/`;
+  const match = sortedByFilename(projectImageModules).find(([path]) => {
+    if (!path.startsWith(prefix)) return false;
+    const filename = path.split('/').pop() ?? '';
+    return filename.replace(/\.[^.]+$/, '') === 'dark';
+  });
+  return match?.[1];
+}
+
 /** 依語意檔名（不含副檔名）取單張 Gallery 頁面圖片，例如 getGalleryImage('hero')；找不到時回傳 undefined。 */
 export function getGalleryImage(name: string): ImageMetadata | undefined {
   const match = sortedByFilename(galleryImageModules).find(([path]) => {

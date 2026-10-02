@@ -165,6 +165,12 @@ const designThemesBlock = z.object({
   // 預設 vertical：這一區放的是設計系統規格圖，橫排會讓每張都太小看不清細節。
   // 預設值要跟 image-slots.mjs 的 SECTION_OPTIONS 第一個選項一致。
   direction: z.enum(['vertical', 'horizontal']).default('vertical'),
+  /*
+    預設 stacked（圖在上、文在下，跟現在一樣）。split 是圖文左右並排，
+    每個主題依序交錯左右邊（奇數在左、偶數在右），用的是跟 experienceDemo／
+    researchFramework 同一套 layout 命名習慣，後台也用同一套下拉選單元件。
+  */
+  layout: z.enum(['stacked', 'split']).default('stacked'),
   themes: z.array(
     z.object({
       title: localized(),

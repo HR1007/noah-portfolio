@@ -77,7 +77,7 @@ sections:
     heading:
       en: 'Seven principles, turned into rules you can check'
       zh: 七個原則，變成可以逐條檢查的硬規則
-    layout: split
+    layout: stacked
     paragraphs:
       - en: >-
           Hierarchy, KPI selection, the right chart for the data, filters,
@@ -103,6 +103,7 @@ sections:
       en: Responsive and auto layout specification page
       zh: 響應式與 auto layout 規格頁
   - type: designThemes
+    layout: split
     eyebrow:
       en: DESIGN SYSTEM
       zh: 設計系統
@@ -245,7 +246,7 @@ sections:
             breadcrumb that remembers where you came from. Filters stay visible
             on screen, and an export carries exactly the same conditions.
           zh: 從總覽的區域缺口一路下鑽到單筆訂單，麵包屑記得你從哪裡來。篩選條件永遠顯示在畫面上，匯出時帶著同一組條件走。
-        ratio: 3/4
+        ratio: 2976/1778
         alt:
           en: Transaction detail page
           zh: 交易明細頁
@@ -259,7 +260,7 @@ sections:
             system emails a preview to you first — nothing reaches a recipient
             before you confirm.
           zh: 直接帶入你目前的篩選。七個內容區塊可勾選，每個都標了會多幾頁。排程建立後系統先寄一份預覽給你自己，你確認之前不會發給任何收件人。
-        ratio: 3/4
+        ratio: 2976/1778
         alt:
           en: Report builder with live preview
           zh: 建立報表頁，右側為即時預覽
@@ -272,7 +273,7 @@ sections:
             rule created it or a person did. Closing it writes back to the rule,
             which is what makes threshold tuning possible at all.
           zh: 每件任務都帶著來源、負責人與到期日，並標明是規則命中還是有人手動建立。結案後回寫到規則，這正是之後能調門檻的依據。
-        ratio: 3/4
+        ratio: 2976/1778
         alt:
           en: Follow-up tasks page
           zh: 跟進任務頁

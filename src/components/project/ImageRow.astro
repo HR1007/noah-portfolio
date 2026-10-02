@@ -68,8 +68,13 @@ const { rows, images, eyebrow, heading, direction = 'horizontal', ctaLabel, ctaH
     像沒排好；統一貼齊底部，就像裝置一起放在同一條地平線上，是這類混合尺寸
     裝置圖常見的處理方式。
   */
+  /*
+    不另外加 padding：外層 .image-row-section 已經有 var(--content-gutter)
+    左右內距與 var(--sp-6) 底部間距，這裡以前重複加了同一組值，等於圖片
+    兩側各被多吃掉一份 --content-gutter（桌面上是 160px，兩側共 320px），
+    圖因此比其他段落窄一截、看起來特別小，底部間距也變成兩倍高。
+  */
   .image-row {
-    padding: 0 var(--content-gutter) var(--sp-6);
     display: grid;
     grid-template-columns: repeat(var(--columns), 1fr);
     align-items: end;

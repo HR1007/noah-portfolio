@@ -17,7 +17,7 @@ import Persona from '../components/project/Persona.astro';
 import DesignThemes from '../components/project/DesignThemes.astro';
 import Flow from '../components/project/Flow.astro';
 import ProjectQuote from '../components/project/ProjectQuote.astro';
-import { getProjectImageMap } from '../lib/media';
+import { getProjectImageMap, getDeviceShowcaseDarkImage } from '../lib/media';
 import { t, type LocalizedText } from '../lib/i18n';
 import SectionNav from '../components/project/SectionNav.astro';
 import { assignImages } from '../lib/image-slots.mjs';
@@ -41,6 +41,7 @@ const { backLabel } = site!.data.nav;
 const images = getProjectImageMap(project.id);
 const { hero: heroImage, bySection } = assignImages(project.data, images);
 const imagesFor = (i: number) => bySection[i] ?? [];
+const deviceShowcaseDarkImage = getDeviceShowcaseDarkImage(project.id);
 
 /*
   這一頁所有「給人看的文字」都經過這裡取值：欄位還是純字串就原樣回傳，
@@ -112,6 +113,7 @@ const { Content } = await render(project);
             case 'deviceShowcase':
               return anchor(<DeviceShowcase
                   image={imagesFor(sectionIndex)[0]}
+                  imageDark={deviceShowcaseDarkImage}
                   ratio={section.ratio}
                   alt={trReq(section.alt)}
                   eyebrow={tr(section.eyebrow)}
@@ -216,6 +218,7 @@ const { Content } = await render(project);
                   heading={trReq(section.heading)}
                   themes={trThemes(section.themes)}
                   direction={section.direction}
+                  layout={section.layout}
                   images={imagesFor(sectionIndex)}
                   ctaLabel={tr(section.ctaLabel)}
                   ctaHref={section.ctaHref}
