@@ -93,8 +93,9 @@
 
   button?.addEventListener('click', () => {
     const root = document.documentElement;
-    // 沒有 data-theme 就代表還在預設狀態，而預設一律是淺色
-    const current = root.dataset.theme ?? 'light';
+    // BaseLayout 的行內 script 一定會先設好 data-theme（預設 dark），
+    // 這裡的 fallback 只防萬一那段 script 沒跑到
+    const current = root.dataset.theme ?? 'dark';
     const next = current === 'dark' ? 'light' : 'dark';
     root.dataset.theme = next;
     localStorage.setItem(STORAGE_KEY, next);

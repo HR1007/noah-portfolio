@@ -1,4 +1,7 @@
 ---
-// Astro 的 i18n 路由需要這個檔案存在，才能自動產生 "/" → "/en/" 的轉址。
-// 實際內容由 Astro 在建置時接管，這裡不需要放版面。
+// "/" 不再轉址到 "/en"（見 astro.config.mjs 的 redirectToDefaultLocale 註解），
+// 這裡直接渲染跟 src/pages/en/index.astro 一樣的內容，根網址本身就能回應 200。
+import Home from '../views/Home.astro';
 ---
+
+<Home locale="en" />

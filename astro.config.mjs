@@ -44,7 +44,14 @@ export default defineConfig({
     locales: ['en', 'zh'],
     routing: {
       prefixDefaultLocale: true,
-      redirectToDefaultLocale: true,
+      /*
+        關掉自動轉址：原本 "/" 沒有內容可以回應，Astro 會自動 307 轉到 "/en"。
+        短網址服務（例如 PicSee）會把「有轉址行為」的網址當作風險，預設擋下來，
+        導致根網址沒辦法縮。改成 false 之後 "/" 變成一個可以自己實作的路由，
+        src/pages/index.astro 直接渲染跟 /en 一樣的內容，不再轉址，根網址本身
+        就能直接回應 200。/en、/zh 這兩條既有路徑完全不受影響，照舊運作。
+      */
+      redirectToDefaultLocale: false,
     },
   },
 });
