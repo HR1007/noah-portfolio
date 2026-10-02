@@ -27,10 +27,10 @@ const alternateURL = new URL(swapLocalePath(Astro.url.pathname, otherLocale), As
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script is:inline>
+      // 預設深色：訪客第一次進站、還沒按過切換鈕時就是這個值。
+      // 按過切換鈕之後 localStorage 存的選擇優先，深色不會蓋掉訪客自己選的淺色。
       const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'light' || savedTheme === 'dark') {
-        document.documentElement.dataset.theme = savedTheme;
-      }
+      document.documentElement.dataset.theme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
 
       /*
         iOS Safari 只有在頁面上真的掛了 touchstart 監聽器時，才會即時套用 :active
