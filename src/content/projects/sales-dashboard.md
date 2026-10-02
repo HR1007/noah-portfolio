@@ -178,6 +178,7 @@ sections:
           zh: 從推播通知到結案跟進任務的手機動線
     direction: vertical
   - type: experienceDemo
+    layout: split
     eyebrow:
       en: THE MOMENT
       zh: 收斂點
@@ -199,7 +200,6 @@ sections:
     alt:
       en: The assign follow-up dialog over the overview screen
       zh: 指派跟進對話框疊在總覽畫面上
-    layout: stacked
   - type: featureSplit
     eyebrow:
       en: DATA LINEAGE

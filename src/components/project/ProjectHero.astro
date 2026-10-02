@@ -15,9 +15,14 @@ interface Props {
 const { title, ctaLabel, ctaHref, image } = Astro.props;
 
 // hero 圖不套固定比例：直接用圖片自己的原始尺寸，只有寬度超過容器（1040px）
-// 時才等比例縮小。這樣不同案例的 hero 可以是不同形狀，也永遠不會被裁切或
-// 被放大超過原始解析度。沒有圖時佔位框才需要一個比例，用設計稿的 1040×675.66。
-const PLACEHOLDER_RATIO = '1040 / 675.66';
+// 或高度超過 --project-hero-max-height 時才等比例縮小。這樣不同案例的 hero
+// 可以是不同形狀，也永遠不會被裁切或被放大超過原始解析度。沒有圖時佔位框
+// 才需要一個比例——寬度沿用設計稿的 1040，高度改用 --project-hero-max-height
+// 目前的值（480），不是設計稿原始的 675.66，這樣空版位的佔位框跟上傳圖片後
+// 的實際高度一致，不會上傳完圖片後方塊突然變矮一截。
+// Placeholder 元件吃的是字串比例、不是 CSS var，所以這裡要手動跟 tokens.css
+// 的 --project-hero-max-height 同步；改了那個 token 記得也要改這裡。
+const PLACEHOLDER_RATIO = '1040 / 480';
 ---
 
 <section class="project-hero">
@@ -113,7 +118,8 @@ const PLACEHOLDER_RATIO = '1040 / 675.66';
     width: auto;
     height: auto;
     max-width: 100%;
-    max-height: var(--hero-max-height);
+    /* hero 專屬的高度上限，跟案例頁內文圖片共用的 --hero-max-height 分開——見 tokens.css 的註解 */
+    max-height: var(--project-hero-max-height);
     display: block;
   }
 

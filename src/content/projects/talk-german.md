@@ -40,6 +40,7 @@ sections:
       en: Talk German app screens shown across three phone mockups
       zh: 三台手機模擬畫面展示 Talk German 的 app 介面
   - type: researchFramework
+    layout: split
     eyebrow:
       en: RESEARCH FRAMEWORK
       zh: 研究架構
@@ -65,7 +66,6 @@ sections:
         Talk German wireflow — entry, audio input, recognition and the bilingual
         result, drawn in both light and dark
       zh: Talk German 的 wireflow——進入、語音輸入、辨識與雙語結果，淺色深色各畫一次
-    layout: stacked
   - type: persona
     eyebrow:
       en: PERSONA
@@ -124,6 +124,7 @@ sections:
           zh: 每個畫面都標好尺寸，讓實作對得回設計，不必靠猜。
     direction: vertical
   - type: experienceDemo
+    layout: split
     eyebrow:
       en: EXPERIENCE DEMO
       zh: 體驗展示
@@ -146,7 +147,6 @@ sections:
     alt:
       en: Talk German translation screen demo on a single phone
       zh: 單台手機展示 Talk German 的翻譯結果畫面
-    layout: stacked
   - type: featureSplit
     heading:
       en: Experience the Intuitive Flow

@@ -176,7 +176,17 @@
   */
   --home-hero-width: 78px;
   --connect-grid-width: 800px; /* 首頁聯絡管道那一排的寬度上限 */
+  /*
+    --hero-max-height 是 Media 元件 fit="natural" 模式的共用預設上限，
+    deviceShowcase／experienceDemo／researchFramework／featureSplit 等
+    案例頁內文圖片都繼承這一個值（刻意收斂成單一 token，避免散落多處）。
+
+    ProjectHero 另外開一個專屬的 --project-hero-max-height：案例頁最上方
+    的 hero 圖緊接在大標題下面，用跟內文圖片一樣的高度上限時視覺上特別搶眼，
+    所以單獨縮小。這是刻意跟上面那個共用值分開，不是忘記收斂。
+  */
   --hero-max-height: 675.66px; /* hero 圖高度上限，取自設計稿 */
+  --project-hero-max-height: 480px;
 
   /*
     全螢幕圖片檢視。底色與文字色刻意不隨主題反轉——看圖時暗底就是對的，
