@@ -127,7 +127,7 @@ sections:
         No hunting for a contact page. The inquiry form sits beside the hero, so
         a visitor can say what they need and send it without scrolling away.
       zh: 不用去找聯絡我們。詢價表單就在 hero 旁邊，訪客把需求講清楚、送出，不必往下捲。
-    ratio: 9/16
+    ratio: 16/10
     alt:
       en: New Formosa Sport homepage with the free-quote form beside the hero
       zh: 新台灣運動首頁，免費報價表單就在 hero 旁邊
@@ -142,7 +142,7 @@ sections:
         environment variables.
       zh: 詢價表單接到 Netlify Forms——自動收件、即時檢視，權限與通知路由都由環境變數控制。
     imagePosition: right
-    ratio: 4/3
+    ratio: 3/4
     alt:
       en: Inquiry form screenshot showing the automated lead pipeline
       zh: 詢價表單畫面，展示自動化的收件管道
@@ -157,7 +157,7 @@ sections:
         updatable without anyone standing by to run a pipeline.
       zh: 靜態網站、沒有 build 指令，直接從 repository 部署。客戶沒有工程團隊，所以網站必須在沒人守著跑流程的情況下也改得動。
     imagePosition: left
-    ratio: 4/3
+    ratio: 3/4
     alt:
       en: Deployment configuration screenshot
       zh: 部署設定畫面
@@ -169,7 +169,7 @@ sections:
       en: How do five unrelated business lines share one site without competing?
       zh: 五條互不相干的業務線，要怎麼共用一個網站又不互相打架？
     imagePosition: right
-    ratio: 4/3
+    ratio: 3/4
     alt:
       en: Overview of the five business lines sharing one site
       zh: 五條業務線共用一個網站的總覽
@@ -184,7 +184,7 @@ sections:
         quietly invent a seventh shade of red.
       zh: Formosa Red 與深藍本來就是這家店的顏色；要做的是把它們變成角色固定的 token，讓新頁面沒辦法偷偷長出第七種紅。
     imagePosition: left
-    ratio: 4/3
+    ratio: 3/4
     alt:
       en: Color and typography system screenshot
       zh: 色彩與字體系統畫面

@@ -91,7 +91,7 @@ sections:
       zh: >-
         這段 demo
         只講一條線：從品牌故事進來，用一次點擊取代填表單來連結錢包，付一頓飯的錢，拿到第一個收藏品。每個畫面回答的都是同一個問題——我能帶走什麼？
-    ratio: 3/4
+    ratio: 16/10
     alt:
       en: Foodlet experience demo phone mockup
       zh: Foodlet 體驗展示的手機模擬畫面
@@ -111,7 +111,7 @@ sections:
             transaction stops being the end of the meal and starts being worth
             keeping.
           zh: 點餐、付款與回饋收在同一條錢包動線裡。交易不再是這頓飯的句點，而是值得留著的東西。
-        ratio: 4/3
+        ratio: 3/4
         alt:
           en: Where Payment Starts Paying Back screen
           zh: 付款回饋機制的畫面
@@ -123,7 +123,7 @@ sections:
             The moment a payment clears it returns a digital collectible — the
             receipt becomes something you would actually look at again.
           zh: 付款完成的那一刻就回傳一個數位收藏品——收據變成你真的會再打開來看的東西。
-        ratio: 4/3
+        ratio: 3/4
         alt:
           en: From Transaction to Collectible screen
           zh: 交易轉為收藏品的畫面
@@ -135,7 +135,7 @@ sections:
             Local restaurants join the same rewards layer, so value accrues
             across the neighbourhood instead of inside one storefront.
           zh: 在地餐廳接進同一層回饋機制，價值累積在整個街區，而不是關在單一家店裡。
-        ratio: 4/3
+        ratio: 3/4
         alt:
           en: 'An Ecosystem, Not an App screen'
           zh: 在地餐廳共用回饋層的畫面

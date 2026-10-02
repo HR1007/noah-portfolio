@@ -142,7 +142,7 @@ sections:
       zh: >-
         看介面怎麼把「從說出口到聽得懂」這段路變簡單。這段 demo
         走過核心動線：先是一個安全但不囉唆的登入，接著是效率導向的語音擷取——現場錄音與上傳音檔都支援。最後停在左右對照的翻譯結果，讓學習者當場確認自己聽懂了多少，在真實環境裡也守得住注意力。
-    ratio: 9/16
+    ratio: 16/10
     alt:
       en: Talk German translation screen demo on a single phone
       zh: 單台手機展示 Talk German 的翻譯結果畫面

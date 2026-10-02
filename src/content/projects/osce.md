@@ -187,7 +187,7 @@ sections:
       zh: >-
         搜尋、篩選與批次操作收進同一個視圖，原本讓流程支離破碎的跳頁就消失了。需要精準批次處理時用密集表格，需要看狀態時用卡片格線——同一份資料，兩種真的不一樣的工具。
     imagePosition: left
-    ratio: 4/3
+    ratio: 3/4
     alt:
       en: Unified task surface dashboard screenshot
       zh: 收攏後的單一操作面後台畫面
@@ -201,7 +201,7 @@ sections:
         keeps content compliant with existing eye-strain requirements.
       zh: 考試會在昏暗的模擬情境室裡連續進行好幾個小時；獨立設計的深色主題讓內容仍然符合既有的視覺疲勞規範。
     imagePosition: right
-    ratio: 4/3
+    ratio: 3/4
     alt:
       en: Dark mode dashboard screenshot
       zh: 深色模式的後台畫面

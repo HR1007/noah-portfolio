@@ -111,7 +111,7 @@ export const SECTION_META = {
       eyebrow: 'EXPERIENCE DEMO',
       heading: `${TBD} 標題`,
       body: `${TBD} 說明文字，待補`,
-      ratio: '9/16',
+      ratio: '16/10',
       alt: `${TBD} Experience demo`,
     }),
   },

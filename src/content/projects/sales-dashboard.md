@@ -223,7 +223,7 @@ sections:
         連續期數」四格組成，而且不跑回測就不能存檔——過去 12 個月會叫幾次要先看清楚。低於 3 次代表門檻太鬆抓不到問題，高於 8
         次代表太吵，主管會開始無視。
     imagePosition: right
-    ratio: 4/3
+    ratio: 3/4
     alt:
       en: Insight rules page with condition builder and backtest
       zh: 洞察規則頁，含條件建構器與回測
@@ -244,7 +244,7 @@ sections:
             breadcrumb that remembers where you came from. Filters stay visible
             on screen, and an export carries exactly the same conditions.
           zh: 從總覽的區域缺口一路下鑽到單筆訂單，麵包屑記得你從哪裡來。篩選條件永遠顯示在畫面上，匯出時帶著同一組條件走。
-        ratio: 4/3
+        ratio: 3/4
         alt:
           en: Transaction detail page
           zh: 交易明細頁
@@ -258,7 +258,7 @@ sections:
             system emails a preview to you first — nothing reaches a recipient
             before you confirm.
           zh: 直接帶入你目前的篩選。七個內容區塊可勾選，每個都標了會多幾頁。排程建立後系統先寄一份預覽給你自己，你確認之前不會發給任何收件人。
-        ratio: 4/3
+        ratio: 3/4
         alt:
           en: Report builder with live preview
           zh: 建立報表頁，右側為即時預覽
@@ -271,7 +271,7 @@ sections:
             rule created it or a person did. Closing it writes back to the rule,
             which is what makes threshold tuning possible at all.
           zh: 每件任務都帶著來源、負責人與到期日，並標明是規則命中還是有人手動建立。結案後回寫到規則，這正是之後能調門檻的依據。
-        ratio: 4/3
+        ratio: 3/4
         alt:
           en: Follow-up tasks page
           zh: 跟進任務頁
@@ -312,7 +312,7 @@ sections:
         4、8、12、16、24、32、40 這七階，所以不會冒出 13 或 18。整份檔案 52
         張畫面、兩套主題、三個斷點，命名規則與前端對齊——接手的人不用問我，就知道下一個元件該叫什麼。
     imagePosition: left
-    ratio: 4/3
+    ratio: 3/4
     alt:
       en: Core components rebuilt with real auto layout
       zh: 用原生 auto layout 重建的核心元件
