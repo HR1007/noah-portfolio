@@ -153,6 +153,34 @@ sections:
             七種對話框、三種
             toast。標題就是問題本身，破壞性動作用紅色而且永遠不是預設焦點，按下去之前先說清楚範圍：匯出幾筆、影響幾人、什麼時候生效。可逆的事不問，直接做，然後給「復原」。
     direction: vertical
+  - type: experienceDemo
+    layout: stacked
+    eyebrow:
+      en: BRAND
+      zh: 品牌
+    heading:
+      en: A mark that says what the product does
+      zh: 讓標誌直接說出這個產品在做什麼
+    body:
+      en: >-
+        The original mark was a bullseye — it said "aim" but never said at
+        what. I explored four directions that all keep the orange rounded
+        square and put a screen inside it, and picked B: a rising line on a
+        monitor that ends in a red dot. The screen is the war room, the line is
+        the trend, and the dot is the one anomaly the insight card wants you to
+        look at. The orange is the same accent the interface uses, and below
+        20px the strokes thicken so it still reads in the sidebar and a browser
+        tab.
+      zh: >-
+        原本的標誌是靶心——它說「瞄準」，卻沒說瞄準什麼。我試了四個方向，都保留橘色圓角方塊、把一台螢幕放進去，最後選了
+        B：螢幕裡一條上升的折線，終點是一個紅點。螢幕是戰情室，折線是趨勢，紅點就是洞察卡要你注意的那個異常。底座的橘和介面強調色是同一個橘；20px
+        以下線條自動加粗，在側欄和瀏覽器分頁的尺寸也讀得出來。
+    ratio: 101/36
+    alt:
+      en: >-
+        Logo redesign board — four computer-themed directions, each shown at
+        160, 44 and 30 px and on dark and light headers
+      zh: 標誌重新設計提案——四個電腦主題方向，各自展示 160、44、30 px 三種尺寸與深淺兩種頁首
   - type: flow
     eyebrow:
       en: FLOW
