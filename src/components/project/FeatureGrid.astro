@@ -14,12 +14,14 @@ interface Props {
   eyebrow?: string;
   heading?: string;
   direction?: 'horizontal' | 'vertical';
+  /** true：三欄圖片原生比例不一、並排高度對不齊時，改用 fit="cover" 裁成統一比例 */
+  uniform?: boolean;
   columns: Column[];
   images: (ImageMetadata | undefined)[];  ctaLabel?: string;
   ctaHref?: string;
 }
 
-const { eyebrow, heading, columns, images, direction = 'horizontal', ctaLabel, ctaHref } = Astro.props;
+const { eyebrow, heading, columns, images, direction = 'horizontal', uniform = false, ctaLabel, ctaHref } = Astro.props;
 ---
 
 <section class="feature-grid" data-direction={direction}>
@@ -36,7 +38,7 @@ const { eyebrow, heading, columns, images, direction = 'horizontal', ctaLabel, c
     {
       columns.map((column, index) => (
         <div class="feature-grid__column">
-          <Media fit="natural" image={images[index]} ratio={column.ratio} alt={column.alt} />
+          <Media fit={uniform ? 'cover' : 'natural'} image={images[index]} ratio={column.ratio} alt={column.alt} />
           <h3 class="feature-grid__column-heading">{column.heading}</h3>
           <p class="feature-grid__column-body">{column.body}</p>
         </div>

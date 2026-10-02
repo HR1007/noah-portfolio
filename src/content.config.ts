@@ -73,6 +73,14 @@ const featureGridBlock = z.object({
   heading: localized().optional(),
   // horizontal：欄位並排（預設）；vertical：一欄一列往下排，圖片可以放大
   direction: z.enum(['horizontal', 'vertical']).default('horizontal'),
+  /*
+    預設 false：圖片維持原始比例（fit="natural"），不裁切。只有在三欄圖片
+    原始比例彼此差太多、並排時高度對不齊的案例才開 true——開了之後這個段落
+    改用 fit="cover"，照 column.ratio 裁成統一比例，照片形狀不一也能排整齊。
+    是 per-section 的選項，不是全站預設，因為大多數案例的三張圖本來就已經
+    原生比例一致，裁了反而平白損失內容。
+  */
+  uniform: z.boolean().default(false),
   columns: z.array(
     z.object({
       heading: localized(),

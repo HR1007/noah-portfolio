@@ -228,6 +228,7 @@ sections:
       en: Insight rules page with condition builder and backtest
       zh: 洞察規則頁，含條件建構器與回測
   - type: featureGrid
+    uniform: true
     eyebrow:
       en: SUPPORTING PAGES
       zh: 支撐頁面
