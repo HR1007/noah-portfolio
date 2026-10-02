@@ -76,6 +76,14 @@ const isNatural = fit === 'natural';
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /*
+      Safari 已知的渲染問題：overflow: hidden 搭配 border-radius 的容器，
+      有時不會正確裁切子元素（img 被升成獨立的合成層，繞過父層的
+      clip path），圓角在 Safari 看起來像完全沒套用。這個元件站上到處用，
+      直接在圖片自己身上也補一份 border-radius，不只依賴父層的 overflow
+      裁切——inherit 拿父層已經算好的值，不另外重複寫一次 var(--radius)。
+    */
+    border-radius: inherit;
   }
 
   /*

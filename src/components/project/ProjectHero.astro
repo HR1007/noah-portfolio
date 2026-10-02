@@ -121,6 +121,15 @@ const PLACEHOLDER_RATIO = '1040 / 480';
     /* hero 專屬的高度上限，跟案例頁內文圖片共用的 --hero-max-height 分開——見 tokens.css 的註解 */
     max-height: var(--project-hero-max-height);
     display: block;
+    /*
+      Safari 已知的渲染問題：overflow: hidden 搭配 border-radius 的 flex
+      容器，有時不會正確裁切子元素（img 被升成獨立的合成層，繞過父層的
+      clip path），圓角在 Safari 看起來像完全沒套用。直接在圖片自己身上
+      也補一份 border-radius，不依賴父層的 overflow 裁切，兩邊都圓，
+      不管哪個瀏覽器的合成行為都一樣。inherit 直接拿父層算好的值，
+      不另外寫一次 var(--radius)。
+    */
+    border-radius: inherit;
   }
 
   /*
