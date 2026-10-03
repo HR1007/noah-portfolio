@@ -191,6 +191,9 @@ const flowBlock = z.object({
   body: localized().optional(),
   // horizontal：步驟並排成一列（預設）；vertical：一步一列往下排
   direction: z.enum(['horizontal', 'vertical']).default('horizontal'),
+  // 跟 featureGrid 的 uniform 同一套邏輯，見那邊 schema 的註解：預設 false
+  // 不裁切；步驟之間圖片原生比例差太多、容器尺寸對不齊時才開 true。
+  uniform: z.boolean().default(false),
   steps: z.array(z.object({ label: z.string(), ratio: z.string(), alt: localized() })),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
   // 每種段落都支援，後台的「進階設定」可以逐段開關。

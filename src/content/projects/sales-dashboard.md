@@ -182,6 +182,7 @@ sections:
         160, 44 and 30 px and on dark and light headers
       zh: 標誌重新設計提案——四個電腦主題方向，各自展示 160、44、30 px 三種尺寸與深淺兩種頁首
   - type: flow
+    uniform: true
     eyebrow:
       en: FLOW
       zh: 動線
@@ -196,12 +197,12 @@ sections:
       zh: 五張畫面串成主線，三條分支從中間岔出去。所有縮圖都是設計檔裡實際完成的畫面匯出，不是重畫的示意框。
     steps:
       - label: Operation flow
-        ratio: 16/10
+        ratio: 16/9
         alt:
           en: Operation flow from login to assigning a follow-up
           zh: 從登入到指派跟進的操作動線
       - label: Mobile flow
-        ratio: 1920/992
+        ratio: 16/9
         alt:
           en: Mobile flow from push notification to closing a follow-up task
           zh: 從推播通知到結案跟進任務的手機動線
