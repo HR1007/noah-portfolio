@@ -162,14 +162,13 @@ sections:
       zh: 讓標誌直接說出這個產品在做什麼
     body:
       en: >-
-        The original mark was a bullseye — it said "aim" but never said at
-        what. I explored four directions that all keep the orange rounded
-        square and put a screen inside it, and picked B: a rising line on a
-        monitor that ends in a red dot. The screen is the war room, the line is
-        the trend, and the dot is the one anomaly the insight card wants you to
-        look at. The orange is the same accent the interface uses, and below
-        20px the strokes thicken so it still reads in the sidebar and a browser
-        tab.
+        The original mark was a bullseye — it said "aim" but never said at what.
+        I explored four directions that all keep the orange rounded square and
+        put a screen inside it, and picked B: a rising line on a monitor that
+        ends in a red dot. The screen is the war room, the line is the trend,
+        and the dot is the one anomaly the insight card wants you to look at.
+        The orange is the same accent the interface uses, and below 20px the
+        strokes thicken so it still reads in the sidebar and a browser tab.
       zh: >-
         原本的標誌是靶心——它說「瞄準」，卻沒說瞄準什麼。我試了四個方向，都保留橘色圓角方塊、把一台螢幕放進去，最後選了
         B：螢幕裡一條上升的折線，終點是一個紅點。螢幕是戰情室，折線是趨勢，紅點就是洞察卡要你注意的那個異常。底座的橘和介面強調色是同一個橘；20px
@@ -311,7 +310,7 @@ sections:
       en: RESPONSIVE
       zh: 三個斷點
     heading:
-      en: One screen, three breakpoints at once
+      en: 'One screen, three breakpoints at once'
       zh: 同一個畫面，三個斷點同時成立
     images:
       - ratio: 5920/2480
@@ -321,6 +320,8 @@ sections:
             the same overview screen
           zh: 桌機、平板、手機三個裝置 mockup 並排，都是同一個總覽畫面
     direction: horizontal
+    ctaLabel: Let's Try Out
+    ctaHref: 'https://hr1007.github.io/Sales-War-Room/'
   - type: featureSplit
     eyebrow:
       en: HANDOFF
@@ -346,5 +347,7 @@ sections:
     alt:
       en: Core components rebuilt with real auto layout
       zh: 用原生 auto layout 重建的核心元件
+    ctaLabel: Let's Try Out
+    ctaHref: 'https://hr1007.github.io/Sales-War-Room/'
 ---
 
