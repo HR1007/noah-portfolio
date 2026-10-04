@@ -13,7 +13,6 @@ hero:
     en: Try it out
     zh: 實際試試
   ctaHref: 'https://star-overlay.vercel.app/'
-  gradient: violet
 sections:
   - type: textSection
     eyebrow:

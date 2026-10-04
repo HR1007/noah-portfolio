@@ -14,7 +14,6 @@ hero:
     en: Try it out
     zh: 實際試試
   ctaHref: 'https://osce-medical-assessment-platform.figma.site'
-  gradient: cool
 sections:
   - type: textSection
     eyebrow:

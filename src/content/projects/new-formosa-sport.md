@@ -13,7 +13,6 @@ hero:
     en: Try it out
     zh: 實際試試
   ctaHref: 'https://new-formosa-sport.netlify.app/index.html#home'
-  gradient: mint
 sections:
   - type: textSection
     eyebrow:
@@ -203,6 +202,8 @@ sections:
     alt:
       en: Mobile inquiry flow screenshot
       zh: 手機詢價流程畫面
+    ctaLabel: Let's Try Out
+    ctaHref: 'https://new-formosa-sport.netlify.app/'
   - type: featureSplit
     heading:
       en: The System Holds at 375px
@@ -218,5 +219,7 @@ sections:
     alt:
       en: Mobile layout at 375px viewport
       zh: 375px 視窗下的手機版面
+    ctaLabel: Let's Try Out
+    ctaHref: 'https://new-formosa-sport.netlify.app/'
 ---
 

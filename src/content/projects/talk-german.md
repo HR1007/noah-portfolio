@@ -14,7 +14,6 @@ hero:
     en: Try it out
     zh: 實際試試
   ctaHref: 'https://deutsch-translater.figma.site'
-  gradient: slate
 sections:
   - type: textSection
     eyebrow:

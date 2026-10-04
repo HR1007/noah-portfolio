@@ -14,7 +14,6 @@ hero:
     en: Open the Figma prototype
     zh: 打開 Figma Prototype
   ctaHref: '#'
-  gradient: slate
 sections:
   - type: textSection
     eyebrow:
