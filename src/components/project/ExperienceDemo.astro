@@ -9,6 +9,8 @@ interface Props {
   heading: string;
   body: string;
   image: ImageMetadata | undefined;
+  /** 版位影片，選填。有的話優先播放，取代圖片；見 lib/media.ts 的 getProjectVideoMap */
+  video?: string | undefined;
   ratio: string;
   alt: string;
   ctaLabel?: string;
@@ -16,7 +18,18 @@ interface Props {
   layout?: 'stacked' | 'split' | 'split-reverse';
 }
 
-const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = 'stacked' } = Astro.props;
+const {
+  eyebrow,
+  heading,
+  body,
+  image,
+  video,
+  ratio,
+  alt,
+  ctaLabel,
+  ctaHref,
+  layout = 'stacked',
+} = Astro.props;
 ---
 
 <section class="experience-demo" data-layout={layout}>
@@ -35,10 +48,46 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = '
     </ReadMore>
     {ctaLabel && ctaHref && <Button label={ctaLabel} href={ctaHref} variant="primary" />}
   </div>
+  {/*
+    靜音自動播放、循環，像 GIF 一樣——這一段本來就是「看產品實際怎麼動」，
+    不需要訪客自己按播放。controls 一律保留：減少動態偏好的訪客不會被
+    自動播放打擾（下面的 script 只在沒開減少動態時才呼叫 play()），
+    但仍然可以自己手動播放，不會完全看不到這段內容。
+    aspect-ratio 用內容裡的 ratio 欄位頂著版面——影片的 metadata 要等
+    載入後才知道真正尺寸，沒有這個會在載入完成那一刻跳一下版。
+  */}
   <div class="experience-demo__media" data-reveal>
-    <Media fit="natural" image={image} ratio={ratio} alt={alt} />
+    {
+      video ? (
+        <video
+          class="experience-demo__video"
+          src={video}
+          style={`aspect-ratio: ${ratio}`}
+          muted
+          loop
+          playsinline
+          controls
+          preload="auto"
+          aria-label={alt}
+        />
+      ) : (
+        <Media fit="natural" image={image} ratio={ratio} alt={alt} />
+      )
+    }
   </div>
 </section>
+
+{
+  video && (
+    <script>
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.querySelectorAll<HTMLVideoElement>('.experience-demo__video').forEach((v) => {
+          v.play().catch(() => {});
+        });
+      }
+    </script>
+  )
+}
 
 <style>
   .experience-demo {
@@ -104,10 +153,26 @@ const { eyebrow, heading, body, image, ratio, alt, ctaLabel, ctaHref, layout = '
   }
 
   .experience-demo__body {
-    max-width: var(--prose-width);
     font-size: var(--font-size-body);
     line-height: 1.7;
     color: var(--color-muted);
+  }
+
+  /*
+    跟 Media.astro 的 natural 模式用同一套邏輯：width/height 都 auto、只用
+    max-* 設上限，等比例縮放、不裁切、不放大過原始解析度。aspect-ratio 讓
+    瀏覽器在影片 metadata 真正載入前就能算出正確空間，不會跳版。影片本身
+    不需要經過 Safari 的 overflow:hidden 裁切問題——圓角直接套在它自己身上，
+    沒有「父層裁子層」的關係，不會踩到 Media.astro 註解提到的那個雷。
+  */
+  .experience-demo__video {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: var(--hero-max-height);
+    margin-inline: auto;
+    border-radius: var(--radius);
   }
 
   /*

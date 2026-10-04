@@ -975,8 +975,6 @@ async function handleSwap(indexA, indexB) {
 
 let currentPageImageGroups = [];
 let currentHomeSets = [];
-// 漸層選項向後端拿，與 content schema 同一份清單
-let heroGradients = ['slate'];
 let sectionOptions = {};  // 型別 -> { 欄位: [可選值] }
 let ctaDefault = { ctaLabel: "Let's Try Out", ctaHref: '#' }; // 由 /api/cta-default 覆寫
 let projectSlots = {};   // slug -> 版位清單（含所屬段落）
@@ -1365,12 +1363,6 @@ function renderMonoNode(val, keyPath, container, dataObj) {
     container.appendChild(renderMonoRow('Type（唯讀，決定區塊版型）', keyPath, dataObj, { readonly: true }));
     return;
   }
-  if (key === 'gradient') {
-    container.appendChild(
-      renderMonoRow('Hero 漸層底色', keyPath, dataObj, { select: heroGradients })
-    );
-    return;
-  }
   if (key === 'imagePosition') {
     container.appendChild(renderMonoRow('Image Position', keyPath, dataObj, { select: ['left', 'right'] }));
     return;
@@ -1495,15 +1487,13 @@ async function loadContentPage() {
   document.querySelector('.content-savebar')?.remove();
   contentEl.innerHTML = '<p style="padding:16px;color:var(--muted)">載入中…</p>';
 
-  const [{ en, zh }, slugs, gradients, opts] = await Promise.all([
+  const [{ en, zh }, slugs, opts] = await Promise.all([
     fetch(`${API}/api/site`).then((r) => r.json()),
     fetch(`${API}/api/collections/projects`).then((r) => r.json()),
-    fetch(`${API}/api/hero-gradients`).then((r) => r.json()).catch(() => ['slate']),
     fetch(`${API}/api/section-options`).then((r) => r.json()).catch(() => ({})),
     ensureSectionTypes(),
     fetch(`${API}/api/cta-default`).then((r) => r.json()).then((d) => { ctaDefault = d; }).catch(() => {}),
   ]);
-  heroGradients = gradients;
   sectionOptions = opts;
   siteEn = en;
   siteZh = zh;

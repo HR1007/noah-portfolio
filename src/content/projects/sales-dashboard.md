@@ -11,14 +11,14 @@ summary:
   zh: 把實習時建的銷售儀表板重新設計成一套系統。重點從來不是把資料變成圖表，而是從發現問題走到指派跟進。
 hero:
   ctaLabel:
-    en: Open the Figma prototype
-    zh: 打開 Figma Prototype
+    en: Try it out
+    zh: 實際試試
   ctaHref: '#'
 sections:
   - type: textSection
     eyebrow:
-      en: ORIGIN
-      zh: 起點
+      en: ORIGIN & INSPIRATION
+      zh: 起點與靈感
     heading:
       en: It started as a Power BI report
       zh: 從一份 Power BI 報表開始

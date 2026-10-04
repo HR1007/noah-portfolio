@@ -17,7 +17,6 @@ import {
   getImageSlots, SECTION_META, SECTION_OPTIONS, describeSection, sectionItemCount, plain,
   createSection, addSectionItem, removeSectionItem, sectionTypeOptions, CTA_DEFAULT,
 } from '../src/lib/image-slots.mjs';
-import { HERO_GRADIENTS } from '../src/lib/hero-gradients.mjs';
 import { snapshotBefore, pendingUndo, restoreLast, clearUndo } from './undo.mjs';
 import {
   CONTENT_PATHS, changedFiles, outsideFiles, buildMessage,
@@ -282,8 +281,6 @@ function textItemPreviews(section, list) {
   });
 }
 
-// 漸層清單由 src/lib/hero-gradients.mjs 提供，與 content schema 同一份，
-// 後台不自行維護一份選項，避免兩邊選項不一致。
 // 完整版位資訊（含所屬段落），供 Content 分頁以段落為單位分組顯示圖片。
 // 一樣讀 src/lib/image-slots.mjs，不另外算一套。
 /*
@@ -341,7 +338,7 @@ app.post(
       summary: { en: '[需確認] 案例摘要，待補' },
       ctaLabel: { en: 'More Details' },
       tags: [],
-      hero: { ctaLabel: { en: 'Try it out' }, ctaHref: '#', gradient: 'slate' },
+      hero: { ctaLabel: { en: 'Try it out' }, ctaHref: '#' },
       sections,
     };
 
@@ -473,8 +470,6 @@ app.put(
 
 // 各段落型別支援的版型選項，後台據此渲染下拉選單（即使 .md 裡還沒有該欄位）
 app.get('/api/section-options', (req, res) => res.json(SECTION_OPTIONS));
-
-app.get('/api/hero-gradients', (req, res) => res.json(HERO_GRADIENTS));
 
 app.get('/api/collections/gallery', async (req, res) => {
   try {

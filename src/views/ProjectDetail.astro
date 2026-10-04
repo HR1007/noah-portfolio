@@ -17,7 +17,7 @@ import Persona from '../components/project/Persona.astro';
 import DesignThemes from '../components/project/DesignThemes.astro';
 import Flow from '../components/project/Flow.astro';
 import ProjectQuote from '../components/project/ProjectQuote.astro';
-import { getProjectImageMap, getDeviceShowcaseDarkImage } from '../lib/media';
+import { getProjectImageMap, getProjectVideoMap, getDeviceShowcaseDarkImage } from '../lib/media';
 import { t, type LocalizedText } from '../lib/i18n';
 import SectionNav from '../components/project/SectionNav.astro';
 import { assignImages } from '../lib/image-slots.mjs';
@@ -42,6 +42,15 @@ const images = getProjectImageMap(project.id);
 const { hero: heroImage, bySection } = assignImages(project.data, images);
 const imagesFor = (i: number) => bySection[i] ?? [];
 const deviceShowcaseDarkImage = getDeviceShowcaseDarkImage(project.id);
+
+/*
+  版位影片（目前只有 experienceDemo 用得到）。assignImages 本身跟圖片的型別
+  無關，只是純粹的版位編號查表，所以直接餵進 getProjectVideoMap 的結果，
+  一樣會得到跟圖片版位完全對齊的 bySection——某個版位到底有沒有影片，
+  是呼叫端（下面的 experienceDemo case）自己決定要不要優先用，兩份表不互相干涉。
+*/
+const { bySection: videoBySection } = assignImages(project.data, getProjectVideoMap(project.id));
+const videoFor = (i: number) => videoBySection[i]?.[0];
 
 /*
   這一頁所有「給人看的文字」都經過這裡取值：欄位還是純字串就原樣回傳，
@@ -128,6 +137,7 @@ const { Content } = await render(project);
                   heading={trReq(section.heading)}
                   body={trReq(section.body)}
                   image={imagesFor(sectionIndex)[0]}
+                  video={videoFor(sectionIndex)}
                   ratio={section.ratio}
                   alt={trReq(section.alt)}
                   ctaLabel={tr(section.ctaLabel)}

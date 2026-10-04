@@ -8,7 +8,6 @@ interface Props {
   ctaLabel: string;
   href: string;
   image: ImageMetadata | undefined;
-  reverse?: boolean;
   /**
    * 開場作品：獨立一整排、單欄、圖放大，視覺份量明顯高於其餘作品。
    * 目前只給排在第一順位的案例用（見 Portfolio.astro）。
@@ -16,7 +15,7 @@ interface Props {
   featured?: boolean;
 }
 
-const { title, summary, ctaLabel, href, image, reverse = false, featured = false } = Astro.props;
+const { title, summary, ctaLabel, href, image, featured = false } = Astro.props;
 ---
 
 {/*
@@ -25,10 +24,7 @@ const { title, summary, ctaLabel, href, image, reverse = false, featured = false
   不會誤觸全螢幕放大檢視——跟藝廊封面卡是同一條規則，不用另外處理。
 */}
 <a
-  class:list={[
-    'portfolio-card',
-    { 'portfolio-card--reverse': reverse, 'portfolio-card--featured': featured },
-  ]}
+  class:list={['portfolio-card', { 'portfolio-card--featured': featured }]}
   href={href}
 >
   <div class="portfolio-card__media">
@@ -63,15 +59,7 @@ const { title, summary, ctaLabel, href, image, reverse = false, featured = false
     color: inherit;
   }
 
-  .portfolio-card--reverse {
-    direction: rtl;
-  }
-
-  .portfolio-card--reverse > * {
-    direction: ltr;
-  }
-
-  /* 開場作品：單欄、圖在上，份量明顯大一截，不跟其餘案例走同一套左右交錯節奏 */
+  /* 開場作品：單欄、圖在上，份量明顯大一截，不跟其餘案例走同一套版型 */
   .portfolio-card--featured {
     grid-template-columns: 1fr;
     gap: var(--sp-4);
@@ -87,10 +75,17 @@ const { title, summary, ctaLabel, href, image, reverse = false, featured = false
     transform: scale(1.04);
   }
 
+  /*
+    align-items 原本是 flex-start，文字欄的子元素（標題／摘要／CTA）會各自
+    縮到內容本身的寬度，摘要段落因此沒有「滿欄寬」可以對齊——改成 stretch
+    之後子元素撐滿欄寬，摘要段落的 text-align: justify 才有空間可以分配，
+    右邊緣才能跟圖片欄的右緣對齊。標題與 CTA 文字本身仍是靠左，撐滿的只是
+    看不見的容器寬度，視覺上沒有變化。
+  */
   .portfolio-card__body {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: var(--sp-2);
   }
 
@@ -105,6 +100,8 @@ const { title, summary, ctaLabel, href, image, reverse = false, featured = false
   .portfolio-card__summary {
     font-size: var(--font-size-body);
     color: var(--color-muted);
+    /* 右邊緣跟圖片欄的右緣對齊；最後一行天生不受 justify 影響，不會被硬拉開 */
+    text-align: justify;
   }
 
   .portfolio-card--featured .portfolio-card__summary {
@@ -177,10 +174,8 @@ const { title, summary, ctaLabel, href, image, reverse = false, featured = false
   }
 
   @media (max-width: 767px) {
-    .portfolio-card,
-    .portfolio-card--reverse {
+    .portfolio-card {
       grid-template-columns: 1fr;
-      direction: ltr;
     }
   }
 </style>

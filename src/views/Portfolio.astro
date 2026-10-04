@@ -41,7 +41,8 @@ const heroImage = getPortfolioImage('hero');
         /*
           第一順位的案例獨立一整排、視覺放大（featured），呼應它被排到第一順位
           這個決定——第一眼看到的不只是排序在前，視覺上也確實是「開場作品」。
-          其餘案例的左右交錯節奏從它們自己算起（index - 1），不受開場那一排影響。
+          其餘案例固定圖左文右，不左右交錯——交錯會讓文字欄的左邊界在「貼齊頁面
+          左緣」與「貼齊圖片右側的內緣」之間跳來跳去，往下捲動時讀起來像沒對齊。
         */
         projects.map((project, index) => (
           <PortfolioCard
@@ -50,7 +51,6 @@ const heroImage = getPortfolioImage('hero');
             ctaLabel={t(project.data.ctaLabel, locale)}
             href={`/${locale}/projects/${project.id}`}
             image={getProjectImages(project.id)[0]}
-            reverse={index > 0 && (index - 1) % 2 === 1}
             featured={index === 0}
           />
         ))

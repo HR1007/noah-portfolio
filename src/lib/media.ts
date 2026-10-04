@@ -7,6 +7,17 @@ const projectImageModules = import.meta.glob<ImageModule>(
   { eager: true }
 );
 
+/*
+  案例頁版位影片（目前只有 experienceDemo 在用）。跟 projectImageModules 共用同一套
+  檔名編號慣例（00、01、02...對應版位），但影片不是 astro:assets 認得的格式，
+  改用 Vite 內建的 asset pipeline——匯入的預設值就是帶內容雜湊的正式網址，
+  跟 lib/media.ts 開頭 homeVideoModules 的做法一致。
+*/
+const projectVideoModules = import.meta.glob<{ default: string }>(
+  '/src/assets/projects/*/*.{mp4,webm}',
+  { eager: true }
+);
+
 const galleryImageModules = import.meta.glob<ImageModule>(
   '/src/assets/gallery/*.{png,jpg,jpeg,webp,avif}',
   { eager: true }
@@ -71,6 +82,27 @@ export function getProjectImageMap(slug: string): Record<number, ImageMetadata> 
     const base = path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? '';
     if (!/^\d+$/.test(base)) continue;
     map[Number(base)] = image;
+  }
+
+  return map;
+}
+
+/**
+ * 依檔名的數字編號回傳指定專案的版位影片對照表，邏輯跟 getProjectImageMap
+ * 完全對稱（00.mp4 → 0、05.webm → 5），只是掃 projectVideoModules、回傳網址
+ * 字串而不是 ImageMetadata。兩份表各自獨立：同一個版位編號若只有圖片檔，
+ * 這裡就是 undefined；呼叫端（目前只有 ExperienceDemo）自己決定有影片時
+ * 優先播影片、沒有時退回圖片，兩者互不影響彼此的編號。
+ */
+export function getProjectVideoMap(slug: string): Record<number, string> {
+  const prefix = `/src/assets/projects/${slug}/`;
+  const map: Record<number, string> = {};
+
+  for (const [path, mod] of Object.entries(projectVideoModules)) {
+    if (!path.startsWith(prefix)) continue;
+    const base = path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? '';
+    if (!/^\d+$/.test(base)) continue;
+    map[Number(base)] = mod.default;
   }
 
   return map;

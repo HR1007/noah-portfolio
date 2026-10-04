@@ -1,6 +1,5 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { HERO_GRADIENTS } from './lib/hero-gradients.mjs';
 
 /*
   會顯示在頁面上的文字：中英對照。
@@ -230,9 +229,6 @@ const projects = defineCollection({
       .object({
         ctaLabel: localized(),
         ctaHref: z.string().default('#'), // [需確認] 待設計師提供實際 demo／prototype 連結
-        // 漸層底色只存名稱，實際色值定義在 src/styles/tokens.css，
-        // 避免把 hex 散進內容檔。
-        gradient: z.enum(HERO_GRADIENTS).default('slate'),
       })
       .optional(),
     sections: z.array(projectSection).default([]),
