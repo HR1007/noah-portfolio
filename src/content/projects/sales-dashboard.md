@@ -13,7 +13,7 @@ hero:
   ctaLabel:
     en: Try it out
     zh: 實際試試
-  ctaHref: '#'
+  ctaHref: 'https://hr1007.github.io/Sales-War-Room/'
 sections:
   - type: textSection
     eyebrow:
