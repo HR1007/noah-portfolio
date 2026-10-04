@@ -320,8 +320,6 @@ sections:
             the same overview screen
           zh: 桌機、平板、手機三個裝置 mockup 並排，都是同一個總覽畫面
     direction: vertical
-    ctaLabel: Let's Try Out
-    ctaHref: 'https://hr1007.github.io/Sales-War-Room/'
   - type: featureSplit
     eyebrow:
       en: HANDOFF
