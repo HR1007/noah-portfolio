@@ -319,7 +319,7 @@ sections:
             Desktop, tablet and phone device mockups side by side, all showing
             the same overview screen
           zh: 桌機、平板、手機三個裝置 mockup 並排，都是同一個總覽畫面
-    direction: horizontal
+    direction: vertical
     ctaLabel: Let's Try Out
     ctaHref: 'https://hr1007.github.io/Sales-War-Room/'
   - type: featureSplit
@@ -347,7 +347,5 @@ sections:
     alt:
       en: Core components rebuilt with real auto layout
       zh: 用原生 auto layout 重建的核心元件
-    ctaLabel: Let's Try Out
-    ctaHref: 'https://hr1007.github.io/Sales-War-Room/'
 ---
 
