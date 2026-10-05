@@ -248,5 +248,7 @@ sections:
     alt:
       en: Two phone mockups showing the finished Star Overlay look
       zh: 兩台手機模擬畫面，展示 Star Overlay 完成後的樣子
+    ctaLabel: Let's Try Out
+    ctaHref: 'https://star-overlay.vercel.app/'
 ---
 
