@@ -93,6 +93,7 @@ sections:
             state, so five business lines build from one kit.
           zh: 按鈕、輸入框、標籤與服務卡連狀態一起定義，五條業務線用同一套零件組出來。
     direction: vertical
+    layout: stacked
   - type: flow
     eyebrow:
       en: FLOW

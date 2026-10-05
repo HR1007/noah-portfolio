@@ -122,6 +122,7 @@ sections:
             design without guesswork.
           zh: 每個畫面都標好尺寸，讓實作對得回設計，不必靠猜。
     direction: vertical
+    layout: stacked
   - type: experienceDemo
     layout: split
     eyebrow:

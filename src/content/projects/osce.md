@@ -152,6 +152,7 @@ sections:
             afterwards.
           zh: 考試會在昏暗的模擬情境室裡連續進行好幾個小時，所以深色底是跟淺色一起被定義出來的，不是事後從淺色推導出來的。
     direction: vertical
+    layout: stacked
   - type: flow
     eyebrow:
       en: FLOW

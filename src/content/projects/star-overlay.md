@@ -110,6 +110,7 @@ sections:
             with the states it actually ships with.
           zh: 一張表看完整組控制項：按鈕、比例預設、數量滑桿、六種星形，以及吸色色票——每一個都連它真正會用到的狀態一起定義。
     direction: vertical
+    layout: stacked
   - type: flow
     eyebrow:
       en: FLOW
@@ -182,7 +183,7 @@ sections:
     ctaLabel:
       en: Let's Try Out
       zh: 來試試看
-    ctaHref: '#'
+    ctaHref: 'https://star-overlay.vercel.app/'
   - type: featureGrid
     eyebrow:
       en: INTUITIVE CAPABILITIES
