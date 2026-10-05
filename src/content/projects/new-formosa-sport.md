@@ -131,6 +131,8 @@ sections:
     alt:
       en: New Formosa Sport homepage with the free-quote form beside the hero
       zh: 新台灣運動首頁，免費報價表單就在 hero 旁邊
+    ctaLabel: Let's Try Out
+    ctaHref: '#'
   - type: featureSplit
     heading:
       en: Automated Lead Pipeline
@@ -161,6 +163,8 @@ sections:
     alt:
       en: Deployment configuration screenshot
       zh: 部署設定畫面
+    ctaLabel: Let's Try Out
+    ctaHref: 'https://new-formosa-sport.netlify.app/'
   - type: featureSplit
     heading:
       en: Experience the Intuitive Flow
@@ -173,6 +177,8 @@ sections:
     alt:
       en: Overview of the five business lines sharing one site
       zh: 五條業務線共用一個網站的總覽
+    ctaLabel: Let's Try Out
+    ctaHref: 'https://new-formosa-sport.netlify.app/'
   - type: featureSplit
     heading:
       en: Single Source of Truth
