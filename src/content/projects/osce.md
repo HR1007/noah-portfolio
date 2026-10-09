@@ -173,6 +173,10 @@ sections:
         alt:
           en: OSCE flow — configuring a station and its rubric
           zh: OSCE 流程——設定考站與其評分表
+      - label: '[需確認] Step'
+        ratio: 3/4
+        alt:
+          en: '[需確認] Flow step'
     direction: horizontal
   - type: featureSplit
     heading:
