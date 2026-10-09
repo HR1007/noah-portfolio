@@ -168,11 +168,6 @@ sections:
         memory.
       zh: 原本的流程把一個動作拆散到十個分頁。重新設計後，整場考試的建置留在同一個畫面上——考試的結構長在介面裡，不再長在某個人的記憶裡。
     steps:
-      - label: Set up the station
-        ratio: 3/4
-        alt:
-          en: OSCE flow — configuring a station and its rubric
-          zh: OSCE 流程——設定考站與其評分表
       - label: '[需確認] Step'
         ratio: 3/4
         alt:
