@@ -50,7 +50,7 @@
     ]
   },
   "footer": {
-    "copyright": "© 2026 Chung Wen Hung. All content, including pixel art and photography, are personal works."
+    "copyright": "© 2026 Chung Wen Hung. All pixel art and photography on this site are my own work."
   },
   "home": {
     "heroName": "NOAH WEN",
@@ -63,13 +63,13 @@
     "heroQuote": "My life is an 8px grid, and I'm just trying not to let my anxiety overflow-y",
     "reachCaption": "Hey — I see you.",
     "aboutHeading": "About me",
-    "aboutSubheading": "Shaping Intuitive Solutions",
-    "aboutIntro": "I hold a master’s degree in Information Management from National Kaohsiung University of Science and Technology, with a focus on UI/UX design and human factors engineering. During my time as a data analysis intern at e-Excellence, I explored how dashboards can transform raw data into clear, actionable insights. My exchange experience in Computer Science at THWS in Germany deepened my understanding of how cultural differences shape users’ perceptions and interactions with interfaces. For my master’s research, I redesigned the backend of a medical OSCE assessment system in Taiwan using a User-Centered Design (UCD) approach, refining workflows and working to translate design improvements into practice.",
-    "aboutResearch": "My research thread is putting ergonomics into clinical settings. It started in 2023 with an AR ordering interface driven by gesture control, and led to using eye tracking and usability testing on hospital medication recognition — the same question throughout: in a high-pressure, low-tolerance environment, can the interface prevent one more mistake?",
+    "aboutSubheading": "Making complex systems feel simple",
+    "aboutIntro": "I did my master's in Information Management at NKUST, working somewhere between UI/UX design and human factors. As a data analysis intern at e-Excellence, I kept coming back to one question: how do you get a dashboard full of numbers to just tell you what matters? An exchange year in Computer Science at THWS in Germany then showed me how differently people read the same button depending on where they grew up. For my thesis, I took on Taiwan's OSCE medical assessment system and used user-centered design to untangle its back-office workflows. Drawing the new flow was the easy part. Getting it adopted is the work I'm still pushing on.",
+    "aboutResearch": "Most of my research comes back to one idea: bringing human factors into clinical settings. It began in 2023 with a gesture-controlled AR ordering interface, then moved into hospitals, where I used eye tracking and usability testing on a medication recognition system. The projects changed; the question didn't. When the pressure is high and there's little room for error, can an interface spare someone one more mistake?",
     "beyondGridHeading": "Beyond the Grid",
     "beyondGridParagraphs": [
-      "When I'm not refining pixels or analyzing datasets, I immerse myself in illustration and digital art. My love for visual storytelling often translates into my web projects, where I enjoy integrating unique character designs.",
-      "Having served as a Student Ambassador and International Volunteer in Würzburg, I have a deep appreciation for cross-cultural exchange and travel photography. I believe that observing the world from different perspectives fuels my creativity and empathy as a designer."
+      "When I'm not nudging pixels or digging through data, I'm usually drawing. The two never stay apart for long. Halfway through a web page a character pops into my head, and more often than not it ends up living on that page.",
+      "I've been a student ambassador, an international volunteer, and for a while a resident of Würzburg. Living somewhere new means relearning the small things, like buying bread or catching a tram, and once the ordinary stops being obvious, you start actually seeing it. For a designer, that's a pretty good trade."
     ],
     "experience": [
       {
@@ -85,7 +85,7 @@
       {
         "title": "Data Analysis Intern",
         "period": "2023 - 2024",
-        "description": "e-Excellence Inc., Applied Information Architecture (IA) and Visual Hierarchy to transform complex datasets into intuitive, user-friendly visual stories for management."
+        "description": "At e-Excellence, used information architecture and visual hierarchy to turn messy datasets into charts managers could read — and act on."
       }
     ],
     "activitiesHeading": "Conferences & Service",
@@ -154,9 +154,9 @@
     ]
   },
   "portfolio": {
-    "eyebrow": "Bridging the gap between technical logic and human-centered intuition.",
+    "eyebrow": "Somewhere between technical logic and human intuition.",
     "headline": "Portfolio",
-    "intro": "I'm a designer who's honestly just obsessed with how people actually function. To me, design isn't just about 'looking good'—it's about Human Factors and hard evidence. I rely on eye-tracking, emotional responses, and user interviews to prove that a layout actually works. Whether I'm cleaning up a chaotic technical interface or geeking out over dark mode aesthetics, I love thinking outside the box to turn complex digital friction into a smooth, 'it just works' experience."
+    "intro": "Honestly, what hooks me isn't how things look. It's how people actually work. So I design from evidence: eye tracking, emotional responses, user interviews, all pointed at one question — does this layout actually help? Some weeks that means tearing apart a chaotic technical interface; some nights it's trying the same dark-mode gray over and over. Big job or small, the goal doesn't change: find where people get stuck, and get it out of their way."
   },
   "projectQuote": {
     "quote": "A great interface is like an 8px grid: invisible to the eye, but felt in every seamless interaction.",
