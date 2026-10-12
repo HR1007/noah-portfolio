@@ -241,7 +241,7 @@ sections:
     ctaLabel:
       en: Let's Try Out
       zh: 來試試看
-    ctaHref: '#'
+    ctaHref: 'https://osce-medical-assessment-platform.figma.site'
   - type: featureSplit
     eyebrow:
       en: AUDIT LOG
@@ -262,6 +262,6 @@ sections:
     ctaLabel:
       en: Let's Try Out
       zh: 來試試看
-    ctaHref: '#'
+    ctaHref: 'https://osce-medical-assessment-platform.figma.site'
 ---
 
