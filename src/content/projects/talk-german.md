@@ -168,7 +168,7 @@ sections:
     ctaLabel:
       en: Let's Try Out
       zh: 來試試看
-    ctaHref: '#'
+    ctaHref: 'https://deutsch-translater.figma.site'
   - type: featureGrid
     eyebrow:
       en: INTUITIVE CAPABILITIES
@@ -231,7 +231,7 @@ sections:
     ctaLabel:
       en: Let's Try Out
       zh: 來試試看
-    ctaHref: '#'
+    ctaHref: 'https://deutsch-translater.figma.site'
   - type: featureSplit
     heading:
       en: Nightfall Immersion
@@ -250,6 +250,6 @@ sections:
     ctaLabel:
       en: Let's Try Out
       zh: 來試試看
-    ctaHref: '#'
+    ctaHref: 'https://deutsch-translater.figma.site'
 ---
 
