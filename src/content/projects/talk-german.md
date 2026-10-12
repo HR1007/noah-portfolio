@@ -133,38 +133,20 @@ sections:
       zh: 實際走一遍 Talk German
     body:
       en: >-
-        Explore how the interface simplifies the path from speech to
-        understanding. This demo walks through the core user journey: starting
-        with a secure, frictionless login, moving to high-efficiency audio
-        capture—supporting both live recording and audio file uploads. The demo
-        concludes with a clear, side-by-side translation comparison, allowing
-        learners to instantly verify their German comprehension and maintain
-        focus in real-world environments.
+        How do you get from hearing German to understanding it, without the
+        interface getting in the way? This demo follows the core journey: a
+        login that's secure but quick, audio capture that takes either a live
+        recording or an uploaded file, and a side-by-side translation where
+        learners can check right away how much they understood. The aim is
+        simple: take the pressure off, and keep attention on the sentence in
+        front of you.
       zh: >-
-        看介面怎麼把「從說出口到聽得懂」這段路變簡單。這段 demo
-        走過核心動線：先是一個安全但不囉唆的登入，接著是效率導向的語音擷取——現場錄音與上傳音檔都支援。最後停在左右對照的翻譯結果，讓學習者當場確認自己聽懂了多少，在真實環境裡也守得住注意力。
+        從聽見德文到聽懂德文，介面能不能別擋路？這段 demo
+        走過核心動線：先是一個安全但不囉唆的登入，接著是語音擷取，現場錄音或上傳音檔都行，最後停在左右對照的翻譯結果，學習者當場就能確認自己聽懂了幾成。整段設計的目的其實很單純：把壓力降下來，讓注意力留在「聽懂這句話」上。
     ratio: 16/10
     alt:
       en: Talk German translation screen demo on a single phone
       zh: 單台手機展示 Talk German 的翻譯結果畫面
-  - type: featureSplit
-    heading:
-      en: Experience the Intuitive Flow
-      zh: 走一遍就懂的動線
-    body:
-      en: >-
-        Take a hands-on look at how design simplifies German translation. This
-        demo showcases the fluid transition from speech to instant parallel
-        results, built specifically to reduce pressure and keep learners focused
-        on understanding the language.
-      zh: >-
-        親手看一次設計怎麼讓德文翻譯變簡單。這段 demo
-        展示從語音到即時對照結果之間的流暢銜接——它的目的很明確：把壓力降下來，讓學習者把注意力留在「聽懂這句話」上。
-    imagePosition: right
-    ratio: 3/4
-    alt:
-      en: Hand holding a phone showing the Talk German intuitive flow
-      zh: 手拿手機展示 Talk German 的操作動線
     ctaLabel:
       en: Let's Try Out
       zh: 來試試看
