@@ -5,10 +5,12 @@ title:
 order: 5
 summary:
   en: >-
-    Inspired by my exchange at THWS Würzburg. Talk German bridges the gap
-    between complex academic structures and spontaneous speech, seamlessly
-    merging information management logic with intuitive design.
-  zh: 靈感來自我在 THWS 符茲堡的交換。Talk German 把厚重的學術資料與當下說出口的話接起來，讓資訊管理的邏輯與直覺的介面設計走在同一條線上。
+    Born out of my exchange year at THWS Würzburg. Talk German connects the
+    dense German of lecture files with the German people actually speak, using
+    information-management logic to keep the interface out of your way.
+  zh: >-
+    這個點子是在 THWS 符茲堡交換時冒出來的。Talk German
+    想把課堂上那些厚重的學術資料，和日常裡隨口說出的德文接起來；背後撐著的是資訊管理的邏輯，擺在前面的是不必多想的介面。
 hero:
   ctaLabel:
     en: Try it out
@@ -24,15 +26,17 @@ sections:
       zh: "\U0001F968 Talk German"
     paragraphs:
       - en: >-
-          Inspired by my exchange at THWS Würzburg, I realized that language is
-          the ultimate interface. Talk German bridges the gap between complex
-          academic files and spontaneous speech by merging Information
-          Management logic with intuitive design. It is more than just a
-          utility—it is a learning companion built to transform linguistic
-          barriers into clear, accessible opportunities for growth.
+          During my exchange at THWS Würzburg, it hit me that language is the
+          most basic interface there is: if you can't get through it, nothing
+          behind it works. Talk German tries to connect dense academic files
+          with the German people actually speak, pairing information-management
+          logic with a design you don't have to think about. I didn't want
+          another utility you open, use and close. I wanted something closer to
+          a study partner, one that turns the language barrier into a door you
+          can actually push open.
         zh: >-
-          在 THWS 符茲堡交換的那段時間，我意識到語言才是最根本的那層介面。Talk German
-          把厚重的學術檔案與當下說出口的話接起來，讓資訊管理的邏輯與直覺的介面設計走在同一條線上。它不只是一個工具，而是一個學習上的夥伴——把語言的門檻，換成看得懂、進得去的成長機會。
+          在 THWS 符茲堡交換那段時間，我才真正意識到，語言其實是最底層的一層介面：這層卡住了，後面什麼都用不了。Talk German
+          想做的，是把厚重的學術檔案和日常隨口說出的德文接起來，背後用資訊管理的邏輯撐著，前面給一個不必多想的介面。我不希望它只是個查完就關掉的工具，它應該更像一個陪你念書的夥伴，把語言這道門檻，變成一扇推得開的門。
   - type: deviceShowcase
     ratio: 16/10
     alt:
@@ -48,17 +52,19 @@ sections:
       zh: 從說出口到聽得懂，整條路徑攤開來畫一次
     paragraphs:
       - en: >-
-          The whole product is four moments: land, choose an input, wait for
-          recognition, read the result. This wireflow settles that path before
-          any visual design — upload a file or record live, both converge on the
-          same recognition step, and both land on the same side-by-side result.
+          Strip it down and the whole product is four moments: arrive, pick an
+          input, wait for recognition, read the result. This wireflow locked
+          that path in before any visual design started. Upload a file or record
+          live, and either way you reach the same recognition step and end on
+          the same side-by-side result.
         zh: >-
-          整個產品其實只有四個時刻：進來、選擇輸入方式、等待辨識、讀結果。這張 wireflow
-          在任何視覺設計開始之前，先把這條路徑定下來——上傳檔案或現場錄音，兩條路匯進同一個辨識步驟，也落在同一個左右對照的結果畫面。
+          拆到最後，整個產品只有四個時刻：進來、選輸入方式、等辨識、看結果。這張 wireflow
+          在視覺設計動工前，就先把這條路定下來了。不管是上傳檔案還是現場錄音，兩條路都會匯進同一個辨識步驟，最後落在同一個左右對照的結果畫面。
       - en: >-
-          Light and dark were drawn together from the start rather than
-          retrofitted, so neither theme inherits a layout built for the other.
-        zh: 淺色與深色是一開始就一起畫的，不是事後補的，所以兩個主題都不會繼承一套為另一個而生的版面。
+          Light and dark were drawn side by side from the first sketch, so
+          neither theme is stuck with a layout that was really built for the
+          other.
+        zh: 淺色和深色從第一張草圖就一起畫，所以哪一邊都不必遷就一套原本為另一邊設計的版面。
     ratio: 4/3
     alt:
       en: >-
@@ -84,19 +90,19 @@ sections:
       zh: 設計主軸
     heading:
       en: >-
-        A compact design system — colour, type, spacing and redlines that keep
-        every screen consistent across both themes.
-      zh: 一套小而完整的設計系統——色彩、字體、間距與標註，讓每個畫面在兩種主題下都對得上。
+        A small but complete design system: colour, type, spacing and redlines
+        that keep every screen in step across both themes.
+      zh: 一套小而完整的設計系統。色彩、字體、間距和標註都定好了，每個畫面切到哪個主題都對得上。
     themes:
       - title:
           en: Colour
           zh: 色彩
         description:
           en: >-
-            Brand violet with an amber pretzel mark. Dark and light canvases
-            share one set of ink and status tokens, so a screen switches theme
-            without redrawing.
-          zh: 品牌紫，配一個琥珀色的蝴蝶餅標記。深色與淺色畫布共用同一組墨色與狀態 token，畫面切換主題不必重畫。
+            Brand violet, with an amber pretzel mark. Dark and light canvases
+            share one set of ink and status tokens, so switching themes never
+            means redrawing a screen.
+          zh: 主色是品牌紫，再點一個琥珀色的蝴蝶餅標記。深淺兩種畫布共用同一組墨色和狀態 token，切換主題時不用重畫任何一個畫面。
       - title:
           en: Typography
           zh: 字體
@@ -112,15 +118,15 @@ sections:
           en: >-
             A 4pt base scale from 4 to 48, with four radii mapped to chips,
             cards, panels and the CTA.
-          zh: 以 4pt 為基準、從 4 到 48 的階梯，搭配四種圓角，分別對應標籤、卡片、面板與主要按鈕。
+          zh: 間距從 4 到 48，以 4pt 為一階往上疊；圓角有四種，分別給標籤、卡片、面板和主要按鈕。
       - title:
           en: Redlines
           zh: 標註
         description:
           en: >-
-            Every screen specced with measurements, so the build matches the
-            design without guesswork.
-          zh: 每個畫面都標好尺寸，讓實作對得回設計，不必靠猜。
+            Every screen is specced with measurements, so whoever builds it
+            never has to guess.
+          zh: 每個畫面都標好了尺寸，做的人照著實作就好，不必用猜的。
     direction: vertical
     layout: stacked
   - type: experienceDemo
@@ -148,7 +154,7 @@ sections:
       en: Talk German translation screen demo on a single phone
       zh: 單台手機展示 Talk German 的翻譯結果畫面
     ctaLabel:
-      en: Let's Try Out
+      en: Try it out
       zh: 來試試看
     ctaHref: 'https://deutsch-translater.figma.site'
   - type: featureGrid
@@ -160,37 +166,38 @@ sections:
       zh: 功能
     columns:
       - heading:
-          en: Intuitive Authentication
+          en: No-fuss Sign-in
           zh: 不囉唆的登入
         body:
           en: >-
-            This interface serves as the user's primary entry point,
-            prioritizing a low-friction experience.
-          zh: 這個畫面是使用者的第一個入口，優先考慮的是「不要卡住人」。
+            The front door to the app, built so nobody gets stuck before they've
+            even started.
+          zh: 這是進 app 的第一道門，原則只有一個：別讓人還沒開始就卡住。
         ratio: 3/4
         alt:
           en: Intuitive Authentication screen
           zh: 登入畫面
       - heading:
-          en: Seamless Audio Capture
+          en: Record or Upload
           zh: 順手的語音擷取
         body:
           en: >-
-            This screen features a streamlined, dual-mode information
-            architecture for input selection.
-          zh: 這個畫面用精簡的雙模式資訊架構，讓人選擇要用哪一種方式輸入。
+            Two ways in, recording or uploading, laid out so choosing takes no
+            thought at all.
+          zh: 錄音或上傳，兩種輸入方式並排擺好，要選哪個一眼就知道。
         ratio: 3/4
         alt:
           en: Seamless Audio Capture screen
           zh: 語音擷取畫面
       - heading:
-          en: Parallel Insight
+          en: Side by Side
           zh: 左右對照
         body:
           en: >-
-            Once the complex audio recognition is complete, the resulting layout
-            focuses on context retention and immediate verification.
-          zh: 複雜的語音辨識完成之後，結果的版面把重點放在保住上下文，以及當場就能核對。
+            Once recognition finishes, the original and the translation sit side
+            by side, so the context stays intact and you can check one against
+            the other on the spot.
+          zh: 辨識跑完之後，原文和翻譯左右並排，上下文不會斷掉，對不對當場就能核對。
         ratio: 3/4
         alt:
           en: Parallel Insight screen
@@ -202,16 +209,16 @@ sections:
       zh: 白天的易讀性
     body:
       en: >-
-        The Light Mode is designed to provide maximum legibility and a crisp,
-        clean aesthetic that mimics traditional learning environments.
-      zh: 淺色模式追求的是最大的可讀性，以及一種乾淨俐落、接近傳統學習環境的樣子。
+        Light mode goes all in on legibility: crisp, clean, and close to the
+        feel of a printed textbook.
+      zh: 淺色模式把可讀性擺在第一位，畫面乾淨俐落，讀起來像在翻一本印刷課本。
     imagePosition: right
     ratio: 3/4
     alt:
       en: Light mode screen of Talk German
       zh: Talk German 的淺色模式畫面
     ctaLabel:
-      en: Let's Try Out
+      en: Try it out
       zh: 來試試看
     ctaHref: 'https://deutsch-translater.figma.site'
   - type: featureSplit
@@ -220,17 +227,16 @@ sections:
       zh: 入夜之後
     body:
       en: >-
-        Developed as a sophisticated alternative for low-light settings, the
-        Dark Mode focuses on user well-being by significantly reducing eye
-        strain.
-      zh: 深色模式是為低光環境準備的另一種選擇，重點放在使用者的狀態——明顯降低眼睛的負擔。
+        When the lights go down, dark mode takes over. It puts the reader's eyes
+        first and noticeably cuts down on strain during long sessions.
+      zh: 光線暗下來的時候，就換深色模式上場。它把使用者的眼睛擺在第一位，盯著螢幕久了也不那麼累。
     imagePosition: left
     ratio: 3/4
     alt:
       en: Dark mode screen of Talk German
       zh: Talk German 的深色模式畫面
     ctaLabel:
-      en: Let's Try Out
+      en: Try it out
       zh: 來試試看
     ctaHref: 'https://deutsch-translater.figma.site'
 ---
