@@ -132,7 +132,7 @@ sections:
       en: New Formosa Sport homepage with the free-quote form beside the hero
       zh: 新台灣運動首頁，免費報價表單就在 hero 旁邊
     ctaLabel: Let's Try Out
-    ctaHref: '#'
+    ctaHref: 'https://new-formosa-sport.netlify.app/index.html#home'
   - type: featureSplit
     heading:
       en: Automated Lead Pipeline
