@@ -213,31 +213,17 @@ sections:
       zh: 實際走一遍 OSCE 平台
     body:
       en: >-
-        A walk through the redesigned backend: advanced filters that expand in
-        place, status read through semantic colour, and bulk actions that stay
-        where the selection happens. The same tasks that once needed ten tabs,
-        done on one screen.
-      zh: 走一遍重新設計過的後台：進階篩選就地展開、狀態用語意化色彩讀取、批次操作留在你做選取的地方。以前要開十個分頁才做得完的事，現在在一個畫面上完成。
+        A walk through the redesigned backend, and how a fragmented system
+        folds into one continuous surface: advanced filters open right where
+        you are, status reads at a glance through semantic colour, and bulk
+        actions stay next to your selection. Work that once took ten tabs now
+        fits on one screen.
+      zh: 帶你走一遍改版後的後台，看一個東拼西湊的系統怎麼收成一個連貫的操作面：進階篩選在原地展開，狀態靠語意化色彩一眼讀出，批次操作就待在你選取資料的地方。以前得開十個分頁才辦得完的事，現在一個畫面就搞定。
     ratio: 16/10
     alt:
       en: OSCE Medical Assessment Platform demo on laptop
       zh: 筆電上的 OSCE 醫學考評平台展示
     layout: stacked
-  - type: featureSplit
-    heading:
-      en: Experience the Intuitive Flow
-      zh: 走一遍就懂的動線
-    body:
-      en: >-
-        Watch a fragmented backend fold into one continuous surface. Advanced
-        filters expand in place. Status is read through semantic color rather
-        than a wall of text. Bulk actions live where the selection happens.
-      zh: 看一個支離破碎的後台，怎麼收攏成一個連續的操作面。進階篩選就地展開；狀態用語意化色彩讀取，而不是一整面文字；批次操作留在你做選取的地方。
-    imagePosition: right
-    ratio: 3/4
-    alt:
-      en: Intuitive flow demo illustration
-      zh: 動線展示插圖
     ctaLabel:
       en: Let's Try Out
       zh: 來試試看
