@@ -46,7 +46,7 @@ sections:
   - type: persona
     eyebrow:
       en: PERSONA
-      zh: 使用者輪廓
+      zh: 人物誌
     heading:
       en: Who opens this ten times a day
       zh: 一天會打開這個畫面十次的人
@@ -57,7 +57,7 @@ sections:
           en: >-
             Persona — Chien-chung Lin, regional sales manager covering four
             counties in central Taiwan
-          zh: 使用者輪廓——林建中，負責中部四縣市的區域銷售主管
+          zh: 人物誌——林建中，負責中部四縣市的區域銷售主管
   - type: deviceShowcase
     eyebrow:
       en: THE SCREEN

@@ -68,16 +68,16 @@ sections:
   - type: persona
     eyebrow:
       en: PERSONA
-      zh: 使用者輪廓
+      zh: 人物誌
     heading:
       en: Talk German — Persona
-      zh: Talk German — 使用者輪廓
+      zh: Talk German — 人物誌
     personas:
       - name: Emma Chen
         ratio: 3/4
         alt:
           en: Emma Chen persona board — a 22-year-old exchange student in Würzburg
-          zh: Emma Chen 使用者輪廓看板——22 歲，在符茲堡交換的學生
+          zh: Emma Chen 人物誌看板——22 歲，在符茲堡交換的學生
   - type: designThemes
     eyebrow:
       en: DESIGN THEMES

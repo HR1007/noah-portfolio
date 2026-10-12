@@ -40,16 +40,16 @@ sections:
   - type: persona
     eyebrow:
       en: PERSONA
-      zh: 使用者輪廓
+      zh: 人物誌
     heading:
       en: New Formosa Sport — Persona
-      zh: 新台灣運動 — 使用者輪廓
+      zh: 新台灣運動 — 人物誌
     personas:
       - name: School equipment buyer
         ratio: 3/4
         alt:
           en: New Formosa Sport persona board
-          zh: 新台灣運動使用者輪廓看板
+          zh: 新台灣運動人物誌看板
   - type: designThemes
     eyebrow:
       en: DESIGN THEMES

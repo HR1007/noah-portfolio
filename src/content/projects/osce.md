@@ -111,10 +111,10 @@ sections:
   - type: persona
     eyebrow:
       en: PERSONA
-      zh: 使用者輪廓
+      zh: 人物誌
     heading:
       en: OSCE — Persona
-      zh: OSCE — 使用者輪廓
+      zh: OSCE — 人物誌
     personas:
       - name: Exam coordinator
         ratio: 3/4
@@ -122,7 +122,7 @@ sections:
           en: >-
             OSCE persona board — the coordinator who sets up and runs the
             stations
-          zh: OSCE 使用者輪廓看板——負責建置與執行考站的承辦人
+          zh: OSCE 人物誌看板——負責建置與執行考站的承辦人
   - type: designThemes
     eyebrow:
       en: DESIGN THEMES

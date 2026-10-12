@@ -62,16 +62,16 @@ sections:
   - type: persona
     eyebrow:
       en: PERSONA
-      zh: 使用者輪廓
+      zh: 人物誌
     heading:
       en: Star Overlay — Persona
-      zh: Star Overlay — 使用者輪廓
+      zh: Star Overlay — 人物誌
     personas:
       - name: Mia Wang
         ratio: 3/4
         alt:
           en: Mia Wang persona portrait
-          zh: Mia Wang 使用者輪廓
+          zh: Mia Wang 人物誌
   - type: designThemes
     eyebrow:
       en: DESIGN SYSTEM

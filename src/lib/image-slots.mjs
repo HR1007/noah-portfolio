@@ -218,7 +218,7 @@ export const SECTION_META = {
   },
 
   persona: {
-    label: 'Persona',
+    label: '人物誌',
     images: 0,
     list: {
       key: 'personas',
@@ -226,13 +226,13 @@ export const SECTION_META = {
       label: '人物',
       min: 1,
       max: null,
-      create: () => ({ name: `${TBD} Persona 名稱`, ratio: '3/4', alt: `${TBD} Persona portrait` }),
+      create: () => ({ name: `${TBD} 人物誌名稱`, ratio: '3/4', alt: `${TBD} 人物誌看板` }),
     },
     create: () => ({
       type: 'persona',
       eyebrow: 'PERSONA',
       heading: `${TBD} 標題`,
-      personas: [{ name: `${TBD} Persona 名稱`, ratio: '3/4', alt: `${TBD} Persona portrait` }],
+      personas: [{ name: `${TBD} 人物誌名稱`, ratio: '3/4', alt: `${TBD} 人物誌看板` }],
     }),
   },
 

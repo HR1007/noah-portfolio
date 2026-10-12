@@ -44,16 +44,16 @@ sections:
   - type: persona
     eyebrow:
       en: PERSONA
-      zh: 使用者輪廓
+      zh: 人物誌
     heading:
       en: Foodlet — Persona
-      zh: Foodlet — 使用者輪廓
+      zh: Foodlet — 人物誌
     personas:
       - name: Everyday diner
         ratio: 3/4
         alt:
           en: Foodlet persona board
-          zh: Foodlet 使用者輪廓看板
+          zh: Foodlet 人物誌看板
   - type: flow
     eyebrow:
       en: FLOW
