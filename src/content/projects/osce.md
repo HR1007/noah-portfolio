@@ -5,10 +5,10 @@ title:
 order: 4
 summary:
   en: >-
-    My master's thesis: redesigning the information system behind an AR + OSCE
-    assessment platform, so the structure of an exam lives in the interface
-    instead of the coordinator's head.
-  zh: 我的碩士論文：重新設計 AR + OSCE 考評平台背後的資訊系統，讓一場考試的結構長在介面裡，而不是長在承辦人的腦袋裡。
+    My master's thesis. I redesigned the information system behind an AR + OSCE
+    assessment platform, so that how an exam fits together shows up on screen
+    instead of living only in one coordinator's memory.
+  zh: 我的碩士論文。我替一套 AR + OSCE 考評平台重新設計背後的資訊系統，希望一場考試怎麼排，打開介面就看得出來，不必再靠承辦人一個人記著。
 hero:
   ctaLabel:
     en: Try it out
@@ -24,20 +24,21 @@ sections:
       zh: OSCE 醫學考評平台
     paragraphs:
       - en: >-
-          This is my master's thesis, built on the "AR + OSCE" teaching and
+          This is my master's thesis. It builds on the "AR + OSCE" teaching and
           assessment platform from the Department of Pharmacy at Tajen
-          University of Technology, developed in collaboration with OSCE domain
-          experts. OSCE is a rigorously designed assessment method — stations,
-          rubrics, standardized patients, all of it specified. Its information
-          system, on the other hand, had never really been treated as something
-          that needed designing. The line that stuck with me from the interviews
-          was a coordinator's aside: she had to open ten separate tabs just to
-          assign one exam seat. Which meant the structure of the exam lived in
-          her head, not in the interface. That gap is where this project
-          started.
+          University of Technology, and I worked with OSCE domain experts
+          throughout. OSCE itself is a meticulous method: how stations are set
+          up, how rubrics are scored, how standardized patients play their parts
+          — all of it is specified. Oddly, the information system holding it
+          together had never been treated as something worth designing. One
+          coordinator's offhand complaint from the interviews has stayed with
+          me: she had to open ten separate tabs just to assign one exam seat.
+          She was carrying the whole exam's structure in her head, and the
+          interface wasn't helping her hold any of it. That gap is where this
+          project started.
         zh: >-
-          這是我的碩士論文，以大仁科技大學藥學系的「AR + OSCE」教學考評平台為基礎，並與 OSCE 領域專家合作發展。OSCE
-          本身是一套設計得相當嚴謹的考評方法——考站、評分表、標準化病人，全部都有明確規格。但另一方面，它的資訊系統，過去從來沒有真正被當成一件需要設計的事。訪談裡讓我一直記得的，是一位承辦人隨口提到：光是安排一個考位，她就得開十個不同的分頁。這代表整場考試的結構，其實是存在她的腦袋裡，而不是存在介面裡。這個落差，就是這個專案的起點。
+          這是我的碩士論文。底子是大仁科技大學藥學系的「AR + OSCE」教學考評平台，過程中一路和 OSCE 領域的專家合作。OSCE
+          本身是一套很講究的考評方法，考站怎麼設、評分表怎麼打、標準化病人怎麼演，樣樣都有規格。奇怪的是，撐起這一切的資訊系統，好像從來沒有人把它當成需要設計的東西。訪談時有位承辦人隨口抱怨了一句，我到現在都還記得：光是排一個考位，她就得開十個分頁。換句話說，整場考試的結構全靠她自己記著，介面一點忙也沒幫上。這個專案就是從這個落差開始的。
   - type: deviceShowcase
     ratio: 16/10
     alt:
@@ -53,19 +54,20 @@ sections:
       zh: 研究架構
     paragraphs:
       - en: >-
-          Human-Centered Design as the anchor, Double Diamond as the structure —
-          with a different lens deliberately fitted to each diamond. The first
-          diamond, discover and define, ran on Experience-Centered Design:
-          situational context, emotional demands, how roles actually
-          collaborate. Task analysis alone doesn't surface any of that. The
-          second diamond, develop and deliver, switched to User-Centered Design
-          for task-driven iteration and usability, and participatory
-          co-creation. The reasoning is simple: keep the efficiency and
-          error-prevention UCD cares about, without flattening the lived
-          experience of turning an exam into a handful of numbers.
+          Human-centered design is the anchor and the Double Diamond is the
+          frame, but I deliberately fitted each diamond with a different lens.
+          The first, discover and define, ran on experience-centered design: the
+          situation on the ground, the emotional pressure, how the different
+          roles actually work together. Task analysis alone won't dig any of
+          that up. For the second, develop and deliver, I switched to
+          user-centered design and moved forward through task-driven iteration,
+          usability testing and participatory co-creation. Why switch halfway? I
+          wanted to keep the efficiency and error-prevention UCD is good at,
+          without squeezing what an exam actually feels like for the people
+          inside it into a handful of numbers.
         zh: >-
-          以人本設計為錨，雙鑽石為骨架——並且刻意為兩顆鑽石各配一副不同的鏡片。第一顆鑽石（探索與定義）走體驗中心設計：情境脈絡、情緒需求、各個角色實際上怎麼協作。這些東西，單靠任務分析看不出來。第二顆鑽石（發展與交付）換成使用者中心設計，做任務導向的迭代、可用性測試與參與式共創。理由很單純：UCD
-          在意的效率與防錯要留著，但不能因此把「一場考試被壓縮成幾個數字」這件事背後的真實經驗給抹平。
+          人本設計是錨，雙鑽石是骨架，不過兩顆鑽石我刻意各配了一副不同的鏡片。第一顆負責探索與定義，用的是體驗中心設計：現場的情境、人的情緒壓力、不同角色之間實際怎麼搭配。這些東西光靠任務分析是挖不出來的。到了第二顆，進入發展與交付，我換成使用者中心設計，靠任務導向的迭代、可用性測試和參與式共創往前推。為什麼要中途換？UCD
+          重視的效率和防錯當然要留，可是一場考試對身在其中的人是什麼滋味，總不能就這樣被壓成幾個數字吧？
     ratio: 4/3
     alt:
       en: >-
@@ -81,10 +83,10 @@ sections:
       zh: 所有考試收在同一個資料夾
     body:
       en: >-
-        Sessions are filed by name and date, with each card carrying its own
-        completion status—so an examiner can see what remains outstanding
-        without opening anything.
-      zh: 測驗依姓名與日期歸檔，每張卡片自己帶著完成狀態——考官不用點開任何一個，就知道還有哪些沒結束。
+        Sessions are filed by name and date, and every card shows its own
+        completion status. An examiner can tell what's still outstanding at a
+        glance, without opening a thing.
+      zh: 每一場測驗都按姓名和日期歸檔，卡片上直接標著完成狀態。考官不用一張張點開，掃一眼就知道還剩哪些沒收尾。
     imagePosition: right
     ratio: 3/4
     alt:
@@ -99,10 +101,10 @@ sections:
       zh: 整屆考生，一張表看完
     body:
       en: >-
-        Student ID, score, timestamp and examiner in a single filterable row.
-        Advanced filters narrow by year and date range, and the result exports
-        in one click.
-      zh: 學號、成績、時間與考官收在同一列，而且可以篩。進階篩選能限縮年級與日期區間，結果一鍵匯出。
+        Student ID, score, timestamp and examiner sit in one row you can filter.
+        Advanced filters narrow it by year and date range, and whatever's left
+        exports in one click.
+      zh: 學號、成績、時間、考官全擺在同一列，隨時可以篩。想縮小範圍就打開進階篩選，挑年級、挑日期區間，篩完按一下就能匯出。
     imagePosition: left
     ratio: 3/4
     alt:
@@ -129,28 +131,28 @@ sections:
       zh: 設計主軸
     heading:
       en: >-
-        A system built for long shifts in dim rooms — colour that carries
-        status, and a dark theme that is not an afterthought.
-      zh: 為昏暗房間裡的長時間輪班而做——用顏色承載狀態，而深色模式不是事後補的。
+        Built for long shifts in dim rooms: colour does the work of showing
+        status, and the dark theme was planned from the start.
+      zh: 這套系統要撐過昏暗房間裡的長時間輪班：狀態交給顏色來說，深色模式也從一開始就在規劃裡。
     themes:
       - title:
           en: Semantic colour
           zh: 語意化色彩
         description:
           en: >-
-            Status is read from colour before it is read as text, so a
-            coordinator scanning a full station list does not have to parse
-            every row.
-          zh: 狀態先被看成顏色，才被讀成文字。承辦人掃過一整排考站時，不必逐列讀完才知道發生什麼事。
+            You see a status as a colour before you read it as text. A
+            coordinator scanning a full list of stations can spot the trouble
+            without parsing every row.
+          zh: 狀態先用顏色被看見，文字只是第二層。承辦人掃過一整排考站，不必逐列讀完，就知道哪裡出了狀況。
       - title:
           en: Dark theme
           zh: 深色模式
         description:
           en: >-
-            Exams run for hours in dimmed simulation rooms, so the dark surface
-            is specified alongside the light one rather than derived from it
-            afterwards.
-          zh: 考試會在昏暗的模擬情境室裡連續進行好幾個小時，所以深色底是跟淺色一起被定義出來的，不是事後從淺色推導出來的。
+            Exams can run for hours in dimmed simulation rooms, so the dark
+            surface was specified alongside the light one instead of being
+            derived from it afterwards.
+          zh: 考試常在燈光調暗的模擬情境室裡一連跑上好幾個小時，所以深色底和淺色底是同時定義的，並不是做完淺色再反推出來。
     direction: vertical
     layout: stacked
   - type: flow
@@ -162,11 +164,10 @@ sections:
       zh: 一個考位，一個地方
     body:
       en: >-
-        The original workflow scattered a single action across ten tabs. The
-        redesigned flow keeps a whole exam setup on one surface, so the
-        structure of the exam lives in the interface instead of in someone's
-        memory.
-      zh: 原本的流程把一個動作拆散到十個分頁。重新設計後，整場考試的建置留在同一個畫面上——考試的結構長在介面裡，不再長在某個人的記憶裡。
+        In the old workflow, a single action was scattered across ten tabs. Now
+        an entire exam is set up on one surface. Open the interface and the
+        exam's structure is right there, no one's memory required.
+      zh: 舊流程裡，同一個動作被拆到十個分頁去做。改版後，建置一整場考試都在同一個畫面上完成。考試長什麼樣子，打開介面就看得到，不必再去翻誰的記憶。
     steps:
       - label: '[需確認] Step'
         ratio: 3/4
@@ -179,12 +180,12 @@ sections:
       zh: 收攏成單一操作面
     body:
       en: >-
-        Search, filtering and batch operations consolidated into one view,
-        removing the page-hopping that fragmented the original workflow. A dense
-        table for precise batch work, a card grid for status when needed — same
-        data, two genuinely different tools.
+        Search, filtering and batch operations now share one view, and the
+        page-hopping that kept breaking the workflow apart is gone. Use a dense
+        table for precise batch work, or a card grid when you need to see
+        status. Same data, two genuinely different tools.
       zh: >-
-        搜尋、篩選與批次操作收進同一個視圖，原本讓流程支離破碎的跳頁就消失了。需要精準批次處理時用密集表格，需要看狀態時用卡片格線——同一份資料，兩種真的不一樣的工具。
+        搜尋、篩選、批次操作都收進同一個視圖，那些讓流程斷成好幾截的跳頁也跟著沒了。要精準地批次處理，就切到密集表格；想看整體狀態，就換成卡片格線。資料是同一份，工具卻是真的兩種。
     imagePosition: left
     ratio: 3/4
     alt:
@@ -196,9 +197,9 @@ sections:
       zh: 為長時間作業而做的深色模式
     body:
       en: >-
-        Exams run for hours in dimmed simulation rooms; a dedicated dark theme
-        keeps content compliant with existing eye-strain requirements.
-      zh: 考試會在昏暗的模擬情境室裡連續進行好幾個小時；獨立設計的深色主題讓內容仍然符合既有的視覺疲勞規範。
+        Exams run for hours in dimmed simulation rooms. A dedicated dark theme
+        keeps the screen within existing eye-strain guidelines, even there.
+      zh: 考試在昏暗的模擬情境室裡一跑就是好幾個小時。獨立設計的深色主題，讓畫面在這種環境下依然符合既有的視覺疲勞規範。
     imagePosition: right
     ratio: 3/4
     alt:
@@ -209,23 +210,24 @@ sections:
       en: EXPERIENCE DEMO
       zh: 體驗展示
     heading:
-      en: See the OSCE platform in Action
+      en: See the OSCE Platform in Action
       zh: 實際走一遍 OSCE 平台
     body:
       en: >-
-        A walk through the redesigned backend, and how a fragmented system
-        folds into one continuous surface: advanced filters open right where
-        you are, status reads at a glance through semantic colour, and bulk
-        actions stay next to your selection. Work that once took ten tabs now
-        fits on one screen.
-      zh: 帶你走一遍改版後的後台，看一個東拼西湊的系統怎麼收成一個連貫的操作面：進階篩選在原地展開，狀態靠語意化色彩一眼讀出，批次操作就待在你選取資料的地方。以前得開十個分頁才辦得完的事，現在一個畫面就搞定。
+        A walk through the redesigned backend, and how a fragmented system folds
+        into one continuous surface: advanced filters open right where you are,
+        status reads at a glance through semantic colour, and bulk actions stay
+        next to your selection. Work that once took ten tabs now fits on one
+        screen.
+      zh: >-
+        帶你走一遍改版後的後台，看一個東拼西湊的系統怎麼收成一個連貫的操作面：進階篩選在原地展開，狀態靠語意化色彩一眼讀出，批次操作就待在你選取資料的地方。以前得開十個分頁才辦得完的事，現在一個畫面就搞定。
     ratio: 16/10
     alt:
       en: OSCE Medical Assessment Platform demo on laptop
       zh: 筆電上的 OSCE 醫學考評平台展示
     layout: stacked
     ctaLabel:
-      en: Let's Try Out
+      en: Try it out
       zh: 來試試看
     ctaHref: 'https://osce-medical-assessment-platform.figma.site'
   - type: featureSplit
@@ -237,16 +239,17 @@ sections:
       zh: 每一次更動都留得下痕跡
     body:
       en: >-
-        Logins, edits, deletions and exports are colour-tagged and searchable by
-        account and date. When a score is disputed, the record answers it.
-      zh: 登入、編輯、刪除與匯出都用顏色標記，可依帳號與日期查詢。成績有爭議的時候，紀錄自己會回答。
+        Logins, edits, deletions and exports each get their own colour tag,
+        searchable by account and date. If a score is ever disputed, the log has
+        the answer.
+      zh: 登入、編輯、刪除、匯出，每一種操作都有自己的顏色，也能依帳號和日期查回去。哪天成績起了爭議，翻一下紀錄就有答案。
     imagePosition: left
     ratio: 3/4
     alt:
       en: System audit log with colour-tagged event types
       zh: 系統操作日誌，事件類型以顏色標記
     ctaLabel:
-      en: Let's Try Out
+      en: Try it out
       zh: 來試試看
     ctaHref: 'https://osce-medical-assessment-platform.figma.site'
 ---
