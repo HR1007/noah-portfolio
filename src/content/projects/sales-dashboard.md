@@ -34,15 +34,17 @@ sections:
           out against the others.
         zh: >-
           實習時我為某家雲端辦公 SaaS
-          公司建了一份銷售儀表板：篩年月、看地區與縣市、排出熱銷品與業績最好的業務員。它能回答「現在數字多少」，卻回答不了「所以我現在該做什麼」。這個案子是把同一套分析架構重新設計一次——公司、實際數據與產品名稱皆保密，這裡全部匿名並換成虛構資料，但每個數字都彼此對得起來。
+          公司建了一份銷售儀表板：篩年月、看地區與縣市、排出熱銷品與業績最好的業務員。它能回答「現在數字多少」，卻回答不了「所以我現在該做什麼」。這個案子是把同一套分析架構重新設計一次——公司、實際數據與產品名稱皆保密，這裡全部匿名並換成虛構資料。
       - en: >-
-          The original was a neon-purple template: wave backgrounds, ribbon
-          cards, a scatter plot, a donut. It looked full. But a regional manager
-          opening it on Monday morning still had to hunt across ten charts to
-          work out which region was in trouble — and then leave the dashboard
-          entirely to do anything about it.
+          The original dashboard used a dark purple neon theme with gradient
+          backgrounds, card-based layouts, scatter plots, bar charts, and pie
+          charts. Although visually dense, it still forced regional managers to
+          scan ten different charts every Monday morning to identify
+          underperforming regions. Even after spotting an issue, they had to
+          leave the dashboard and use other tools to contact sales
+          representatives individually before taking action.
         zh: >-
-          原版是深紫霓虹的模板：波浪背景、緞帶卡片、散點圖、甜甜圈。畫面看起來很滿。但區域主管週一早上打開它，還是得自己在十張圖裡找出哪一區出事——找到之後，也得離開這個畫面才能處理。
+          原版是深紫霓虹的模板：漸層背景、卡片式排列、散點圖、長條圖、圓餅圖，操作畫面看起來很滿。但區域主管週一早上打開它，還是得自己在十張圖裡找出哪一區出事，找到之後，也得離開這個畫面，利用其他工具聯絡個別通知業務才能處理。
   - type: persona
     eyebrow:
       en: PERSONA
