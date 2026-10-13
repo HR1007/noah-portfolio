@@ -112,11 +112,13 @@ sections:
         company is organised first.
       zh: 多數人來逛，最後是想問一句話，而不是結帳。所以這條流程要做的，是讓人從進站一路走到送出詢價，途中不必先搞懂這家公司內部怎麼分工。
     steps:
-      - label: Pick a store or service
-        ratio: 3/4
+      - label: Inquiry flow
+        ratio: 1280/849
         alt:
-          en: New Formosa Sport flow — choosing a store or service line
-          zh: 新台灣運動流程——選擇門市或服務項目
+          en: >-
+            New Formosa Sport inquiry flow — six screens from landing to a sent
+            inquiry, with four branches off the main path
+          zh: 新台灣運動詢價動線——從進站到送出詢價的六個畫面，加上四條從主線岔出去的分支
     direction: horizontal
   - type: experienceDemo
     layout: stacked
