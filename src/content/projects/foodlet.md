@@ -12,8 +12,7 @@ hero:
   ctaLabel:
     en: Try it out
     zh: 實際試試
-  ctaHref: >-
-    https://www.figma.com/proto/aVnuImBK2EgVqq3Vt6FpQw/%E4%BD%9C%E5%93%81%E9%9B%86%E5%82%99%E4%BB%BD?page-id=43%3A11182&node-id=43-12924&p=f&viewport=76%2C306%2C0.05&t=IInl5MtWo3LS1WHp-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=43%3A12924
+  ctaHref: 'https://hr1007.github.io/foodlet/'
 sections:
   - type: textSection
     eyebrow:
@@ -97,7 +96,7 @@ sections:
     ctaLabel:
       en: Let's Try Out
       zh: 來試試看
-    ctaHref: '#'
+    ctaHref: 'https://hr1007.github.io/foodlet/#/join'
     layout: split
   - type: featureGrid
     columns:
