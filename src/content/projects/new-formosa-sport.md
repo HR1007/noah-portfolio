@@ -179,7 +179,7 @@ sections:
     ctaLabel:
       en: Try it out
       zh: 來試試看
-    ctaHref: 'https://new-formosa-sport.netlify.app/'
+    ctaHref: 'https://new-formosa-sport.netlify.app/index.html#home'
   - type: featureSplit
     heading:
       en: 'Five Lines, One Site'
@@ -197,7 +197,7 @@ sections:
     ctaLabel:
       en: Try it out
       zh: 來試試看
-    ctaHref: 'https://new-formosa-sport.netlify.app/'
+    ctaHref: 'https://new-formosa-sport.netlify.app/index.html#home'
   - type: featureSplit
     heading:
       en: 'Built for the Corridor, Not the Desk'
@@ -216,7 +216,7 @@ sections:
     ctaLabel:
       en: Try it out
       zh: 來試試看
-    ctaHref: 'https://new-formosa-sport.netlify.app/'
+    ctaHref: 'https://new-formosa-sport.netlify.app/index.html#home'
   - type: featureSplit
     heading:
       en: The System Holds at 375px
@@ -237,6 +237,6 @@ sections:
     ctaLabel:
       en: Try it out
       zh: 來試試看
-    ctaHref: 'https://new-formosa-sport.netlify.app/'
+    ctaHref: 'https://new-formosa-sport.netlify.app/index.html#home'
 ---
 
