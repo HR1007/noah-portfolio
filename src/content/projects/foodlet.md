@@ -5,9 +5,10 @@ title:
 order: 6
 summary:
   en: >-
-    Redefining Taiwan's F&B landscape by merging seamless digital payments with
-    Web3-driven rewards and digital collections.
-  zh: 把行動支付、Web3 回饋與數位收藏接成同一條動線，重新想像台灣餐飲結帳的那一刻。
+    What if paying for a meal gave you something back? Foodlet ties mobile
+    payment, Web3 rewards and digital collectibles into one flow for Taiwan's
+    restaurants.
+  zh: 結帳那一下，能不能多給你一點什麼？Foodlet 把行動支付、Web3 回饋和數位收藏串成同一條動線，替台灣的餐廳重新想像買單的那一刻。
 hero:
   ctaLabel:
     en: Try it out
@@ -23,18 +24,19 @@ sections:
       zh: 食錢包 Foodlet——讓一頓飯留下可以帶走的東西。
     paragraphs:
       - en: >-
-          Foodlet is the first interface I ever built. It's a third as polished
-          as what I make now, and it still holds a place in this portfolio,
-          because everything started here. It began with a fairly casual
-          observation in class: middle-class restaurants in Taiwan had already
-          taken over mobile payment, and it actually happens in the moment of
-          pulling out your phone and walking out the door — a beep, and that's
-          it. Probably the least memorable second of the whole meal. So I wanted
-          to know: if a wallet was designed by someone who cared about the meal
-          instead of the transaction, what would it look like?
+          Foodlet is the first interface I ever built. It's maybe a third as
+          polished as what I make now, but it stays in this portfolio because
+          this is where everything started. The idea came from a pretty casual
+          observation in class: mid-range restaurants in Taiwan had already gone
+          all in on mobile payment, and the whole thing happens in the few
+          seconds between pulling out your phone and walking out the door. A
+          beep, and that's it — probably the least memorable second of the
+          entire meal. So I got curious: if a wallet were designed by someone
+          who cared about the meal rather than the transaction, what would it
+          look like?
         zh: >-
           Foodlet
-          是我做的第一個介面。它的完成度只有現在的三分之一，卻還留在這份作品集裡，因為一切是從這裡開始的。起因是課堂上一個蠻隨意的觀察：台灣的中價位餐廳早就被行動支付佔滿，而那件事只發生在你掏出手機、走出店門的那幾秒——嗶一聲，就結束了。那大概是整頓飯裡最沒有記憶點的一秒。所以我想知道：如果做這個錢包的人在意的是那頓飯，而不是那筆交易，它會長什麼樣子？
+          是我做的第一個介面。說真的，它的完成度大概只有我現在作品的三分之一，但我還是把它留在這份作品集裡，因為一切都是從這裡開始的。起因是課堂上一個很隨意的觀察：台灣的中價位餐廳幾乎都用上了行動支付，而付錢這件事，就發生在你掏出手機、走出店門的那幾秒。嗶一聲，結束。那大概是整頓飯裡最沒記憶點的一秒吧？所以我開始好奇：如果設計錢包的人在意的是那頓飯，而不是那筆交易，它會長成什麼樣子？
   - type: deviceShowcase
     ratio: 16/10
     alt:
@@ -62,10 +64,10 @@ sections:
       zh: 從嗶一聲，到留得住的東西
     body:
       en: >-
-        The interesting part starts after the payment clears. Connect once, pay
-        for the meal, and the transaction hands something back instead of ending
-        in a beep.
-      zh: 有意思的部分，是從付款完成之後才開始。連結一次錢包、付完這餐，交易會回頭給你一樣東西，而不是嗶一聲就沒了。
+        The interesting part starts after the payment clears. Connect your
+        wallet once, pay for the meal, and the transaction hands you something
+        back instead of ending in a beep.
+      zh: 真正有意思的，是付完錢之後的事。錢包連一次、這餐付完，交易就會回頭塞給你一樣東西，不再是嗶一聲就沒了。
     steps:
       - label: Connect wallet
         ratio: 3/4
@@ -82,19 +84,19 @@ sections:
       zh: 實際走一遍 Foodlet
     body:
       en: >-
-        The demo follows one arc: land on the brand story, connect a wallet with
-        a single tap instead of filling out a form, pay for a meal, and get the
-        first collectible back. Every screen answers the same question — what do
-        I get to keep?
+        The demo follows a single arc: land on the brand story, connect a wallet
+        with one tap instead of a form, pay for a meal, and collect your first
+        keepsake. Every screen is really answering one question — what do I get
+        to keep?
       zh: >-
         這段 demo
-        只講一條線：從品牌故事進來，用一次點擊取代填表單來連結錢包，付一頓飯的錢，拿到第一個收藏品。每個畫面回答的都是同一個問題——我能帶走什麼？
+        只走一條線：從品牌故事進站，點一下就連好錢包，不用填表單，接著付一頓飯的錢，領到第一個收藏品。每個畫面其實都在回答同一個問題：我能帶走什麼？
     ratio: 16/10
     alt:
       en: Foodlet experience demo phone mockup
       zh: Foodlet 體驗展示的手機模擬畫面
     ctaLabel:
-      en: Let's Try Out
+      en: Try it out
       zh: 來試試看
     ctaHref: 'https://hr1007.github.io/foodlet/#/join'
     layout: split
@@ -105,10 +107,10 @@ sections:
           zh: 付款開始回頭給你東西
         body:
           en: >-
-            Ordering, payment and rewards fold into a single wallet flow, so a
-            transaction stops being the end of the meal and starts being worth
-            keeping.
-          zh: 點餐、付款與回饋收在同一條錢包動線裡。交易不再是這頓飯的句點，而是值得留著的東西。
+            Ordering, payment and rewards fold into one wallet flow, so a
+            transaction stops being the full stop at the end of a meal and
+            becomes something worth keeping.
+          zh: 點餐、付款、回饋全收進同一條錢包動線。交易不再是這頓飯的句點，反而變成值得留著的東西。
         ratio: 3/4
         alt:
           en: Where Payment Starts Paying Back screen
@@ -118,9 +120,9 @@ sections:
           zh: 從一筆交易，變成一個收藏
         body:
           en: >-
-            The moment a payment clears it returns a digital collectible — the
-            receipt becomes something you would actually look at again.
-          zh: 付款完成的那一刻就回傳一個數位收藏品——收據變成你真的會再打開來看的東西。
+            The moment a payment clears, it sends back a digital collectible.
+            The receipt turns into something you'd actually want to open again.
+          zh: 付款一完成，就回傳一個數位收藏品。收據從此變成你會想再點開來看的東西。
         ratio: 3/4
         alt:
           en: From Transaction to Collectible screen
@@ -130,9 +132,10 @@ sections:
           zh: 這是一個生態系，不是一支 app
         body:
           en: >-
-            Local restaurants join the same rewards layer, so value accrues
-            across the neighbourhood instead of inside one storefront.
-          zh: 在地餐廳接進同一層回饋機制，價值累積在整個街區，而不是關在單一家店裡。
+            Local restaurants plug into the same rewards layer, so value builds
+            up across the whole neighbourhood instead of getting locked inside
+            one storefront.
+          zh: 在地餐廳都接進同一層回饋機制，累積下來的價值會散在整個街區，不會被關在某一家店裡。
         ratio: 3/4
         alt:
           en: 'An Ecosystem, Not an App screen'
@@ -147,10 +150,10 @@ sections:
       zh: 從餐桌上借來的顏色
     body:
       en: >-
-        Warm amber as the primary, with fixed shades, tints and action colours.
-        Four headline sizes and four body sizes — enough to build every screen,
-        few enough to stay consistent.
-      zh: 主色用溫暖的琥珀，配上固定的深淺階、淡色階與狀態色。四個標題級距、四個內文級距——夠用來組出每一個畫面，又少到不會走鐘。
+        Warm amber leads, backed by fixed shades, tints and action colours. Four
+        headline sizes and four body sizes: enough to build every screen, few
+        enough to keep things consistent.
+      zh: 主色選了溫暖的琥珀色，再配上固定的深淺階、淡色階和狀態色。標題四個級距、內文四個級距，組出每個畫面都夠用，數量又少到不容易走鐘。
     imagePosition: right
     ratio: 3/4
     alt:
@@ -165,10 +168,10 @@ sections:
       zh: 每一種欄位狀態，都先畫清楚
     body:
       en: >-
-        Default, placeholder, focus and error specified up front, in both light
-        and dark. Required fields are marked before the form is sent, not after
-        it fails.
-      zh: 預設、提示文字、聚焦與錯誤四種狀態一次定義完，淺色深色都有。必填在送出前就標好，不是等它失敗才說。
+        Default, placeholder, focus and error are all specified up front, in
+        both light and dark. Required fields are marked before you hit send, not
+        after the form fails.
+      zh: 預設、提示文字、聚焦、錯誤，四種狀態一開始就定義好，淺色深色各一套。必填欄位在送出前就標清楚，不會等到送出失敗才告訴你。
     imagePosition: right
     ratio: 3/4
     alt:
@@ -184,9 +187,9 @@ sections:
     body:
       en: >-
         Rounded 3D characters do the explaining; pixel-art food does the
-        rewarding. The collectible has to look like something worth keeping, not
-        a receipt.
-      zh: 圓潤的 3D 角色負責說明，像素風的食物負責獎勵。收藏品要看起來像值得留著的東西，不能像一張收據。
+        rewarding. A collectible has to look worth keeping. If it looks like a
+        receipt, it's failed.
+      zh: 圓滾滾的 3D 角色負責解說，像素風的食物負責當獎勵。收藏品一定要看起來值得收藏，要是長得像收據，那就失敗了。
     imagePosition: right
     ratio: 3/4
     alt:
@@ -201,9 +204,10 @@ sections:
       zh: 你真的會留下來的那張收據
     body:
       en: >-
-        Payment clears and the first collectible lands — a pixel cookie, claimed
-        in one tap. The moment that used to be a beep now hands something back.
-      zh: 付款完成，第一個收藏品就出現了——一塊像素餅乾，點一下領走。以前只有嗶一聲的那個瞬間，現在會回頭給你東西。
+        The payment clears and the first collectible drops in: a pixel cookie,
+        claimed with one tap. The second that used to be just a beep now gives
+        something back.
+      zh: 付款一完成，第一個收藏品就跳出來了：一塊像素餅乾，點一下就能領走。以前只會嗶一聲的那一秒，現在會回頭送你東西。
     imagePosition: left
     ratio: 3/4
     alt:
