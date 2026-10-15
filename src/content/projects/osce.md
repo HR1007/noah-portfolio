@@ -169,10 +169,13 @@ sections:
         exam's structure is right there, no one's memory required.
       zh: 舊流程裡，同一個動作被拆到十個分頁去做。改版後，建置一整場考試都在同一個畫面上完成。考試長什麼樣子，打開介面就看得到，不必再去翻誰的記憶。
     steps:
-      - label: '[需確認] Step'
-        ratio: 3/4
+      - label: Operation flow
+        ratio: 1280/1148
         alt:
-          en: '[需確認] Flow step'
+          en: >-
+            Operation flow from login to correcting a score: six screens on the
+            main line, with eight branches peeling off it
+          zh: 從登入到修正成績的操作動線：主線六個畫面，另有八條分支從中岔出
     direction: horizontal
   - type: featureSplit
     heading:
