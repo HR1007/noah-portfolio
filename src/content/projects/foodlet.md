@@ -93,8 +93,8 @@ sections:
         只走一條線：從品牌故事進站，點一下就連好錢包，不用填表單，接著付一頓飯的錢，領到第一個收藏品。每個畫面其實都在回答同一個問題：我能帶走什麼？
     ratio: 16/10
     alt:
-      en: Foodlet experience demo phone mockup
-      zh: Foodlet 體驗展示的手機模擬畫面
+      en: 'Foodlet collection page on a laptop, showing the NFTs a diner has earned'
+      zh: 筆電上的 Foodlet 收藏頁，列出用餐者領到的 NFT
     ctaLabel:
       en: Try it out
       zh: 來試試看
@@ -111,10 +111,10 @@ sections:
             transaction stops being the full stop at the end of a meal and
             becomes something worth keeping.
           zh: 點餐、付款、回饋全收進同一條錢包動線。交易不再是這頓飯的句點，反而變成值得留著的東西。
-        ratio: 3/4
+        ratio: 1/1
         alt:
-          en: Where Payment Starts Paying Back screen
-          zh: 付款回饋機制的畫面
+          en: Illustration of a person beside a laptop showing a food-ordering app
+          zh: 站在筆電旁、螢幕顯示點餐 App 的人物插圖
       - heading:
           en: From Transaction to Collectible
           zh: 從一筆交易，變成一個收藏
@@ -123,10 +123,12 @@ sections:
             The moment a payment clears, it sends back a digital collectible.
             The receipt turns into something you'd actually want to open again.
           zh: 付款一完成，就回傳一個數位收藏品。收據從此變成你會想再點開來看的東西。
-        ratio: 3/4
+        ratio: 1/1
         alt:
-          en: From Transaction to Collectible screen
-          zh: 交易轉為收藏品的畫面
+          en: >-
+            Three phones showing pixel-art burger, pizza and chicken drumstick
+            NFTs
+          zh: 三支手機螢幕上分別是漢堡、披薩與雞腿的像素 NFT
       - heading:
           en: 'An Ecosystem, Not an App'
           zh: 這是一個生態系，不是一支 app
@@ -136,10 +138,10 @@ sections:
             up across the whole neighbourhood instead of getting locked inside
             one storefront.
           zh: 在地餐廳都接進同一層回饋機制，累積下來的價值會散在整個街區，不會被關在某一家店裡。
-        ratio: 3/4
+        ratio: 900/886
         alt:
-          en: 'An Ecosystem, Not an App screen'
-          zh: 在地餐廳共用回饋層的畫面
+          en: Illustration of two diners ordering at a self-service kiosk
+          zh: 兩位顧客在自助點餐機前點餐的插圖
     direction: horizontal
   - type: featureSplit
     eyebrow:
