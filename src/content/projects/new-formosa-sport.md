@@ -68,10 +68,14 @@ sections:
           zh: 色彩
         description:
           en: >-
-            Formosa Red, the colour the shop already had, stays on as the brand
-            anchor, paired with a deep navy that keeps long product listings
-            calm.
-          zh: 原本的 Formosa Red 留下來當品牌的錨，再配一個深藍，讓又長又密的商品列表看起來安靜一點。
+            Formosa Red and a deep navy were already the shop's colours. Red
+            stays on as the brand anchor; navy keeps long product listings calm.
+            My job was turning both into tokens with fixed roles, so no new page
+            could quietly sneak in a seventh shade of red.
+          zh: >-
+            Formosa Red
+            和深藍，本來就是這家店的顏色。紅色留下來當品牌的錨，深藍讓又長又密的商品列表安靜一點。我要做的，是把它們變成角色固定的
+            token，這樣新頁面就沒機會偷偷冒出第七種紅。
       - title:
           en: Typography
           zh: 字體
@@ -155,8 +159,8 @@ sections:
     imagePosition: right
     ratio: 3/4
     alt:
-      en: Inquiry form screenshot showing the automated lead pipeline
-      zh: 詢價表單畫面，展示自動化的收件管道
+      en: Quote form confirmation screen after an inquiry is sent
+      zh: 詢價送出後的「已收到您的需求」確認畫面
   - type: featureSplit
     heading:
       en: Zero-Build Deployment
@@ -170,8 +174,8 @@ sections:
     imagePosition: left
     ratio: 3/4
     alt:
-      en: Deployment configuration screenshot
-      zh: 部署設定畫面
+      en: Sporting goods retail service page on the live site
+      zh: 正式站上的運動用品零售服務頁
     ctaLabel:
       en: Try it out
       zh: 來試試看
@@ -194,21 +198,6 @@ sections:
       en: Try it out
       zh: 來試試看
     ctaHref: 'https://new-formosa-sport.netlify.app/'
-  - type: featureSplit
-    heading:
-      en: Single Source of Truth
-      zh: 單一事實來源
-    body:
-      en: >-
-        Formosa Red and a deep navy were already the shop's colours. My job was
-        to turn them into tokens with fixed roles, so no new page could quietly
-        sneak in a seventh shade of red.
-      zh: Formosa Red 和深藍，本來就是這家店的顏色。我要做的，是把它們變成角色固定的 token，這樣新頁面就沒機會偷偷冒出第七種紅。
-    imagePosition: left
-    ratio: 3/4
-    alt:
-      en: Color and typography system screenshot
-      zh: 色彩與字體系統畫面
   - type: featureSplit
     heading:
       en: 'Built for the Corridor, Not the Desk'
