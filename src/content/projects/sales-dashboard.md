@@ -6,9 +6,9 @@ order: 1
 summary:
   en: >-
     An internship dashboard, rebuilt as a design system. The point was never
-    turning data into charts — it's the path from spotting a problem to
-    assigning the follow-up.
-  zh: 把實習時建的銷售儀表板重新設計成一套系統。重點從來不是把資料變成圖表，而是從發現問題走到指派跟進。
+    turning data into charts. It was the path from spotting a problem to
+    assigning someone to follow it up.
+  zh: 把實習時做的銷售儀表板，重新設計成一套系統。說到底，重點從來不是把資料畫成圖表，而是讓人從發現問題，一路走到把跟進指派出去。
 hero:
   ctaLabel:
     en: Try it out
@@ -26,25 +26,24 @@ sections:
       - en: >-
           During my internship I built a sales dashboard for a cloud-office SaaS
           company: filter by year and month, look at regions and counties, rank
-          the hot products and the top clerks. It answered "what is the number
-          right now" but never "so what should I do next". This case is that
-          same analytical structure, redesigned from the ground up. The company,
-          the real figures and the product names are all confidential, so
-          everything here is anonymised and fabricated — but every number ties
-          out against the others.
+          the best-selling products and the top sales reps. It could tell you
+          "what's the number right now", but never "so what do I do next". This
+          case takes that same analytical structure and redesigns it from the
+          ground up. The company, the real figures and the product names are all
+          confidential, so everything here is anonymised and the data is made
+          up.
         zh: >-
-          實習時我為某家雲端辦公 SaaS
-          公司建了一份銷售儀表板：篩年月、看地區與縣市、排出熱銷品與業績最好的業務員。它能回答「現在數字多少」，卻回答不了「所以我現在該做什麼」。這個案子是把同一套分析架構重新設計一次——公司、實際數據與產品名稱皆保密，這裡全部匿名並換成虛構資料。
+          實習的時候，我替一家雲端辦公 SaaS
+          公司做了一份銷售儀表板：可以篩年月、看地區和縣市，也能排出熱銷品和業績最好的業務員。它答得出「現在數字是多少」，卻答不出「那我現在該做什麼」。這個案子，就是把同一套分析架構從頭重新設計一次。公司、實際數據和產品名稱都要保密，所以這裡全部匿名，數字也都換成虛構的。
       - en: >-
-          The original dashboard used a dark purple neon theme with gradient
-          backgrounds, card-based layouts, scatter plots, bar charts, and pie
-          charts. Although visually dense, it still forced regional managers to
-          scan ten different charts every Monday morning to identify
-          underperforming regions. Even after spotting an issue, they had to
-          leave the dashboard and use other tools to contact sales
-          representatives individually before taking action.
+          The original used a dark purple neon template: gradient backgrounds,
+          card layouts, and a scatter plot, bar charts and pie charts packed in.
+          It looked full. But a regional manager opening it on Monday morning
+          still had to dig through ten charts to work out which region was in
+          trouble. And once they found it, they had to leave the dashboard,
+          switch to other tools, and message each sales rep one by one.
         zh: >-
-          原版是深紫霓虹的模板：漸層背景、卡片式排列、散點圖、長條圖、圓餅圖，操作畫面看起來很滿。但區域主管週一早上打開它，還是得自己在十張圖裡找出哪一區出事，找到之後，也得離開這個畫面，利用其他工具聯絡個別通知業務才能處理。
+          原版用的是深紫霓虹的模板，漸層背景、卡片式排列，再塞進散點圖、長條圖、圓餅圖，畫面看起來滿滿的。可是區域主管週一早上打開它，還是得自己在十張圖裡翻出哪一區出了問題。好不容易找到了，又得離開這個畫面，換到別的工具，一個一個去通知業務。
   - type: persona
     eyebrow:
       en: PERSONA
@@ -82,15 +81,15 @@ sections:
     paragraphs:
       - en: >-
           Hierarchy, KPI selection, the right chart for the data, filters,
-          visual clarity, context, feedback. All seven sound obviously correct —
-          which is exactly why they get ignored. So each became a rule the
-          design system can be checked against: at most nine blocks on a screen,
-          every number carries a unit and a comparison baseline, a semantic
-          colour means one thing and only one thing, and all four data states
-          have their own screen.
+          visual clarity, context, feedback. All seven sound obviously right,
+          which is exactly why they get skipped. So I turned each into a rule
+          the design system can be checked against: at most nine blocks on a
+          screen, every number carries a unit and a comparison baseline, each
+          semantic colour means one thing only, and all four data states get
+          their own screen.
         zh: >-
           資訊層級、KPI
-          選擇、圖表適配、篩選互動、視覺清楚、數據脈絡、操作回饋——這七件事聽起來都對，也正因為都對而最容易被跳過。所以我把每一條都變成可以拿來檢查的規則：一個畫面最多九塊、每個數字都要有單位與比較基準、一個語意色只有一種意思、四種資料狀態各自有畫面。
+          選擇、圖表適配、篩選互動、視覺清楚、數據脈絡、操作回饋。這七件事聽起來都很對，偏偏正因為太理所當然，最常被跳過。所以我把每一條都改寫成能拿來檢查的規則：一個畫面最多九塊、每個數字都要帶單位和比較基準、一個語意色只能有一種意思、四種資料狀態各有各的畫面。
       - en: >-
           Three breakpoints only — 375, 768, 1200 — because there are three real
           situations: at the desk seeing everything, in a meeting with a tablet,
@@ -98,7 +97,7 @@ sections:
           out, legends and decoration go first; the hierarchy goes last. Unit,
           period and baseline are never dropped at any width.
         zh: >-
-          斷點只有三個：375、768、1200，對應三種真實情境——在辦公桌前看全貌、開會帶平板、站在客戶門口查一個數字。空間變小時先砍圖例與裝飾，最後才動資訊層級；單位、期間與比較基準在任何寬度都不刪。
+          斷點只設三個：375、768、1200，因為真實情境也就這三種：坐在辦公桌前看全貌、開會時拿平板、站在客戶門口查一個數字。空間不夠時，先砍圖例和裝飾，資訊層級留到最後才動；至於單位、期間和比較基準，不管多窄都不刪。
     ratio: 4/3
     alt:
       en: Responsive and auto layout specification page
@@ -126,7 +125,8 @@ sections:
             palette, because red, amber and green are already spoken for by
             "declining", "needs attention" and "growing".
           zh: >-
-            底色與強調色直接取自客戶品牌：炭灰來自官網導覽，橘來自產品字標。橘色只管介面——logo、主按鈕、側欄選取、目前月份。圖表另外給一組五色，因為紅、黃、綠已經被「衰退、需注意、成長」徵用了。
+            底色和強調色都直接取自客戶的品牌：炭灰來自官網導覽列，橘色來自產品字標。橘色只留給介面用，像
+            logo、主按鈕、側欄選取狀態和目前月份。圖表另外配一組五色，因為紅、黃、綠早就被「衰退、需注意、成長」占走了。
       - title:
           en: Components & naming
           zh: 元件與命名
@@ -138,8 +138,8 @@ sections:
             component is defined together with the states it actually ships
             with: loading, empty, stale, failed.
           zh: >-
-            三段式命名「類別 / 元件 / 變體」，九個類別各管一件事。Figma 的元件名就是前端的 component
-            名，兩邊只有一份真相。每個元件都連它真正會用到的狀態一起定義：載入中、沒有資料、資料延遲、載入失敗。
+            命名分三段：「類別 / 元件 / 變體」，九個類別各管一件事。Figma 裡的元件名就是前端的 component
+            名，兩邊只認同一份真相。每個元件都連同它上線後真的會遇到的狀態一起定義：載入中、沒有資料、資料延遲、載入失敗。
       - title:
           en: Screens that interrupt
           zh: 會打斷人的畫面
@@ -172,9 +172,9 @@ sections:
         The orange is the same accent the interface uses, and below 20px the
         strokes thicken so it still reads in the sidebar and a browser tab.
       zh: >-
-        原本的標誌是靶心——它說「瞄準」，卻沒說瞄準什麼。我試了四個方向，都保留橘色圓角方塊、把一台螢幕放進去，最後選了
-        B：螢幕裡一條上升的折線，終點是一個紅點。螢幕是戰情室，折線是趨勢，紅點就是洞察卡要你注意的那個異常。底座的橘和介面強調色是同一個橘；20px
-        以下線條自動加粗，在側欄和瀏覽器分頁的尺寸也讀得出來。
+        原本的標誌是個靶心，說了「瞄準」，卻沒說瞄準什麼。我試了四個方向，每個都保留橘色圓角方塊，再往裡面放一台螢幕，最後選了
+        B：螢幕裡一條往上爬的折線，終點是一個紅點。螢幕是戰情室，折線是趨勢，紅點就是洞察卡要你多看一眼的那個異常。底座的橘和介面強調色是同一個橘；縮到
+        20px 以下，線條會自動加粗，放在側欄或瀏覽器分頁上也認得出來。
     ratio: 101/36
     alt:
       en: >-
@@ -194,7 +194,7 @@ sections:
         Five screens on the main line, three branches peeling off the middle.
         Every thumbnail is an actual screen exported from the design file, not a
         redrawn placeholder box.
-      zh: 五張畫面串成主線，三條分支從中間岔出去。所有縮圖都是設計檔裡實際完成的畫面匯出，不是重畫的示意框。
+      zh: 主線五張畫面，三條分支從中段岔出去。每張縮圖都是從設計檔匯出的實際畫面，不是另外重畫的示意框。
     steps:
       - label: Operation flow
         ratio: 16/9
@@ -224,8 +224,8 @@ sections:
         follow-ups page. Between seeing the problem and acting on it there is no
         second system, no meeting, no separate email.
       zh: >-
-        總覽最上方的洞察卡直接把話講完：中區達成率 77.7%，連續兩個月低於
-        85%，附上原因與缺口金額。按下「指派跟進」，對話框只問三件事：負責人、到期日、備註。按下去它就變成跟進任務頁的一列。從看到問題到採取行動，中間不換系統、不開會、不用另外寄信。
+        總覽最上方的洞察卡把話直接講完：中區達成率 77.7%，已經連續兩個月低於
+        85%，原因和缺口金額也一起附上。按下「指派跟進」，對話框只問三件事：負責人、到期日、備註。送出後，它就成了跟進任務頁上的一列。從看到問題到動手處理，中間不必換系統、不必開會，也不用另外寄信。
     ratio: 16/10
     alt:
       en: The assign follow-up dialog over the overview screen
@@ -236,7 +236,7 @@ sections:
       zh: 資料來源
     heading:
       en: Who decided that insight card should appear?
-      zh: 那張洞察卡是誰決定要出現的
+      zh: 那張洞察卡，是誰決定要出現的？
     body:
       en: >-
         Tasks can't come from nowhere. The rules page closes the chain: sync at
@@ -248,10 +248,10 @@ sections:
         anything; more than eight means it's noisy and managers start ignoring
         it.
       zh: >-
-        任務不能憑空出現。規則頁把鏈路補完：每日 00:10 同步、01:00
-        逐條評估、命中就產生洞察卡、主管指派後變成任務、完成後回寫命中紀錄。規則用「指標 ＋ 運算子 ＋ 門檻 ＋
-        連續期數」四格組成，而且不跑回測就不能存檔——過去 12 個月會叫幾次要先看清楚。低於 3 次代表門檻太鬆抓不到問題，高於 8
-        次代表太吵，主管會開始無視。
+        任務不能憑空冒出來。規則頁把整條鏈補齊：每天 00:10 同步、01:00
+        逐條評估，命中就產生洞察卡，主管指派後變成任務，完成後再回寫命中紀錄。一條規則由「指標 ＋ 運算子 ＋ 門檻 ＋
+        連續期數」四格組成，而且沒跑過回測就不能存檔，得先看清楚過去 12 個月它會響幾次。少於 3 次，代表門檻太鬆，什麼都抓不到；多於 8
+        次又太吵，主管遲早會開始無視它。
     imagePosition: right
     ratio: 3/4
     alt:
@@ -288,7 +288,8 @@ sections:
             tick, each labelled with the pages it will add. Once scheduled, the
             system emails a preview to you first — nothing reaches a recipient
             before you confirm.
-          zh: 直接帶入你目前的篩選。七個內容區塊可勾選，每個都標了會多幾頁。排程建立後系統先寄一份預覽給你自己，你確認之前不會發給任何收件人。
+          zh: >-
+            直接沿用你目前的篩選條件。七個內容區塊可以勾選，每一塊都標好會多出幾頁。排程建好之後，系統會先寄一份預覽給你自己，你確認之前，不會發給任何收件人。
         ratio: 2976/1778
         alt:
           en: Report builder with live preview
@@ -339,9 +340,9 @@ sections:
         front end, so whoever picks this up knows what to call the next
         component without asking me.
       zh: >-
-        核心容器用原生 auto layout 重建：方向、間距、內距與縮放行為都設好，加內容時版面會自己重排而不是散掉。間距只取
-        4、8、12、16、24、32、40 這七階，所以不會冒出 13 或 18。整份檔案 52
-        張畫面、兩套主題、三個斷點，命名規則與前端對齊——接手的人不用問我，就知道下一個元件該叫什麼。
+        核心容器全用原生 auto layout 重建，方向、間距、內距和縮放行為都設好了，內容一多，版面會自己重排，不會散掉。間距只從
+        4、8、12、16、24、32、40 這七階裡挑，所以永遠不會冒出 13 或 18。整份檔案有 52
+        張畫面、兩套主題、三個斷點，命名也和前端對齊，接手的人不用問我，就知道下一個元件該叫什麼。
     imagePosition: left
     ratio: 3/4
     alt:
