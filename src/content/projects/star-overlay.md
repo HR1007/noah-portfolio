@@ -133,19 +133,27 @@ sections:
         software.
       zh: 好工具不該擋在你前面。Star Overlay 把整個過程縮得又短又順，讓你的注意力留在照片上，而不是軟體上。
     steps:
-      - label: Upload
-        ratio: 3/4
+      - label: Six steps
+        ratio: 1120/532
         alt:
-          en: Upload step
-          zh: 上傳步驟
-      - label: '[需確認] Step'
-        ratio: 3/4
+          en: >-
+            From photo to PNG: the six steps from upload to export, each looping
+            back to the canvas
+          zh: 從照片到 PNG：從上傳到輸出的六個步驟，每一步都能回到畫布繼續調整
+      - label: Annotated editor
+        ratio: 4717/2943
         alt:
-          en: '[需確認] Flow step'
-      - label: '[需確認] Step'
-        ratio: 3/4
+          en: >-
+            Desktop editor with each control group numbered and explained
+            alongside
+          zh: 桌面版編輯器，每個控制區塊都標上編號，旁邊附上說明
+      - label: Step sequence
+        ratio: 5086/902
         alt:
-          en: '[需確認] Flow step'
+          en: >-
+            Six frames showing the canvas change step by step, from blank to the
+            finished overlay
+          zh: 六格畫面依序呈現畫布從空白到完成疊圖的變化
     direction: vertical
   - type: experienceDemo
     eyebrow:
