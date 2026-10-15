@@ -215,5 +215,9 @@ sections:
     alt:
       en: Mobile screen awarding the first Foodlet NFT collectible
       zh: 領取第一個 Foodlet NFT 收藏品的手機畫面
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://hr1007.github.io/foodlet/#/join'
 ---
 
