@@ -1,7 +1,7 @@
 ---
 title:
   en: New Formosa Sport — Sports Platform Website Design
-  zh: 新台灣運動——運動用品平台網站設計
+  zh: 新寶島——運動用品平台網站設計
 order: 3
 summary:
   en: >-
@@ -21,7 +21,7 @@ sections:
       zh: 起點與靈感
     heading:
       en: New Formosa Sport — Sports Platform Website Design
-      zh: 新台灣運動——運動用品平台網站設計
+      zh: 新寶島——運動用品平台網站設計
     paragraphs:
       - en: >-
           New Formosa Sport is a long-running sporting goods business in Rende,
@@ -34,25 +34,25 @@ sections:
           a workflow the team could keep using long after I'd stopped touching
           the files.
         zh: >-
-          新台灣運動是台南仁德的老字號運動用品店，手上同時跑著五條線：運動用品零售、場館工程、團體服訂製、場地規劃與維修，還有器材保養維修，客人多半是在地的學校和車隊。這種案子，最省事的答案就是「做個網站」。可是真的走進去看，這家店缺的其實是一套系統：統一的設計語言、能快速上線的網站、會自己跑的詢價管道，還有一套等我不再碰這些檔案之後，店裡的人也接得下去的流程。
+          新寶島是台南仁德的老字號運動用品店，手上同時跑著五條線：運動用品零售、場館工程、團體服訂製、場地規劃與維修，還有器材保養維修，客人多半是在地的學校和車隊。這種案子，最省事的答案就是「做個網站」。可是真的走進去看，這家店缺的其實是一套系統：統一的設計語言、能快速上線的網站、會自己跑的詢價管道，還有一套等我不再碰這些檔案之後，店裡的人也接得下去的流程。
   - type: deviceShowcase
     ratio: 16/10
     alt:
       en: New Formosa Sport website homepage screenshot
-      zh: 新台灣運動網站首頁畫面
+      zh: 新寶島網站首頁畫面
   - type: persona
     eyebrow:
       en: PERSONA
       zh: 人物誌
     heading:
       en: New Formosa Sport — Persona
-      zh: 新台灣運動 — 人物誌
+      zh: 新寶島 — 人物誌
     personas:
       - name: School equipment buyer
         ratio: 3/4
         alt:
           en: New Formosa Sport persona board
-          zh: 新台灣運動人物誌看板
+          zh: 新寶島人物誌看板
   - type: designThemes
     eyebrow:
       en: DESIGN THEMES
@@ -122,7 +122,7 @@ sections:
           en: >-
             New Formosa Sport inquiry flow — six screens from landing to a sent
             inquiry, with four branches off the main path
-          zh: 新台灣運動詢價動線——從進站到送出詢價的六個畫面，加上四條從主線岔出去的分支
+          zh: 新寶島詢價動線——從進站到送出詢價的六個畫面，加上四條從主線岔出去的分支
     direction: horizontal
   - type: experienceDemo
     layout: stacked
@@ -141,7 +141,7 @@ sections:
     ratio: 16/10
     alt:
       en: New Formosa Sport homepage with the free-quote form beside the hero
-      zh: 新台灣運動首頁，免費報價表單就在 hero 旁邊
+      zh: 新寶島首頁，免費報價表單就在 hero 旁邊
     ctaLabel:
       en: Try it out
       zh: 來試試看
