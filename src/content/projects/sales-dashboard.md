@@ -97,7 +97,7 @@ sections:
           out, legends and decoration go first; the hierarchy goes last. Unit,
           period and baseline are never dropped at any width.
         zh: >-
-          斷點只設三個：375、768、1200，因為真實情境也就這三種：坐在辦公桌前看全貌、開會時拿平板、站在客戶門口查一個數字。空間不夠時，先砍圖例和裝飾，資訊層級留到最後才動；至於單位、期間和比較基準，不管多窄都不刪。
+          頁面斷點只設三個：375、768、1200，因為真實情境也就這三種：坐在辦公桌前看全貌、開會時拿平板、站在客戶門口查一個數字。空間不夠時，先砍圖例和裝飾，資訊層級留到最後才動；至於單位、期間和比較基準，不管多窄都不刪。
     ratio: 4/3
     alt:
       en: Responsive and auto layout specification page
@@ -125,7 +125,7 @@ sections:
             palette, because red, amber and green are already spoken for by
             "declining", "needs attention" and "growing".
           zh: >-
-            底色和強調色都直接取自客戶的品牌：炭灰來自官網導覽列，橘色來自產品字標。橘色只留給介面用，像
+            品牌底色和強調色都直接取自客戶的品牌：炭灰來自官網導覽列，橘色來自產品字標。橘色只留給介面用，像
             logo、主按鈕、側欄選取狀態和目前月份。圖表另外配一組五色，因為紅、黃、綠早就被「衰退、需注意、成長」占走了。
       - title:
           en: Components & naming
@@ -151,7 +151,7 @@ sections:
             when it takes effect. Reversible things don't ask; they just happen,
             with an undo.
           zh: >-
-            七種對話框、三種
+            頁面中共七種對話框、三種
             toast。標題就是問題本身，破壞性動作用紅色而且永遠不是預設焦點，按下去之前先說清楚範圍：匯出幾筆、影響幾人、什麼時候生效。可逆的事不問，直接做，然後給「復原」。
     direction: vertical
   - type: experienceDemo
@@ -172,7 +172,7 @@ sections:
         The orange is the same accent the interface uses, and below 20px the
         strokes thicken so it still reads in the sidebar and a browser tab.
       zh: >-
-        原本的標誌是個靶心，說了「瞄準」，卻沒說瞄準什麼。我試了四個方向，每個都保留橘色圓角方塊，再往裡面放一台螢幕，最後選了
+        原本的標誌是個靶心，說了「瞄準」，卻沒說瞄準什麼。 所以我試了四個方向，每個都保留橘色圓角方塊，再往裡面放一台螢幕，最後選了
         B：螢幕裡一條往上爬的折線，終點是一個紅點。螢幕是戰情室，折線是趨勢，紅點就是洞察卡要你多看一眼的那個異常。底座的橘和介面強調色是同一個橘；縮到
         20px 以下，線條會自動加粗，放在側欄或瀏覽器分頁上也認得出來。
     ratio: 101/36
@@ -248,7 +248,7 @@ sections:
         anything; more than eight means it's noisy and managers start ignoring
         it.
       zh: >-
-        任務不能憑空冒出來。規則頁把整條鏈補齊：每天 00:10 同步、01:00
+        所有交付任務不能憑空冒出來。因此需要規則頁把整條鏈補齊：每天 00:10 同步、01:00
         逐條評估，命中就產生洞察卡，主管指派後變成任務，完成後再回寫命中紀錄。一條規則由「指標 ＋ 運算子 ＋ 門檻 ＋
         連續期數」四格組成，而且沒跑過回測就不能存檔，得先看清楚過去 12 個月它會響幾次。少於 3 次，代表門檻太鬆，什麼都抓不到；多於 8
         次又太吵，主管遲早會開始無視它。
