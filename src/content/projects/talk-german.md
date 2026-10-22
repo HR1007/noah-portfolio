@@ -15,7 +15,7 @@ hero:
   ctaLabel:
     en: Try it out
     zh: 實際試試
-  ctaHref: 'https://deutsch-translater.figma.site'
+  ctaHref: 'https://hr1007.github.io/talk-german/'
 sections:
   - type: textSection
     eyebrow:
@@ -156,7 +156,7 @@ sections:
     ctaLabel:
       en: Try it out
       zh: 來試試看
-    ctaHref: 'https://deutsch-translater.figma.site'
+    ctaHref: 'https://hr1007.github.io/talk-german/'
   - type: featureGrid
     eyebrow:
       en: INTUITIVE CAPABILITIES
@@ -220,7 +220,7 @@ sections:
     ctaLabel:
       en: Try it out
       zh: 來試試看
-    ctaHref: 'https://deutsch-translater.figma.site'
+    ctaHref: 'https://hr1007.github.io/talk-german/'
   - type: featureSplit
     heading:
       en: Nightfall Immersion
@@ -238,6 +238,119 @@ sections:
     ctaLabel:
       en: Try it out
       zh: 來試試看
-    ctaHref: 'https://deutsch-translater.figma.site'
+    ctaHref: 'https://hr1007.github.io/talk-german/'
+changelog:
+  - date: '2026-10-22'
+    title:
+      en: Daily Words
+      zh: 每日單字
+    summary:
+      en: >-
+        Ten German nouns a day with articles and example sentences, custom
+        quizzes, cloud sync, and a dark twin for every new screen.
+      zh: 每天 10 個附冠詞與例句的德文名詞、自訂測驗、雲端同步，每個新畫面都有深色版。
+    sections:
+      - type: textSection
+        eyebrow:
+          en: EXTENSION
+          zh: 延伸
+        heading:
+          en: From Understanding to Remembering
+          zh: 從聽懂，到記得住
+        paragraphs:
+          - en: >-
+              Translation got me through lectures, but the words never stayed. So I
+              extended Talk German into a daily habit: ten German nouns a day, each
+              with its article, plural and an example sentence, plus one B1 grammar
+              pattern to use them in. There are two decks, 1,048 everyday words and
+              200 academic ones, and this time it isn't a prototype: it's a working
+              site with its own database.
+            zh: >-
+              翻譯幫我撐過了每一堂課，可是字從來沒有留下來。所以我把 Talk German 延伸成每天的習慣：每天 10 個德文名詞，每個都帶著冠詞、複數和例句，再配一個用得上它們的 B1 句型。字庫有兩套，生活常用 1,048 字和 B1 學術 200 字；而這次不是原型，是一個真的上線、有自己資料庫的網站。
+          - en: >-
+              Every new screen has a dark twin, and switching themes sweeps the
+              new palette across the page in a circle from the top-left corner.
+            zh: 每日單字的每個新畫面都有對應的深色版，切換主題時，新配色會從左上角以圓形擴散、蓋滿整頁。
+      - type: flow
+        eyebrow:
+          en: FLOW
+          zh: 流程
+        heading:
+          en: One Path on the Phone
+          zh: 手機上，一條路走完
+        body:
+          en: >-
+            Seven screens form the main path: translate, learn today's words, test
+            them. Grammar, the word library and cloud sync branch off it, and the
+            bottom tab bar keeps every branch one tap away.
+          zh: 七個畫面串成主線：翻譯、背今天的字、測驗；句型、單字庫和雲端同步是從主線岔出去的分支。底部分頁列讓每條分支都只差一下點擊。
+        steps:
+          - label: Mobile flow
+            ratio: 2480/1823
+            alt:
+              en: >-
+                Talk German mobile flow, seven screens from translation to quiz
+                results with three branches
+              zh: Talk German 手機版動線：從翻譯到測驗結果的七個畫面，加上三條分支
+        direction: horizontal
+      - type: imageRow
+        eyebrow:
+          en: MOBILE
+          zh: 手機版
+        heading:
+          en: 'Ten Words, One Thumb'
+          zh: 十個字，一隻手就背得完
+        direction: horizontal
+        images:
+          - ratio: 390/844
+            alt:
+              en: 'Today''s ten words on mobile, with articles and example sentences'
+              zh: 手機上的今日 10 字，附冠詞與例句
+          - ratio: 390/844
+            alt:
+              en: Flashcard for die Hausarbeit with plural and pronunciation
+              zh: die Hausarbeit 的學習卡，附複數與發音
+          - ratio: 390/844
+            alt:
+              en: Fill-in-the-blank quiz question on mobile
+              zh: 手機上的例句填空題
+      - type: featureSplit
+        heading:
+          en: Quizzes That Know What You Forgot
+          zh: 知道你忘了什麼的測驗
+        body:
+          en: >-
+            Pick a scope, mix four question types (article, fill-in-the-blank,
+            spelling and plural) and set the length. Three correct answers in a row
+            move a word to learned; a miss sends it straight back to learning.
+          zh: 選範圍、混搭四種題型（冠詞、例句填空、中翻德拼寫、複數），再決定題數。連續答對三次的字自動移到「已熟背」，答錯就直接放回「學習中」。
+        imagePosition: right
+        ratio: 45/32
+        alt:
+          en: Custom quiz setup with scope, question types and length
+          zh: 自訂測驗設定：出題範圍、題型與題數
+        ctaLabel:
+          en: Try it out
+          zh: 來試試看
+        ctaHref: 'https://hr1007.github.io/talk-german/#/quiz'
+      - type: featureSplit
+        heading:
+          en: Your Progress Follows You
+          zh: 紀錄跟著你走
+        body:
+          en: >-
+            Everything works without an account and saves in the browser. Sign in
+            with a six-digit code from your inbox, and learned words, quiz history
+            and streaks sync through Supabase, with row-level security so each
+            person can only reach their own data.
+          zh: 不登入也能用，紀錄先存在瀏覽器裡。用信箱收到的 6 位數驗證碼登入後，背過的字、測驗紀錄和連續天數會透過 Supabase 同步；資料表開了 Row Level Security，每個人只碰得到自己的資料。
+        imagePosition: left
+        ratio: 390/844
+        alt:
+          en: Cloud sync screen with a six-digit sign-in code
+          zh: 雲端同步畫面，輸入 6 位數登入驗證碼
+        ctaLabel:
+          en: Try it out
+          zh: 來試試看
+        ctaHref: 'https://hr1007.github.io/talk-german/#/account'
 ---
-

@@ -32,6 +32,10 @@
       }
     }
   },
+  "changelog": {
+    "eyebrow": "更新紀錄",
+    "heading": "更新日誌"
+  },
   "readMore": {
     "more": "閱讀更多",
     "less": "收合"

@@ -32,6 +32,10 @@
       }
     }
   },
+  "changelog": {
+    "eyebrow": "CHANGELOG",
+    "heading": "Update Log"
+  },
   "readMore": {
     "more": "Read more",
     "less": "Show less"
