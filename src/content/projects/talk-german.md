@@ -353,4 +353,25 @@ changelog:
           en: Try it out
           zh: 來試試看
         ctaHref: 'https://hr1007.github.io/talk-german/#/account'
+      - type: researchFramework
+        layout: stacked
+        eyebrow:
+          en: BRAND
+          zh: 品牌
+        heading:
+          en: A Pretzel on Your Home Screen
+          zh: 主畫面上的那顆卷餅
+        paragraphs:
+          - en: >-
+              Once it became a site people come back to every day, it needed a
+              face on the home screen. The pixel pretzel from the header sits on
+              the brand violet, snapped to a 64×64 grid so it still reads at 40px.
+              Add it from Safari or Chrome and it opens like an app.
+            zh: 既然變成每天會打開的網站，就需要一張放在主畫面上的臉。網站左上角的像素椒鹽卷餅放到品牌紫色上，對齊 64×64 格線，縮到 40px 還認得出來。從 Safari 或 Chrome 加到主畫面，打開就像一個 app。
+        ratio: 1600/1635
+        alt:
+          en: >-
+            Talk German app icon sheet: the pixel pretzel icon at several sizes,
+            an Android maskable version and home screen previews
+          zh: Talk German 的 app icon 規格：像素椒鹽卷餅圖示的各種尺寸、Android 自適應版本與主畫面預覽
 ---
