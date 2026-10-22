@@ -232,6 +232,22 @@ const projects = defineCollection({
       })
       .optional(),
     sections: z.array(projectSection).default([]),
+    /*
+      更新日誌：案例上線之後陸續加的功能，跟上面的主要段落分開，頁面上預設收合，
+      點開才看得到細節圖。每一則裡面用的是同一組段落型別。
+      圖片版位接在主要段落之後、同一個資料夾（見 lib/image-slots.mjs）。
+      陣列順序就是頁面上的順序，新的一則放最前面。
+    */
+    changelog: z
+      .array(
+        z.object({
+          date: z.string(), // YYYY-MM-DD，頁面上原樣顯示
+          title: localized(),
+          summary: localized().optional(),
+          sections: z.array(projectSection).default([]),
+        })
+      )
+      .default([]),
   }),
 });
 
@@ -267,6 +283,8 @@ const site = defineCollection({
         }),
       }),
     }),
+    /* 案例頁最下方的更新日誌區塊標題 */
+    changelog: z.object({ eyebrow: z.string(), heading: z.string() }),
     /* 長段落收合的按鈕文案 */
     readMore: z.object({ more: z.string(), less: z.string() }),
     /* 全螢幕圖片檢視的操作文案 */

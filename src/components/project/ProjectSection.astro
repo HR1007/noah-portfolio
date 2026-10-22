@@ -1,0 +1,172 @@
+---
+/*
+  依段落型別挑對應的元件渲染。主要段落與更新日誌裡的段落共用這一支，
+  兩邊才不會各自維護一份 switch、新增型別時漏改其中一邊。
+*/
+import type { CollectionEntry } from 'astro:content';
+import type { ImageMetadata } from 'astro';
+import TextSection from './TextSection.astro';
+import DeviceShowcase from './DeviceShowcase.astro';
+import ExperienceDemo from './ExperienceDemo.astro';
+import FeatureSplit from './FeatureSplit.astro';
+import FeatureGrid from './FeatureGrid.astro';
+import ImageRow from './ImageRow.astro';
+import IllustrationGrid from './IllustrationGrid.astro';
+import ResearchFramework from './ResearchFramework.astro';
+import Persona from './Persona.astro';
+import DesignThemes from './DesignThemes.astro';
+import Flow from './Flow.astro';
+import { t, type Locale, type LocalizedText } from '../../lib/i18n';
+
+type Section = CollectionEntry<'projects'>['data']['sections'][number];
+
+interface Props {
+  section: Section;
+  locale: Locale;
+  images: (ImageMetadata | undefined)[];
+  video?: string;
+  imageDark?: ImageMetadata;
+}
+
+const { section, locale, images, video, imageDark } = Astro.props;
+
+/*
+  這一段所有「給人看的文字」都經過這裡取值：欄位還是純字串就原樣回傳，
+  已經雙語化的就依 locale 取，zh 沒填時退回 en（見 lib/i18n 的 t）。
+  ratio／layout／direction／ctaHref 不經過——那些不是給人讀的。
+*/
+const tr = (v: LocalizedText | undefined) => t(v, locale);
+const trReq = (v: LocalizedText) => t(v, locale);
+
+// 陣列型欄位裡的文字也要逐項取值，其餘設定原樣帶過
+const trAlt = <T extends { alt: LocalizedText }>(items: T[]) =>
+  items.map((item) => ({ ...item, alt: trReq(item.alt) }));
+const trColumns = (
+  cols: { heading: LocalizedText; body: LocalizedText; ratio: string; alt: LocalizedText }[]
+) => cols.map((c) => ({ ...c, heading: trReq(c.heading), body: trReq(c.body), alt: trReq(c.alt) }));
+const trThemes = (themes: { title: LocalizedText; description?: LocalizedText }[]) =>
+  themes.map((x) => ({ ...x, title: trReq(x.title), description: tr(x.description) }));
+---
+
+{
+  section.type === 'textSection' ? (
+    <TextSection
+      eyebrow={tr(section.eyebrow)}
+      heading={trReq(section.heading)}
+      paragraphs={section.paragraphs.map(trReq)}
+      ctaLabel={tr(section.ctaLabel)}
+      ctaHref={section.ctaHref}
+    />
+  ) : section.type === 'deviceShowcase' ? (
+    <DeviceShowcase
+      image={images[0]}
+      imageDark={imageDark}
+      ratio={section.ratio}
+      alt={trReq(section.alt)}
+      eyebrow={tr(section.eyebrow)}
+      heading={tr(section.heading)}
+      ctaLabel={tr(section.ctaLabel)}
+      ctaHref={section.ctaHref}
+    />
+  ) : section.type === 'experienceDemo' ? (
+    <ExperienceDemo
+      eyebrow={tr(section.eyebrow)}
+      heading={trReq(section.heading)}
+      body={trReq(section.body)}
+      image={images[0]}
+      video={video}
+      ratio={section.ratio}
+      alt={trReq(section.alt)}
+      ctaLabel={tr(section.ctaLabel)}
+      ctaHref={section.ctaHref}
+      layout={section.layout}
+    />
+  ) : section.type === 'featureSplit' ? (
+    <FeatureSplit
+      eyebrow={tr(section.eyebrow)}
+      heading={trReq(section.heading)}
+      body={trReq(section.body)}
+      imagePosition={section.imagePosition}
+      image={images[0]}
+      ratio={section.ratio}
+      alt={trReq(section.alt)}
+      ctaLabel={tr(section.ctaLabel)}
+      ctaHref={section.ctaHref}
+    />
+  ) : section.type === 'featureGrid' ? (
+    <FeatureGrid
+      eyebrow={tr(section.eyebrow)}
+      heading={tr(section.heading)}
+      columns={trColumns(section.columns)}
+      direction={section.direction}
+      uniform={section.uniform}
+      images={images}
+      ctaLabel={tr(section.ctaLabel)}
+      ctaHref={section.ctaHref}
+    />
+  ) : section.type === 'imageRow' ? (
+    <ImageRow
+      rows={trAlt(section.images)}
+      direction={section.direction}
+      images={images}
+      eyebrow={tr(section.eyebrow)}
+      heading={tr(section.heading)}
+      ctaLabel={tr(section.ctaLabel)}
+      ctaHref={section.ctaHref}
+    />
+  ) : section.type === 'illustrationGrid' ? (
+    <IllustrationGrid
+      eyebrow={tr(section.eyebrow)}
+      heading={trReq(section.heading)}
+      body={tr(section.body)}
+      alt={trReq(section.alt)}
+      images={images}
+      ctaLabel={tr(section.ctaLabel)}
+      ctaHref={section.ctaHref}
+    />
+  ) : section.type === 'researchFramework' ? (
+    <ResearchFramework
+      eyebrow={tr(section.eyebrow)}
+      heading={trReq(section.heading)}
+      paragraphs={section.paragraphs.map(trReq)}
+      image={images[0]}
+      ratio={section.ratio}
+      alt={trReq(section.alt)}
+      layout={section.layout}
+      ctaLabel={tr(section.ctaLabel)}
+      ctaHref={section.ctaHref}
+    />
+  ) : section.type === 'persona' ? (
+    <Persona
+      eyebrow={tr(section.eyebrow)}
+      heading={trReq(section.heading)}
+      personas={trAlt(section.personas)}
+      images={images}
+      ctaLabel={tr(section.ctaLabel)}
+      ctaHref={section.ctaHref}
+    />
+  ) : section.type === 'designThemes' ? (
+    <DesignThemes
+      eyebrow={tr(section.eyebrow)}
+      heading={trReq(section.heading)}
+      themes={trThemes(section.themes)}
+      direction={section.direction}
+      layout={section.layout}
+      images={images}
+      ctaLabel={tr(section.ctaLabel)}
+      ctaHref={section.ctaHref}
+    />
+  ) : section.type === 'flow' ? (
+    <Flow
+      eyebrow={tr(section.eyebrow)}
+      heading={trReq(section.heading)}
+      body={tr(section.body)}
+      steps={trAlt(section.steps)}
+      direction={section.direction}
+      uniform={section.uniform}
+      images={images}
+      ctaLabel={tr(section.ctaLabel)}
+      ctaHref={section.ctaHref}
+    />
+  ) : null
+}

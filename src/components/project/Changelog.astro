@@ -1,0 +1,204 @@
+---
+/*
+  案例頁最下方的更新日誌：案例上線後陸續加的功能，跟主要段落分開。
+
+  每一則預設收合，只露出日期、標題與一句摘要；點開才看得到細節圖與段落。
+  用原生 <details>，不寫 JS：開合、鍵盤操作與螢幕閱讀器的展開狀態都是瀏覽器內建的。
+  收合中的內容不會被繪製，裡面的 lazy 圖片也就不會下載，點開才載。
+*/
+import type { CollectionEntry } from 'astro:content';
+import type { ImageMetadata } from 'astro';
+import ProjectSection from './ProjectSection.astro';
+import { t, type Locale } from '../../lib/i18n';
+
+type Entry = CollectionEntry<'projects'>['data']['changelog'][number];
+
+interface Props {
+  /** 標題的 id，給 aria-labelledby 用；錨點 id 由外層包的容器負責 */
+  headingId: string;
+  eyebrow: string;
+  heading: string;
+  entries: Entry[];
+  /** byChangelog[第幾則][該則的第幾個段落]，見 lib/image-slots.mjs 的 assignImages */
+  images: Record<number, Record<number, (ImageMetadata | undefined)[]>>;
+  locale: Locale;
+}
+
+const { headingId, eyebrow, heading, entries, images, locale } = Astro.props;
+---
+
+<section class="changelog" aria-labelledby={headingId}>
+  <div class="changelog__head" data-reveal>
+    <p class="changelog__eyebrow">{eyebrow}</p>
+    <h2 class="changelog__heading" id={headingId}>{heading}</h2>
+  </div>
+
+  <ol class="changelog__list">
+    {
+      entries.map((entry, entryIndex) => (
+        <li class="changelog__item" data-reveal>
+          <details class="changelog__entry">
+            <summary class="changelog__summary">
+              <time class="changelog__date" datetime={entry.date}>{entry.date}</time>
+              <span class="changelog__text">
+                <span class="changelog__title">{t(entry.title, locale)}</span>
+                {entry.summary && <span class="changelog__desc">{t(entry.summary, locale)}</span>}
+              </span>
+              <svg class="changelog__chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </summary>
+            <div class="changelog__body">
+              {entry.sections.map((section, sectionIndex) => (
+                <ProjectSection
+                  section={section}
+                  locale={locale}
+                  images={images[entryIndex]?.[sectionIndex] ?? []}
+                />
+              ))}
+            </div>
+          </details>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  .changelog {
+    padding-block: var(--sp-6);
+  }
+
+  /* 標題列與每一則對齊內容欄寬，分隔線因此也跟標題左緣對齊 */
+  .changelog__head,
+  .changelog__item {
+    max-width: var(--content-width);
+    margin-inline: auto;
+    padding-inline: var(--content-gutter);
+  }
+
+  .changelog__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    margin-bottom: var(--sp-4);
+  }
+
+  .changelog__eyebrow {
+    font-size: var(--font-size-meta);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .changelog__heading {
+    font-size: var(--font-size-h2);
+  }
+
+  .changelog__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .changelog__entry {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .changelog__item:last-child .changelog__entry {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .changelog__summary {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--sp-1) var(--sp-3);
+    align-items: center;
+    padding-block: var(--sp-3);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  /* Safari 的 summary 預設三角形要另外藏 */
+  .changelog__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .changelog__summary:focus-visible {
+    outline: 1px solid var(--color-ink);
+    outline-offset: calc(var(--sp-1) * -1);
+  }
+
+  .changelog__date {
+    grid-column: 1 / -1;
+    font-size: var(--font-size-meta);
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .changelog__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    min-width: 0;
+  }
+
+  .changelog__title {
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .changelog__desc {
+    font-size: var(--font-size-body);
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .changelog__chevron {
+    width: var(--icon-md);
+    height: var(--icon-md);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    color: var(--color-muted);
+    transition: transform var(--motion-fast) var(--motion-ease);
+  }
+
+  .changelog__entry[open] .changelog__chevron {
+    transform: rotate(180deg);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .changelog__summary:hover .changelog__chevron {
+      color: var(--color-ink);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .changelog__chevron {
+      transition: none;
+    }
+  }
+
+  /*
+    展開後的段落元件自己就帶了內容欄寬與左右留白，這裡把外層的留白抵銷掉，
+    不然會內縮兩次、跟主要段落的左緣對不齊。
+  */
+  .changelog__body {
+    margin-inline: calc(var(--content-gutter) * -1);
+    padding-bottom: var(--sp-4);
+  }
+
+  @media (min-width: 768px) {
+    .changelog__summary {
+      grid-template-columns: var(--sp-9) 1fr auto;
+      align-items: start;
+    }
+
+    .changelog__date {
+      grid-column: auto;
+      padding-top: var(--sp-1);
+    }
+  }
+</style>

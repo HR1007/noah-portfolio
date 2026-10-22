@@ -5,6 +5,7 @@
 //   /api/page-images                 Home／Gallery／Portfolio 的固定命名圖片（hero / avatar / about…）
 //   /api/home/sets/:set              Home 上數量可變的圖組（hobby = Beyond the Grid 生活照）
 //   /api/projects/:slug/sections     案例頁的段落結構（新增／刪除段落、段落內加減項目）
+//   /api/projects/:slug/changelog    案例頁的更新日誌（新增／刪除／排序每一則，及每一則裡的段落）
 import express from 'express';
 import cors from 'cors';
 import fs from 'node:fs/promises';
@@ -16,6 +17,7 @@ import crypto from 'node:crypto';
 import {
   getImageSlots, SECTION_META, SECTION_OPTIONS, describeSection, sectionItemCount, plain,
   createSection, addSectionItem, removeSectionItem, sectionTypeOptions, CTA_DEFAULT,
+  createChangelogEntry, slotKey, MAIN_GROUP, changelogGroup,
 } from '../src/lib/image-slots.mjs';
 import { snapshotBefore, pendingUndo, restoreLast, clearUndo } from './undo.mjs';
 import {
@@ -218,7 +220,11 @@ async function listSlugImages(type, slug) {
   );
 
   if (type === 'projects') {
-    const { slots, sections } = await describeProject(slug).catch(() => ({ slots: [], sections: [] }));
+    const { slots, sections, changelog } = await describeProject(slug).catch(() => ({
+      slots: [],
+      sections: [],
+      changelog: [],
+    }));
     const labels = slots.map((s) => s.label);
     // 版位以「檔名編號」對應，不是陣列位置：刪掉中間某張圖後陣列會塌陷，
     // 用位置配對會讓後面的圖全部套到前一格的標籤，看起來就像圖片往前遞補。
@@ -228,9 +234,9 @@ async function listSlugImages(type, slug) {
       img.slotIndex = idx;
       img.slotLabel = idx === null ? null : labels[idx] ?? null;
     });
-    return { images, requiredSlots: slots.length, slotLabels: labels, slots, sections };
+    return { images, requiredSlots: slots.length, slotLabels: labels, slots, sections, changelog };
   }
-  return { images, requiredSlots: null, slotLabels: null, slots: null, sections: null };
+  return { images, requiredSlots: null, slotLabels: null, slots: null, sections: null, changelog: null };
 }
 
 // 版位規則的唯一來源在 src/lib/image-slots.mjs，渲染端 (ProjectDetail.astro)
@@ -238,19 +244,42 @@ async function listSlugImages(type, slug) {
 async function describeProject(slug) {
   const raw = await fs.readFile(projectFilePath(slug), 'utf-8');
   const { data } = matter(raw);
-  return { data, slots: getImageSlots(data), sections: summarizeSections(data) };
+  return {
+    data,
+    slots: getImageSlots(data),
+    sections: summarizeSections(data),
+    changelog: summarizeChangelog(data),
+  };
 }
 
 // 後台段落卡片需要的資訊：標題、這個段落能不能再加一項、加的是圖還是字。
 // 能不能加是 schema 決定的（例如 Image Row 最多三張、Feature Split 版型固定一張），
 // 由 SECTION_META 統一回答，後台不自己判斷型別。
 function summarizeSections(data) {
-  return (data.sections || []).map((section, index) => {
+  return summarizeSectionList(data.sections || [], 'sections');
+}
+
+/*
+  更新日誌每一則的摘要，結構跟主要段落一樣，只是多了日期與標題。
+  apiBase 是這一組段落的 API 路徑片段，前端照著組網址，不必自己判斷是主要段落還是第幾則日誌。
+*/
+function summarizeChangelog(data) {
+  return (data.changelog || []).map((entry, index) => ({
+    index,
+    date: entry.date ?? '',
+    title: plain(entry.title),
+    sections: summarizeSectionList(entry.sections || [], `changelog/${index}/sections`),
+  }));
+}
+
+function summarizeSectionList(sections, apiBase) {
+  return sections.map((section, index) => {
     const meta = SECTION_META[section.type];
     const list = meta?.list ?? null;
     const count = sectionItemCount(section);
     return {
       index,
+      apiBase,
       type: section.type,
       title: describeSection(section, index),
       list: list
@@ -392,82 +421,6 @@ app.get('/api/projects/:slug/slots', async (req, res) => {
   }
 });
 
-/*
-  調整段落順序。段落一移動，版位編號就跟著變，如果圖檔留在原編號，
-  圖片就會跑到別的段落去——所以這裡必須把圖檔一起搬，讓每個段落
-  帶著自己的圖走。先全部改成暫存檔名再落位，避免搬移過程互相覆蓋。
-*/
-app.put(
-  '/api/projects/:slug/sections/reorder',
-  undoable((req) => ({ label: `調整段落順序（${req.params.slug}）`, targets: projectTargets(req.params.slug) })),
-  async (req, res) => {
-  try {
-    const { from, to } = req.body || {};
-    const file = projectFilePath(req.params.slug);
-    const raw = await fs.readFile(file, 'utf-8');
-    const { data, content } = matter(raw);
-    const sections = data.sections || [];
-    if (![from, to].every((n) => Number.isInteger(n) && n >= 0 && n < sections.length)) {
-      return res.status(400).json({ error: 'invalid index' });
-    }
-
-    // 每個版位在「所屬段落內是第幾張」，是搬移前後唯一穩定的對應鍵
-    const seqOf = (slots) => {
-      const seen = {};
-      return slots.map((sl) => {
-        seen[sl.sectionIndex] = (seen[sl.sectionIndex] ?? -1) + 1;
-        return { ...sl, nth: seen[sl.sectionIndex] };
-      });
-    };
-
-    const oldSeq = seqOf(getImageSlots(data));
-
-    const next = sections.slice();
-    next.splice(to, 0, next.splice(from, 1)[0]);
-    data.sections = next;
-    const newSeq = seqOf(getImageSlots(data));
-
-    // 舊的第 i 個段落，搬移後會落在哪個位置
-    const movedTo = (i) => {
-      if (i === from) return to;
-      if (from < i && i <= to) return i - 1;
-      if (to <= i && i < from) return i + 1;
-      return i;
-    };
-
-    const dir = slugDir('projects', req.params.slug);
-    const files = (await fs.readdir(dir)).filter((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()));
-    const byIndex = new Map();
-    for (const f of files) {
-      const base = path.basename(f, path.extname(f));
-      if (/^\d+$/.test(base)) byIndex.set(Number(base), f);
-    }
-
-    const moves = [];
-    for (const o of oldSeq) {
-      const src = byIndex.get(o.index);
-      if (!src) continue;
-      const targetSection = o.sectionIndex === -1 ? -1 : movedTo(o.sectionIndex);
-      const dest = newSeq.find((n) => n.sectionIndex === targetSection && n.nth === o.nth);
-      if (!dest || dest.index === o.index) continue;
-      const ext = path.extname(src);
-      moves.push({
-        src,
-        tmp: `__tmp_${dest.index}${ext}`,
-        final: `${String(dest.index).padStart(2, '0')}${ext}`,
-      });
-    }
-
-    for (const m of moves) await fs.rename(path.join(dir, m.src), path.join(dir, m.tmp));
-    for (const m of moves) await fs.rename(path.join(dir, m.tmp), path.join(dir, m.final));
-
-    await fs.writeFile(file, matter.stringify(content, data), 'utf-8');
-    res.json({ ok: true, moved: moves.length });
-  } catch (err) {
-    res.status(500).json({ error: String(err) });
-  }
-});
-
 // 各段落型別支援的版型選項，後台據此渲染下拉選單（即使 .md 裡還沒有該欄位）
 app.get('/api/section-options', (req, res) => res.json(SECTION_OPTIONS));
 
@@ -565,27 +518,44 @@ app.get('/api/cta-default', (req, res) => res.json(CTA_DEFAULT));
  * 算出「新版位 → 舊版位」的對照表，用來決定哪個檔案要改成哪個編號。
  * null 代表這一格沒有對應的舊圖（新加的段落／新加的項目），維持空著。
  *
- * 對照的依據是「哪個段落的第幾格」，不是版位編號本身 —— 編號會因為前面
- * 插入或刪除而整串位移，拿它比對等於沒比對。
+ * 對照的依據是「哪個群組、哪個段落的第幾格」（見 image-slots.mjs 的 slotKey），
+ * 不是版位編號本身 —— 編號會因為前面插入或刪除而整串位移，拿它比對等於沒比對。
+ * 更新日誌的版位接在主要段落後面，主要段落一增減，日誌的圖也要靠這張表跟著搬。
  *
  * @param {Record<string, any>} opts
- *   sectionMap      新段落索引 → 舊段落索引（-1 表示這是全新的段落）
+ *   group           這次動到的是哪一組段落（main 或 changelog:n）
+ *   sectionMap      該組裡：新段落索引 → 舊段落索引（-1 表示這是全新的段落）
  *   changedSection  這次動到的舊段落索引（只有段落內加減項目才需要）
  *   itemMap         該段落內：新的第幾格 → 舊的第幾格（null 表示新格子）
+ *   entryMap        更新日誌：新的第幾則 → 舊的第幾則（-1 表示新的一則）
  */
-function buildSlotOrigin(oldData, nextData, { sectionMap, changedSection = null, itemMap = null }) {
-  const oldIndexByKey = new Map(
-    getImageSlots(oldData).map((slot) => [`${slot.sectionIndex}:${slot.slotInSection ?? 0}`, slot.index])
-  );
+function buildSlotOrigin(
+  oldData,
+  nextData,
+  { group = MAIN_GROUP, sectionMap = null, changedSection = null, itemMap = null, entryMap = null }
+) {
+  const oldIndexByKey = new Map(getImageSlots(oldData).map((slot) => [slotKey(slot), slot.index]));
+  const lookup = (g, section, inSection) => oldIndexByKey.get(`${g}:${section}:${inSection}`) ?? null;
 
   return getImageSlots(nextData).map((slot) => {
-    if (slot.sectionIndex === -1) return oldIndexByKey.get('-1:0') ?? null; // hero 不受段落增刪影響
+    let oldGroup = slot.group;
+    if (entryMap && slot.entryIndex !== undefined) {
+      const oldEntry = entryMap[slot.entryIndex];
+      if (oldEntry == null || oldEntry < 0) return null;
+      oldGroup = changelogGroup(oldEntry);
+    }
+
+    // 不是這次動到的那一組（或是 hero）：段落與格子都沒變，只是編號可能位移
+    if (slot.group !== group || slot.sectionIndex === -1 || !sectionMap) {
+      return lookup(oldGroup, slot.sectionIndex, slot.slotInSection ?? 0);
+    }
+
     const oldSection = sectionMap[slot.sectionIndex];
     if (oldSection == null || oldSection < 0) return null;
     const inSection =
       oldSection === changedSection && itemMap ? itemMap[slot.slotInSection] : slot.slotInSection;
     if (inSection == null) return null;
-    return oldIndexByKey.get(`${oldSection}:${inSection}`) ?? null;
+    return lookup(group, oldSection, inSection);
   });
 }
 
@@ -663,74 +633,138 @@ async function applySectionChange(slug, mutate) {
   return { renamed: plan.renames.length, deleted: plan.removals.length };
 }
 
-function sectionAt(data, raw) {
-  const sections = data.sections || [];
+/*
+  一組段落在 frontmatter 裡的位置。主要段落是 data.sections，更新日誌第 n 則是
+  data.changelog[n].sections；兩者的段落操作完全一樣，差別只在讀寫哪裡、版位屬於哪一組。
+*/
+const mainScope = () => ({
+  label: '段落',
+  group: MAIN_GROUP,
+  get: (data) => data.sections || [],
+  set: (data, sections) => ({ ...data, sections }),
+});
+
+function changelogEntries(data, raw) {
+  const list = data.changelog || [];
+  const index = Number(raw);
+  if (!Number.isInteger(index) || index < 0 || index >= list.length) {
+    throw new Error(`第 ${Number(raw) + 1} 則更新日誌不存在`);
+  }
+  return { list, index };
+}
+
+const changelogScope = (raw) => ({
+  label: `更新日誌第 ${Number(raw) + 1} 則的段落`,
+  group: changelogGroup(Number(raw)),
+  get: (data) => {
+    const { list, index } = changelogEntries(data, raw);
+    return list[index].sections || [];
+  },
+  set: (data, sections) => {
+    const { list, index } = changelogEntries(data, raw);
+    const next = [...list];
+    next[index] = { ...next[index], sections };
+    return { ...data, changelog: next };
+  },
+});
+
+function sectionAt(sections, raw) {
   const index = Number(raw);
   if (!Number.isInteger(index) || index < 0 || index >= sections.length) {
     throw new Error(`第 ${raw} 個段落不存在`);
   }
-  return { sections, index };
+  return index;
 }
 
-// body: { type: 'featureGrid', at?: 3 } —— at 省略時加在最後
-app.post(
-  '/api/projects/:slug/sections',
-  undoable((req) => ({ label: `新增段落（${req.params.slug}）`, targets: projectTargets(req.params.slug) })),
-  async (req, res) => {
-  try {
-    const result = await applySectionChange(req.params.slug, (data) => {
-      const sections = [...(data.sections || [])];
+/**
+ * 一組段落的五個結構動作（新增／刪除段落、排序、段落內加減項目）。
+ * 主要段落與每一則更新日誌共用同一套，只差在網址與 scope。
+ *
+ * @param {string} base  例如 '/api/projects/:slug/sections'
+ * @param {(req: any) => ReturnType<typeof mainScope>} scopeOf
+ */
+function registerSectionRoutes(base, scopeOf) {
+  const guard = (verb) =>
+    undoable((req) => ({
+      label: `${verb}（${req.params.slug}，${scopeOf(req).label}）`,
+      targets: projectTargets(req.params.slug),
+    }));
+
+  const run = (mutate) => async (req, res) => {
+    try {
+      const scope = scopeOf(req);
+      const result = await applySectionChange(req.params.slug, (data) => mutate(req, scope, data));
+      res.json({ ok: true, ...result });
+    } catch (err) {
+      res.status(400).json({ error: String(err.message || err) });
+    }
+  };
+
+  /*
+    調整段落順序。段落一移動，版位編號就跟著變，如果圖檔留在原編號，
+    圖片就會跑到別的段落去——所以走跟增刪段落同一套重新編號，讓每個段落帶著自己的圖走。
+    body: { from, to }
+  */
+  app.put(
+    `${base}/reorder`,
+    guard('調整段落順序'),
+    run((req, scope, data) => {
+      const all = scope.get(data);
+      const { from, to } = req.body || {};
+      if (![from, to].every((n) => Number.isInteger(n) && n >= 0 && n < all.length)) {
+        throw new Error('invalid index');
+      }
+      const order = all.map((_, i) => i);
+      order.splice(to, 0, order.splice(from, 1)[0]);
+      const nextData = scope.set(data, order.map((i) => all[i]));
+      return { nextData, slotOrigin: buildSlotOrigin(data, nextData, { group: scope.group, sectionMap: order }) };
+    })
+  );
+
+  // body: { type: 'featureGrid', at?: 3 } —— at 省略時加在最後
+  app.post(
+    base,
+    guard('新增段落'),
+    run((req, scope, data) => {
+      const sections = [...scope.get(data)];
       const at = Number.isInteger(req.body?.at)
         ? Math.max(0, Math.min(req.body.at, sections.length))
         : sections.length;
       sections.splice(at, 0, createSection(req.body?.type));
 
-      const nextData = { ...data, sections };
+      const nextData = scope.set(data, sections);
       const sectionMap = sections.map((_, i) => (i < at ? i : i === at ? -1 : i - 1));
-      return { nextData, slotOrigin: buildSlotOrigin(data, nextData, { sectionMap }) };
-    });
-    res.json({ ok: true, ...result });
-  } catch (err) {
-    res.status(400).json({ error: String(err.message || err) });
-  }
-});
+      return { nextData, slotOrigin: buildSlotOrigin(data, nextData, { group: scope.group, sectionMap }) };
+    })
+  );
 
-// 刪段落會連同該段落的圖片檔一起刪掉：那些圖已經沒有任何版位能放，留著只會變成孤兒檔案。
-app.delete(
-  '/api/projects/:slug/sections/:index',
-  undoable((req) => ({
-    label: `刪除段落（${req.params.slug} 第 ${Number(req.params.index) + 1} 段）`,
-    targets: projectTargets(req.params.slug),
-  })),
-  async (req, res) => {
-  try {
-    const result = await applySectionChange(req.params.slug, (data) => {
-      const { sections: all, index } = sectionAt(data, req.params.index);
+  // 刪段落會連同該段落的圖片檔一起刪掉：那些圖已經沒有任何版位能放，留著只會變成孤兒檔案。
+  app.delete(
+    `${base}/:index`,
+    guard('刪除段落'),
+    run((req, scope, data) => {
+      const all = scope.get(data);
+      const index = sectionAt(all, req.params.index);
       const sections = all.filter((_, i) => i !== index);
 
-      const nextData = { ...data, sections };
+      const nextData = scope.set(data, sections);
       const sectionMap = sections.map((_, i) => (i < index ? i : i + 1));
-      return { nextData, slotOrigin: buildSlotOrigin(data, nextData, { sectionMap }) };
-    });
-    res.json({ ok: true, ...result });
-  } catch (err) {
-    res.status(400).json({ error: String(err.message || err) });
-  }
-});
+      return { nextData, slotOrigin: buildSlotOrigin(data, nextData, { group: scope.group, sectionMap }) };
+    })
+  );
 
-// 往段落的可重複清單加一項：圖片型清單會多一個空版位，文字型清單只是多一段 [需確認] 文字。
-app.post(
-  '/api/projects/:slug/sections/:index/items',
-  undoable((req) => ({ label: `段落內新增一項（${req.params.slug}）`, targets: projectTargets(req.params.slug) })),
-  async (req, res) => {
-  try {
-    const result = await applySectionChange(req.params.slug, (data) => {
-      const { sections: all, index } = sectionAt(data, req.params.index);
+  // 往段落的可重複清單加一項：圖片型清單會多一個空版位，文字型清單只是多一段 [需確認] 文字。
+  app.post(
+    `${base}/:index/items`,
+    guard('段落內新增一項'),
+    run((req, scope, data) => {
+      const all = scope.get(data);
+      const index = sectionAt(all, req.params.index);
       const before = sectionItemCount(all[index]);
       const sections = [...all];
       sections[index] = addSectionItem(all[index]);
 
-      const nextData = { ...data, sections };
+      const nextData = scope.set(data, sections);
       const list = SECTION_META[all[index].type]?.list;
       // 文字型清單不佔版位，版位順序完全沒變，不需要 itemMap
       const itemMap =
@@ -738,51 +772,108 @@ app.post(
       return {
         nextData,
         slotOrigin: buildSlotOrigin(data, nextData, {
+          group: scope.group,
           sectionMap: sections.map((_, i) => i),
           changedSection: index,
           itemMap,
         }),
       };
-    });
-    res.json({ ok: true, ...result });
-  } catch (err) {
-    res.status(400).json({ error: String(err.message || err) });
-  }
-});
+    })
+  );
 
-// 移除段落裡的第 i 項（圖片型清單會連同那一格的圖片檔一起刪）
-app.delete(
-  '/api/projects/:slug/sections/:index/items/:item',
-  undoable((req) => ({ label: `段落內刪除一項（${req.params.slug}）`, targets: projectTargets(req.params.slug) })),
-  async (req, res) => {
-  try {
-    const result = await applySectionChange(req.params.slug, (data) => {
-      const { sections: all, index } = sectionAt(data, req.params.index);
+  // 移除段落裡的第 i 項（圖片型清單會連同那一格的圖片檔一起刪）
+  app.delete(
+    `${base}/:index/items/:item`,
+    guard('段落內刪除一項'),
+    run((req, scope, data) => {
+      const all = scope.get(data);
+      const index = sectionAt(all, req.params.index);
       const item = Number(req.params.item);
       const before = sectionItemCount(all[index]);
       const sections = [...all];
       sections[index] = removeSectionItem(all[index], item);
 
-      const nextData = { ...data, sections };
+      const nextData = scope.set(data, sections);
       const list = SECTION_META[all[index].type]?.list;
       const itemMap =
-        list?.kind === 'image'
-          ? Array.from({ length: before - 1 }, (_, i) => (i < item ? i : i + 1))
-          : null;
+        list?.kind === 'image' ? Array.from({ length: before - 1 }, (_, i) => (i < item ? i : i + 1)) : null;
       return {
         nextData,
         slotOrigin: buildSlotOrigin(data, nextData, {
+          group: scope.group,
           sectionMap: sections.map((_, i) => i),
           changedSection: index,
           itemMap,
         }),
       };
+    })
+  );
+}
+
+registerSectionRoutes('/api/projects/:slug/sections', () => mainScope());
+registerSectionRoutes('/api/projects/:slug/changelog/:entry/sections', (req) => changelogScope(req.params.entry));
+
+// ---------- 更新日誌的每一則（新增／刪除／排序） ----------
+//
+// 一則日誌裡的圖片版位接在主要段落之後；整則刪掉或換順序時，後面幾則的圖也要跟著重新編號，
+// 所以一樣走 applySectionChange，用 entryMap 告訴它「新的第幾則原本是第幾則」。
+
+const changelogGuard = (verb) =>
+  undoable((req) => ({ label: `${verb}（${req.params.slug}）`, targets: projectTargets(req.params.slug) }));
+
+const changelogRun = (mutate) => async (req, res) => {
+  try {
+    const result = await applySectionChange(req.params.slug, (data) => {
+      const list = data.changelog || [];
+      const { next, entryMap } = mutate(req, list);
+      const nextData = { ...data, changelog: next };
+      return { nextData, slotOrigin: buildSlotOrigin(data, nextData, { entryMap }) };
     });
     res.json({ ok: true, ...result });
   } catch (err) {
     res.status(400).json({ error: String(err.message || err) });
   }
-});
+};
+
+// 新的一則放最前面：頁面上的更新日誌是新的在上。body: { date?: 'YYYY-MM-DD' }，省略時用今天。
+app.post(
+  '/api/projects/:slug/changelog',
+  changelogGuard('新增一則更新日誌'),
+  changelogRun((req, list) => {
+    const date = String(req.body?.date || new Date().toISOString().slice(0, 10));
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error('日期格式要是 YYYY-MM-DD');
+    return {
+      next: [createChangelogEntry(date), ...list],
+      entryMap: [-1, ...list.map((_, i) => i)],
+    };
+  })
+);
+
+// 整則刪掉：裡面所有段落的圖片一併刪除
+app.delete(
+  '/api/projects/:slug/changelog/:entry',
+  changelogGuard('刪除一則更新日誌'),
+  changelogRun((req, list) => {
+    const { index } = changelogEntries({ changelog: list }, req.params.entry);
+    const next = list.filter((_, i) => i !== index);
+    return { next, entryMap: next.map((_, i) => (i < index ? i : i + 1)) };
+  })
+);
+
+// body: { from, to }
+app.put(
+  '/api/projects/:slug/changelog/reorder',
+  changelogGuard('調整更新日誌順序'),
+  changelogRun((req, list) => {
+    const { from, to } = req.body || {};
+    if (![from, to].every((n) => Number.isInteger(n) && n >= 0 && n < list.length)) {
+      throw new Error('invalid index');
+    }
+    const order = list.map((_, i) => i);
+    order.splice(to, 0, order.splice(from, 1)[0]);
+    return { next: order.map((i) => list[i]), entryMap: order };
+  })
+);
 
 // 回傳 { images, requiredSlots }：requiredSlots 只有 projects 類型會算（該案例頁
 // 依 sections 需要幾張圖），gallery 類型固定是 null（相片牆沒有「需要幾張」的概念）。

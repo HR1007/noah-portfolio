@@ -80,13 +80,14 @@ const document = { querySelectorAll: () => [], createElement: () => new El() };
 let dragFromIndex = null;
 let dragKind = null;
 let sectionDragFrom = null;
+let sectionDragBase = null;
 const calls = [];
 const reorderSection = (slug, from, to) => calls.push(['reorderSection', slug, from, to]);
 
 const bindDrag = eval(`(${extract('function bindDrag(tile, key, container, onDrop)')})`);
-const bindSectionDrag = eval(`(${extract('function bindSectionDrag(card, index, slug, reload)')})`);
+const bindSectionDrag = eval(`(${extract('function bindSectionDrag(card, index, slug, reload, base = \'sections\')')})`);
 const buildSectionMoveButtons = eval(
-  `(${extract('function buildSectionMoveButtons(index, total, slug, reload)')})`
+  `(${extract('function buildSectionMoveButtons(index, total, slug, reload, base = \'sections\')')})`
 );
 
 // ---------- 組出 Portfolio 分頁的實際結構：卡片 > 格線 > 圖片磚 ----------

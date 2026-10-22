@@ -235,6 +235,7 @@ let currentRequiredSlots = null;
 let currentSlotLabels = [];
 let currentSlots = []; // 案例頁的版位清單（每一格屬於哪個段落）
 let currentSections = []; // 案例頁的段落摘要（標題、能不能再加一項）
+let currentChangelog = []; // 案例頁的更新日誌：每一則的日期、標題與段落摘要
 let sectionTypes = []; // [{ type, label }]，段落型別的中文名稱
 
 /*
@@ -305,6 +306,7 @@ async function loadImages() {
   currentSlotLabels = data.slotLabels || [];
   currentSlots = data.slots || [];
   currentSections = data.sections || [];
+  currentChangelog = data.changelog || [];
 
   if (currentType === 'projects') {
     const filled = currentImages.filter((im) => im.slotIndex != null && im.slotIndex < currentSlots.length).length;
@@ -445,19 +447,21 @@ function renderProjectSections() {
   if (!host) return;
   host.innerHTML = '';
 
+  // 主要段落與每一則更新日誌的段落索引都從 0 開始，要連同群組一起分，不然會混在同一張卡片
   const slotsBySection = new Map();
   currentSlots.forEach((slot) => {
-    if (!slotsBySection.has(slot.sectionIndex)) slotsBySection.set(slot.sectionIndex, []);
-    slotsBySection.get(slot.sectionIndex).push(slot);
+    const key = `${slot.group}:${slot.sectionIndex}`;
+    if (!slotsBySection.has(key)) slotsBySection.set(key, []);
+    slotsBySection.get(key).push(slot);
   });
 
   // Hero 不屬於任何段落，但一樣是一格版位，要能上傳／替換
   host.appendChild(
-    buildSectionCard({ index: -1, title: 'Hero（案例頁最上方大圖）', list: null }, slotsBySection.get(-1) || [], host)
+    buildSectionCard({ index: -1, title: 'Hero（案例頁最上方大圖）', list: null }, slotsBySection.get('main:-1') || [], host)
   );
 
   currentSections.forEach((section) => {
-    host.appendChild(buildSectionCard(section, slotsBySection.get(section.index) || [], host));
+    host.appendChild(buildSectionCard(section, slotsBySection.get(`main:${section.index}`) || [], host));
   });
 
   // 編號超出版位範圍、或檔名不是數字的圖片：頁面用不到，但也不該讓它們默默消失
@@ -465,16 +469,138 @@ function renderProjectSections() {
   if (extras.length) host.appendChild(buildExtrasCard(extras));
 
   host.appendChild(buildAddSectionBar());
+
+  // 更新日誌：跟主要段落分開一區，每一則底下是它自己的段落卡片
+  host.appendChild(buildChangelogHead(currentSlug, loadImages));
+  currentChangelog.forEach((entry) => {
+    host.appendChild(buildChangelogEntryCard(currentSlug, entry, currentChangelog.length, loadImages));
+    entry.sections.forEach((section) => {
+      const card = buildSectionCard(
+        section,
+        slotsBySection.get(`changelog:${entry.index}:${section.index}`) || [],
+        host,
+        entry.sections.length
+      );
+      card.classList.add('sec-card--nested');
+      host.appendChild(card);
+    });
+    const bar = buildAddSectionBar(entry.sections, section0Base(entry));
+    bar.classList.add('sec-card--nested');
+    host.appendChild(bar);
+  });
 }
 
-function buildSectionCard(section, slots, host) {
+/** 一則更新日誌的段落 API 路徑片段，跟 server 的 summarizeChangelog 給的 apiBase 一致 */
+function section0Base(entry) {
+  return `changelog/${entry.index}/sections`;
+}
+
+/*
+  更新日誌區的標題列與「新增一則」。Portfolio 與 Content 兩個分頁共用。
+  新的一則會放在最前面（頁面上新的在上），日期預設今天，標題先填 [需確認]。
+*/
+function buildChangelogHead(slug, reload) {
+  const head = document.createElement('div');
+  head.className = 'changelog-head';
+  head.innerHTML = `<div><h3>更新日誌</h3>
+    <p>案例上線後陸續加的功能。頁面上排在主要段落之後、預設收合，點開才看得到這裡的圖片與段落。</p></div>`;
+
+  const btn = document.createElement('button');
+  btn.className = 'sec-btn';
+  btn.textContent = '＋ 新增一則更新日誌';
+  btn.addEventListener('click', async () => {
+    const date = prompt('這次更新的日期（YYYY-MM-DD）：', new Date().toISOString().slice(0, 10));
+    if (!date) return;
+    if (projectsData[slug] && !(await saveProjectData(slug))) return;
+    await structureRequest(
+      `${API}/api/projects/${slug}/changelog`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ date }) },
+      '已新增一則更新日誌，標題與摘要先填 [需確認]，請到 Content 頁補上',
+      reload
+    );
+  });
+  head.appendChild(btn);
+  return head;
+}
+
+/**
+ * 一則更新日誌的標題卡：上移／下移、刪除整則。
+ * fields 有給（Content 分頁）就把日期、標題、摘要的編輯欄位放進卡片裡。
+ */
+function buildChangelogEntryCard(slug, entry, total, reload, fields = null) {
+  const card = document.createElement('div');
+  card.className = 'sec-card sec-card--changelog';
+
+  const head = document.createElement('div');
+  head.className = 'sec-card__head';
+  const title = document.createElement('strong');
+  title.className = 'sec-card__title';
+  title.textContent = `更新日誌 · ${entry.date} ${entry.title}`;
+  head.appendChild(title);
+
+  const actions = document.createElement('div');
+  actions.className = 'sec-card__actions';
+
+  const move = document.createElement('div');
+  move.className = 'sec-move';
+  [['↑', '往前移一則', entry.index - 1, entry.index <= 0], ['↓', '往後移一則', entry.index + 1, entry.index >= total - 1]]
+    .forEach(([label, hint, to, disabled]) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'sec-move__btn';
+      b.textContent = label;
+      b.title = disabled ? '' : hint;
+      b.disabled = disabled;
+      b.addEventListener('click', async () => {
+        if (projectsData[slug] && !(await saveProjectData(slug))) return;
+        await structureRequest(
+          `${API}/api/projects/${slug}/changelog/reorder`,
+          { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: entry.index, to }) },
+          '已調整更新日誌順序',
+          reload
+        );
+      });
+      move.appendChild(b);
+    });
+  actions.appendChild(move);
+
+  const del = document.createElement('button');
+  del.className = 'sec-btn sec-btn--danger';
+  del.textContent = '刪除這一則';
+  del.addEventListener('click', async () => {
+    const n = entry.sections.length;
+    if (!confirm(`確定刪除更新日誌「${entry.date} ${entry.title}」？${n ? `\n\n裡面的 ${n} 個段落與它們的圖片會一起刪除。` : ''}`)) return;
+    if (projectsData[slug] && !(await saveProjectData(slug))) return;
+    await structureRequest(
+      `${API}/api/projects/${slug}/changelog/${entry.index}`,
+      { method: 'DELETE' },
+      '已刪除這一則更新日誌',
+      reload
+    );
+  });
+  actions.appendChild(del);
+
+  head.appendChild(actions);
+  card.appendChild(head);
+
+  if (fields) {
+    const body = document.createElement('div');
+    body.className = 'sec-card__body';
+    body.appendChild(fields);
+    card.appendChild(body);
+  }
+  return card;
+}
+
+function buildSectionCard(section, slots, host, total = currentSections.length) {
   const card = document.createElement('div');
   card.className = 'sec-card';
   const list = section.list;
 
   // Hero 用的是 index -1，它不是段落、也沒有前後可言，不能拖
   const canDrag = section.index >= 0;
-  if (canDrag) bindSectionDrag(card, section.index, currentSlug, () => loadImages());
+  const base = section.apiBase || 'sections';
+  if (canDrag) bindSectionDrag(card, section.index, currentSlug, () => loadImages(), base);
 
   const head = document.createElement('div');
   head.className = 'sec-card__head';
@@ -495,7 +621,7 @@ function buildSectionCard(section, slots, host) {
 
   if (canDrag) {
     actions.appendChild(
-      buildSectionMoveButtons(section.index, currentSections.length, currentSlug, () => loadImages())
+      buildSectionMoveButtons(section.index, total, currentSlug, () => loadImages(), base)
     );
   }
 
@@ -706,7 +832,7 @@ function buildExtrasCard(extras) {
   return card;
 }
 
-function buildAddSectionBar() {
+function buildAddSectionBar(sections = currentSections, base = 'sections') {
   const bar = document.createElement('div');
   bar.className = 'sec-add';
 
@@ -723,7 +849,7 @@ function buildAddSectionBar() {
   lastOpt.value = '';
   lastOpt.textContent = '放在最後面';
   posSel.appendChild(lastOpt);
-  currentSections.forEach((s) => {
+  sections.forEach((s) => {
     const o = document.createElement('option');
     o.value = String(s.index);
     o.textContent = `插在「${s.title}」之前`;
@@ -733,7 +859,7 @@ function buildAddSectionBar() {
   const btn = document.createElement('button');
   btn.textContent = '＋ 新增段落';
   btn.addEventListener('click', () =>
-    handleAddSection(typeSel.value, posSel.value === '' ? null : Number(posSel.value))
+    handleAddSection(typeSel.value, posSel.value === '' ? null : Number(posSel.value), base)
   );
 
   bar.append(typeSel, posSel, btn);
@@ -776,7 +902,7 @@ async function structureRequest(url, options, okMessage, reload) {
 
 function handleAddItem(section, list) {
   return structureRequest(
-    `${API}/api/projects/${currentSlug}/sections/${section.index}/items`,
+    `${API}/api/projects/${currentSlug}/${section.apiBase || 'sections'}/${section.index}/items`,
     { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' },
     list.kind === 'image' ? `已多加一格「${list.label}」版位` : `已多加一項「${list.label}」（文字先填 [需確認]）`,
     loadImages
@@ -788,7 +914,7 @@ function handleRemoveItem(section, itemIndex, label) {
   const extra = list.kind === 'image' ? '（若這一格有圖，圖片會一併刪除）' : '';
   if (!confirm(`確定要移除「${label}」這個${list.label}？${extra}`)) return;
   return structureRequest(
-    `${API}/api/projects/${currentSlug}/sections/${section.index}/items/${itemIndex}`,
+    `${API}/api/projects/${currentSlug}/${section.apiBase || 'sections'}/${section.index}/items/${itemIndex}`,
     { method: 'DELETE' },
     `已移除一個${list.label}`,
     loadImages
@@ -800,16 +926,16 @@ function handleDeleteSection(section, slots) {
   const warn = withImages ? `\n\n這個段落有 ${withImages} 張圖片，會一起刪除。` : '';
   if (!confirm(`確定要刪除「${section.title}」這個段落？${warn}`)) return;
   return structureRequest(
-    `${API}/api/projects/${currentSlug}/sections/${section.index}`,
+    `${API}/api/projects/${currentSlug}/${section.apiBase || 'sections'}/${section.index}`,
     { method: 'DELETE' },
     '已刪除段落',
     loadImages
   );
 }
 
-function handleAddSection(type, at) {
+function handleAddSection(type, at, base = 'sections') {
   return structureRequest(
-    `${API}/api/projects/${currentSlug}/sections`,
+    `${API}/api/projects/${currentSlug}/${base}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -827,7 +953,7 @@ function handleAddSection(type, at) {
   拖放並不好操作——按鈕是一定按得到的那條路，也不依賴瀏覽器的拖放行為。
   已經在頭或尾的段落，對應方向的按鈕直接停用，不用按了才知道不能動。
 */
-function buildSectionMoveButtons(index, total, slug, reload) {
+function buildSectionMoveButtons(index, total, slug, reload, base = 'sections') {
   const wrap = document.createElement('div');
   wrap.className = 'sec-move';
 
@@ -842,7 +968,7 @@ function buildSectionMoveButtons(index, total, slug, reload) {
       btn.addEventListener('click', (e) => {
         // 卡片本身也綁著拖放與其他點擊行為，這個按鈕只做自己的事
         e.stopPropagation();
-        reorderSection(slug, index, to, reload);
+        reorderSection(slug, index, to, reload, base);
       });
     }
     return btn;
@@ -857,13 +983,14 @@ function buildSectionMoveButtons(index, total, slug, reload) {
   段落卡片的拖放綁定，Content 與 Portfolio 兩個分頁共用。
   兩邊原本各寫各的（而且 Portfolio 根本沒寫），現在只有這一份。
 */
-function bindSectionDrag(card, index, slug, reload) {
+function bindSectionDrag(card, index, slug, reload, base = 'sections') {
   card.draggable = true;
   card.dataset.idx = String(index);
 
   card.addEventListener('dragstart', (e) => {
     dragKind = 'section';
     sectionDragFrom = index;
+    sectionDragBase = base;
     card.classList.add('sec-card--dragging');
     e.dataTransfer.effectAllowed = 'move';
     // Firefox 不設 dataTransfer 就不會真的開始拖；值本身用不到
@@ -872,21 +999,24 @@ function bindSectionDrag(card, index, slug, reload) {
   card.addEventListener('dragend', () => {
     dragKind = null;
     sectionDragFrom = null;
+    sectionDragBase = null;
     document.querySelectorAll('.sec-card').forEach((c) =>
       c.classList.remove('sec-card--dragging', 'sec-card--over')
     );
   });
   card.addEventListener('dragover', (e) => {
-    if (dragKind !== 'section' || sectionDragFrom === null || sectionDragFrom === index) return;
+    // 只能在同一組段落裡排序：主要段落拖到更新日誌（或反過來）時索引指的是不同的清單
+    if (dragKind !== 'section' || sectionDragFrom === null || sectionDragFrom === index || sectionDragBase !== base) return;
     e.preventDefault();
     card.classList.add('sec-card--over');
   });
   card.addEventListener('dragleave', () => card.classList.remove('sec-card--over'));
   card.addEventListener('drop', (e) => {
-    if (dragKind !== 'section' || sectionDragFrom === null || sectionDragFrom === index) return;
+    // 只能在同一組段落裡排序：主要段落拖到更新日誌（或反過來）時索引指的是不同的清單
+    if (dragKind !== 'section' || sectionDragFrom === null || sectionDragFrom === index || sectionDragBase !== base) return;
     e.preventDefault();
     card.classList.remove('sec-card--over');
-    reorderSection(slug, sectionDragFrom, index, reload);
+    reorderSection(slug, sectionDragFrom, index, reload, base);
   });
 }
 
@@ -898,7 +1028,7 @@ function bindSectionDrag(card, index, slug, reload) {
   後端的 PUT /api/projects/:slug/sections/reorder 一直是好的：它會同時改寫 md 的
   段落順序並把圖片檔重新編號，讓每張圖跟著自己的段落一起搬，只是沒人叫得動它。
 */
-async function reorderSection(slug, from, to, reload = loadContentPage) {
+async function reorderSection(slug, from, to, reload = loadContentPage, base = 'sections') {
   /*
     Content 分頁上可能有還沒儲存的文字編輯，而段落 API 是直接讀檔改檔，
     不先存回去的話那些編輯會在重新載入時默默消失。
@@ -908,7 +1038,7 @@ async function reorderSection(slug, from, to, reload = loadContentPage) {
   if (projectsData[slug] && !(await saveProjectData(slug))) return;
 
   await structureRequest(
-    `${API}/api/projects/${slug}/sections/reorder`,
+    `${API}/api/projects/${slug}/${base}/reorder`,
     { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from, to }) },
     '已調整段落順序',
     reload
@@ -983,6 +1113,7 @@ let projectVersions = {}; // slug -> 讀取當下的檔案版本，寫回時用�
 let projectLoaded = {};   // slug -> 讀進來當下的內容快照，用來判斷這個案例有沒有被改過
 let contentSlug = null;  // Content 分頁目前正在編輯的案例
 let sectionDragFrom = null;
+let sectionDragBase = null; // 正在拖的段落屬於哪一組（主要段落或第幾則更新日誌）
 
 async function loadPageImages() {
   pageTitleEl.textContent = '頁面圖片';
@@ -1527,7 +1658,9 @@ async function loadContentPage() {
 */
 // 段落卡片標題優先用 heading，其次 eyebrow，都沒有才退回型別名稱
 function sectionTitle(sec, i) {
-  const name = sec.heading || sec.eyebrow || sectionTypeLabel(sec.type);
+  // 雙語欄位是 { en, zh } 物件，直接塞進字串會變成 [object Object]；後台一律顯示 en
+  const text = (v) => (v && typeof v === 'object' ? v.en : v);
+  const name = text(sec.heading) || text(sec.eyebrow) || sectionTypeLabel(sec.type);
   return `${i + 1}. ${name}`;
 }
 
@@ -1690,71 +1823,110 @@ function renderProjectCard(slug, title, form) {
   heroCard.appendChild(heroBody);
   body.appendChild(heroCard);
 
-  (data.sections || []).forEach((sec, i) => {
-    const card = document.createElement('div');
-    card.className = 'sec-card';
-    bindSectionDrag(card, i, slug, () => loadContentPage());
+  const mainSections = data.sections || [];
+  mainSections.forEach((sec, i) => {
+    const mine = slots.filter((sl) => sl.group === 'main' && sl.sectionIndex === i);
+    body.appendChild(buildContentSecCard(slug, data, sec, i, ['sections'], mainSections.length, 'sections', mine, bySlot));
+  });
+  body.appendChild(buildContentAddSection(slug, 'sections'));
 
-    const head = document.createElement('div');
-    head.className = 'sec-card__head';
-    head.innerHTML = `<span class="sec-card__grip" title="拖拉調整順序">⠿</span>
-      <strong>${sectionTitle(sec, i)}</strong>
-      <span class="sec-card__type">${sectionTypeLabel(sec.type)}</span>`;
-    head.appendChild(
-      buildSectionMoveButtons(i, (data.sections || []).length, slug, () => loadContentPage())
-    );
-    const del = document.createElement('button');
-    del.className = 'sec-card__del';
-    del.textContent = '刪除段落';
-    del.addEventListener('click', () => deleteSection(slug, i));
-    head.appendChild(del);
-    card.appendChild(head);
+  // 更新日誌：每一則先是日期／標題／摘要的卡片，接著是它自己的段落
+  const changelog = data.changelog || [];
+  body.appendChild(buildChangelogHead(slug, loadContentPage));
+  changelog.forEach((entry, e) => {
+    const fields = document.createElement('div');
+    Object.keys(entry)
+      .filter((k) => k !== 'sections')
+      .forEach((k) => renderMonoNode(entry[k], ['changelog', e, k], fields, data));
+    const summary = { index: e, date: entry.date ?? '', title: entry.title?.en ?? entry.title ?? '', sections: entry.sections || [] };
+    body.appendChild(buildChangelogEntryCard(slug, summary, changelog.length, loadContentPage, fields));
 
-    const cardBody = document.createElement('div');
-    cardBody.className = 'sec-card__body';
-
-    // 文案欄位直接顯示；type/ratio/alt 這類技術欄位收進「進階」，
-    // 平常編輯文字時不需要看到，但仍然改得到。
-    const TECHNICAL = new Set(['type', 'ratio', 'alt', 'imagePosition', 'count', 'ctaLabel', 'ctaHref']);
-    /*
-      版型選項（direction、layout、imagePosition）排除在外，改由下面的
-      SECTION_OPTIONS 迴圈統一畫。
-
-      先前兩邊都畫，同一個段落會出現兩個一模一樣的「排列方向」下拉；而且這裡寫死的
-      layout 選項只有 stacked 與 split，少了 split-reverse——用那個下拉永遠選不到
-      左圖右文。選項清單只該有一個來源，就是 SECTION_OPTIONS。
-    */
-    const secOptionKeys = new Set(Object.keys(sectionOptions[sec.type] || {}));
-    const plain = Object.keys(sec).filter((k) => !TECHNICAL.has(k) && !secOptionKeys.has(k));
-    const tech = Object.keys(sec).filter((k) => TECHNICAL.has(k) && !secOptionKeys.has(k));
-
-    plain.forEach((k) => renderMonoNode(sec[k], ['sections', i, k], cardBody, data));
-
-    // 版型選項：即使 .md 裡還沒有這個欄位也要顯示，否則等於功能不存在
-    const secOpts = sectionOptions[sec.type] || {};
-    Object.entries(secOpts).forEach(([field, values]) => {
-      if (sec[field] === undefined) sec[field] = values[0];
-      const label = { layout: '版面', direction: '排列方向', imagePosition: '圖片位置' }[field] || field;
-      cardBody.appendChild(renderMonoRow(label, ['sections', i, field], data, { select: values }));
+    const base = `changelog/${e}/sections`;
+    (entry.sections || []).forEach((sec, i) => {
+      const mine = slots.filter((sl) => sl.group === `changelog:${e}` && sl.sectionIndex === i);
+      const card = buildContentSecCard(slug, data, sec, i, ['changelog', e, 'sections'], entry.sections.length, base, mine, bySlot);
+      card.classList.add('sec-card--nested');
+      body.appendChild(card);
     });
-
-    // 進階設定一律顯示：CTA 開關住在這裡，就算這個段落還沒有任何技術欄位也要看得到
-    const adv = document.createElement('details');
-    adv.className = 'sec-adv';
-    adv.innerHTML = `<summary>進階設定</summary>`;
-    adv.appendChild(buildCtaToggle(i, sec, data));
-    tech.filter((k) => k !== 'ctaLabel' && k !== 'ctaHref')
-      .forEach((k) => renderMonoNode(sec[k], ['sections', i, k], adv, data));
-    cardBody.appendChild(adv);
-
-    const mine = slots.filter((sl) => sl.sectionIndex === i);
-    if (mine.length) cardBody.appendChild(slotStrip(slug, mine, bySlot));
-
-    card.appendChild(cardBody);
-    body.appendChild(card);
+    const add = buildContentAddSection(slug, base);
+    add.classList.add('sec-card--nested');
+    body.appendChild(add);
   });
 
-  // 新增段落
+  wrap.appendChild(header);
+  wrap.appendChild(body);
+  form.appendChild(wrap);
+}
+
+/*
+  Content 分頁的一張段落卡片。主要段落與更新日誌裡的段落共用：
+  keyPrefix 是這一組段落在 frontmatter 裡的路徑（['sections'] 或 ['changelog', n, 'sections']），
+  base 是對應的段落 API 路徑片段。
+*/
+function buildContentSecCard(slug, data, sec, i, keyPrefix, total, base, mine, bySlot) {
+  const card = document.createElement('div');
+  card.className = 'sec-card';
+  bindSectionDrag(card, i, slug, () => loadContentPage(), base);
+
+  const head = document.createElement('div');
+  head.className = 'sec-card__head';
+  head.innerHTML = `<span class="sec-card__grip" title="拖拉調整順序">⠿</span>
+    <strong>${sectionTitle(sec, i)}</strong>
+    <span class="sec-card__type">${sectionTypeLabel(sec.type)}</span>`;
+  head.appendChild(buildSectionMoveButtons(i, total, slug, () => loadContentPage(), base));
+  const del = document.createElement('button');
+  del.className = 'sec-card__del';
+  del.textContent = '刪除段落';
+  del.addEventListener('click', () => deleteSection(slug, i, base, sec, mine));
+  head.appendChild(del);
+  card.appendChild(head);
+
+  const cardBody = document.createElement('div');
+  cardBody.className = 'sec-card__body';
+  const at = (k) => [...keyPrefix, i, k];
+
+  // 文案欄位直接顯示；type/ratio/alt 這類技術欄位收進「進階」，
+  // 平常編輯文字時不需要看到，但仍然改得到。
+  const TECHNICAL = new Set(['type', 'ratio', 'alt', 'imagePosition', 'count', 'ctaLabel', 'ctaHref']);
+  /*
+    版型選項（direction、layout、imagePosition）排除在外，改由下面的
+    SECTION_OPTIONS 迴圈統一畫。
+
+    先前兩邊都畫，同一個段落會出現兩個一模一樣的「排列方向」下拉；而且這裡寫死的
+    layout 選項只有 stacked 與 split，少了 split-reverse——用那個下拉永遠選不到
+    左圖右文。選項清單只該有一個來源，就是 SECTION_OPTIONS。
+  */
+  const secOptionKeys = new Set(Object.keys(sectionOptions[sec.type] || {}));
+  const plain = Object.keys(sec).filter((k) => !TECHNICAL.has(k) && !secOptionKeys.has(k));
+  const tech = Object.keys(sec).filter((k) => TECHNICAL.has(k) && !secOptionKeys.has(k));
+
+  plain.forEach((k) => renderMonoNode(sec[k], at(k), cardBody, data));
+
+  // 版型選項：即使 .md 裡還沒有這個欄位也要顯示，否則等於功能不存在
+  const secOpts = sectionOptions[sec.type] || {};
+  Object.entries(secOpts).forEach(([field, values]) => {
+    if (sec[field] === undefined) sec[field] = values[0];
+    const label = { layout: '版面', direction: '排列方向', imagePosition: '圖片位置' }[field] || field;
+    cardBody.appendChild(renderMonoRow(label, at(field), data, { select: values }));
+  });
+
+  // 進階設定一律顯示：CTA 開關住在這裡，就算這個段落還沒有任何技術欄位也要看得到
+  const adv = document.createElement('details');
+  adv.className = 'sec-adv';
+  adv.innerHTML = `<summary>進階設定</summary>`;
+  adv.appendChild(buildCtaToggle(i, sec, data, keyPrefix));
+  tech.filter((k) => k !== 'ctaLabel' && k !== 'ctaHref')
+    .forEach((k) => renderMonoNode(sec[k], at(k), adv, data));
+  cardBody.appendChild(adv);
+
+  if (mine.length) cardBody.appendChild(slotStrip(slug, mine, bySlot));
+
+  card.appendChild(cardBody);
+  return card;
+}
+
+/** 新增段落的下拉與按鈕；base 決定加在主要段落還是某一則更新日誌裡 */
+function buildContentAddSection(slug, base) {
   const add = document.createElement('div');
   add.className = 'sec-add';
   const sel = document.createElement('select');
@@ -1764,13 +1936,9 @@ function renderProjectCard(slug, title, form) {
   });
   const addBtn = document.createElement('button');
   addBtn.textContent = '＋ 新增段落';
-  addBtn.addEventListener('click', () => addSection(slug, sel.value));
+  addBtn.addEventListener('click', () => addSection(slug, sel.value, base));
   add.appendChild(sel); add.appendChild(addBtn);
-  body.appendChild(add);
-
-  wrap.appendChild(header);
-  wrap.appendChild(body);
-  form.appendChild(wrap);
+  return add;
 }
 
 /*
@@ -1781,7 +1949,7 @@ function renderProjectCard(slug, title, form) {
   只在原地增減那兩個欄位，不呼叫 renderContentForm()：整份表單重繪會把
   <details> 關起來，等於勾完就看不到剛冒出來的欄位。實際寫檔仍是按「儲存所有文案」。
 */
-function buildCtaToggle(index, sec, data) {
+function buildCtaToggle(index, sec, data, keyPrefix = ['sections']) {
   const box = document.createElement('div');
 
   const row = document.createElement('div');
@@ -1807,8 +1975,8 @@ function buildCtaToggle(index, sec, data) {
   const renderFields = () => {
     fields.innerHTML = '';
     if (sec.ctaLabel === undefined) return;
-    renderMonoNode(sec.ctaLabel, ['sections', index, 'ctaLabel'], fields, data);
-    renderMonoNode(sec.ctaHref, ['sections', index, 'ctaHref'], fields, data);
+    renderMonoNode(sec.ctaLabel, [...keyPrefix, index, 'ctaLabel'], fields, data);
+    renderMonoNode(sec.ctaHref, [...keyPrefix, index, 'ctaHref'], fields, data);
   };
 
   input.addEventListener('change', () => {
@@ -1855,29 +2023,27 @@ function slotStrip(slug, slotList, bySlot) {
   並且連帶把圖片檔重新編號。先前這裡是自己拼一個 blank 物件、只改 md 不動檔名，
   所以刪掉中間的段落後，後面的圖片會整串落到別的區塊去（當時只能跳警告要你自己收拾）。
 */
-async function addSection(slug, type) {
+async function addSection(slug, type, base = 'sections') {
   if (!(await saveProjectData(slug))) return;
   await structureRequest(
-    `${API}/api/projects/${slug}/sections`,
+    `${API}/api/projects/${slug}/${base}`,
     { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type }) },
     '已新增段落，文字先填入 [需確認] 佔位',
     loadContentPage
   );
 }
 
-async function deleteSection(slug, i) {
-  const data = projectsData[slug];
+async function deleteSection(slug, i, base, sec, slots) {
   const images = projectImages[slug] || [];
-  const slots = (projectSlots[slug] || []).filter((sl) => sl.sectionIndex === i);
   const withImages = slots.filter((sl) => images.some((im) => im.slotIndex === sl.index)).length;
 
-  let msg = `確定刪除段落「${sectionTitle(data.sections[i], i)}」？`;
+  let msg = `確定刪除段落「${sectionTitle(sec, i)}」？`;
   if (withImages) msg += `\n\n這個段落有 ${withImages} 張圖片，會一起刪除。`;
   if (!confirm(msg)) return;
 
   if (!(await saveProjectData(slug))) return;
   await structureRequest(
-    `${API}/api/projects/${slug}/sections/${i}`,
+    `${API}/api/projects/${slug}/${base}/${i}`,
     { method: 'DELETE' },
     '已刪除段落',
     loadContentPage

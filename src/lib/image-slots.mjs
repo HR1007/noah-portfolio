@@ -18,7 +18,9 @@
  *
  * @typedef {Object} ImageSlot
  * @property {number} index          該案例的第幾張圖（對應檔名排序後的索引）
- * @property {number} sectionIndex   所屬 section 在 sections 陣列裡的索引；hero 為 -1
+ * @property {string} group          'main'（hero 與主要段落）或 'changelog:n'（第 n 則更新日誌）
+ * @property {number} [entryIndex]   更新日誌的第幾則；主要段落沒有這個欄位
+ * @property {number} sectionIndex   所屬段落的索引（主要段落在 sections、更新日誌在該則的 sections）；hero 為 -1
  * @property {string} type           區塊型別，hero 為 'hero'
  * @property {string} label          後台顯示用的版位名稱
  * @property {string} [alt]          內容裡定義的 alt 文字
@@ -351,7 +353,7 @@ function describeSlot(section, sectionIndex, i) {
 
   // 版型固定一張圖的區塊（Device Showcase、Feature Split…）：alt/ratio 寫在區塊本身
   if (!list || list.kind !== 'image') {
-    const heading = section.heading ? ` — ${section.heading}` : '';
+    const heading = plain(section.heading) ? ` — ${plain(section.heading)}` : '';
     return { label: `#${n} ${name}${heading}`, alt: section.alt, ratio: section.ratio };
   }
 
@@ -384,6 +386,7 @@ export function getImageSlots(data) {
   if (!isMigrated) {
     slots.push({
       index: 0,
+      group: MAIN_GROUP,
       sectionIndex: -1,
       type: 'showcase',
       label: 'Showcase（舊版單圖版型，未拆解成 sections）',
@@ -394,27 +397,59 @@ export function getImageSlots(data) {
 
   slots.push({
     index: 0,
+    group: MAIN_GROUP,
     sectionIndex: -1,
     type: 'hero',
     label: 'Hero',
     alt: plain(data.title) ? `${plain(data.title)} hero` : undefined,
   });
 
-  (data.sections || []).forEach((section, sectionIndex) => {
+  pushSectionSlots(slots, data.sections || [], MAIN_GROUP, '');
+
+  /*
+    更新日誌的版位接在主要段落之後，跟主要段落共用同一個圖片資料夾與編號序列。
+    不另開子資料夾，是因為後台的上傳、互換、重新編號全部以「一個資料夾一條編號」
+    運作；接在後面，那整套邏輯不必再寫第二份。主要段落增刪時，後面的更新日誌圖片
+    會一起被重新編號（見 server 的 buildSlotOrigin），不會錯位。
+  */
+  (data.changelog || []).forEach((entry, entryIndex) => {
+    const title = plain(entry?.title) || entry?.date || `第 ${entryIndex + 1} 則`;
+    pushSectionSlots(slots, entry?.sections || [], changelogGroup(entryIndex), `更新日誌「${title}」· `, entryIndex);
+  });
+
+  return slots;
+}
+
+/** 版位所屬的群組：主要段落是 main，更新日誌第 n 則是 changelog:n。 */
+export const MAIN_GROUP = 'main';
+export const changelogGroup = (entryIndex) => `changelog:${entryIndex}`;
+
+/**
+ * 版位在結構變動前後唯一穩定的辨識鍵：哪個群組、第幾個段落、段落內第幾格。
+ * 版位編號本身會因為前面插入或刪除而整串位移，不能拿來比對。
+ */
+export function slotKey(slot) {
+  return `${slot.group}:${slot.sectionIndex}:${slot.slotInSection ?? 0}`;
+}
+
+function pushSectionSlots(slots, sections, group, labelPrefix, entryIndex) {
+  sections.forEach((section, sectionIndex) => {
     const count = imageCountForSection(section);
     for (let i = 0; i < count; i++) {
+      const described = describeSlot(section, sectionIndex, i);
       slots.push({
         index: slots.length,
+        group,
+        ...(entryIndex === undefined ? {} : { entryIndex }),
         sectionIndex,
         type: section.type,
-        ...describeSlot(section, sectionIndex, i),
+        ...described,
+        label: `${labelPrefix}${described.label}`,
         // 該區塊內的第幾格：後台移除單一版位時要指定清單裡的哪一項
         slotInSection: i,
       });
     }
   });
-
-  return slots;
 }
 
 /**
@@ -437,12 +472,15 @@ export function getImageSlots(data) {
  * @template T
  * @param {any} data 案例的 frontmatter
  * @param {Record<number, T>} images 版位編號對圖片的對照表
- * @returns {{ hero: T | undefined, bySection: Record<number, T[]> }}
+ * @returns {{ hero: T | undefined, bySection: Record<number, T[]>, byChangelog: Record<number, Record<number, T[]>> }}
  */
 export function assignImages(data, images) {
   const slots = getImageSlots(data);
   /** @type {Record<number, T[]>} */
   const bySection = {};
+  /** 更新日誌：byChangelog[第幾則][該則的第幾個段落] */
+  /** @type {Record<number, Record<number, T[]>>} */
+  const byChangelog = {};
   /** @type {T | undefined} */
   let hero;
 
@@ -452,11 +490,16 @@ export function assignImages(data, images) {
       hero = image;
       return;
     }
-    if (!bySection[slot.sectionIndex]) bySection[slot.sectionIndex] = [];
-    bySection[slot.sectionIndex].push(image);
+    let target = bySection;
+    if (slot.entryIndex !== undefined) {
+      if (!byChangelog[slot.entryIndex]) byChangelog[slot.entryIndex] = {};
+      target = byChangelog[slot.entryIndex];
+    }
+    if (!target[slot.sectionIndex]) target[slot.sectionIndex] = [];
+    target[slot.sectionIndex].push(image);
   });
 
-  return { hero, bySection };
+  return { hero, bySection, byChangelog };
 }
 
 // ---------- 後台改結構用的純資料操作（不碰檔案，檔案重新編號由 server 負責） ----------
@@ -499,6 +542,19 @@ function toLocalized(node) {
     }
   }
   return out;
+}
+
+/**
+ * 新的一則更新日誌。日期由後台帶入（預設今天）；段落先空著，之後用「新增段落」加。
+ * @param {string} date YYYY-MM-DD
+ */
+export function createChangelogEntry(date) {
+  return toLocalized({
+    date,
+    title: `${TBD} 更新標題`,
+    summary: `${TBD} 一句話說明這次更新了什麼`,
+    sections: [],
+  });
 }
 
 export function createSection(type) {

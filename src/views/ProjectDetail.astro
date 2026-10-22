@@ -5,17 +5,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Media from '../components/Media.astro';
 import BackLink from '../components/BackLink.astro';
 import ProjectHero from '../components/project/ProjectHero.astro';
-import TextSection from '../components/project/TextSection.astro';
-import DeviceShowcase from '../components/project/DeviceShowcase.astro';
-import ExperienceDemo from '../components/project/ExperienceDemo.astro';
-import FeatureSplit from '../components/project/FeatureSplit.astro';
-import FeatureGrid from '../components/project/FeatureGrid.astro';
-import ImageRow from '../components/project/ImageRow.astro';
-import IllustrationGrid from '../components/project/IllustrationGrid.astro';
-import ResearchFramework from '../components/project/ResearchFramework.astro';
-import Persona from '../components/project/Persona.astro';
-import DesignThemes from '../components/project/DesignThemes.astro';
-import Flow from '../components/project/Flow.astro';
+import ProjectSection from '../components/project/ProjectSection.astro';
+import Changelog from '../components/project/Changelog.astro';
 import ProjectQuote from '../components/project/ProjectQuote.astro';
 import { getProjectImageMap, getProjectVideoMap, getDeviceShowcaseDarkImage } from '../lib/media';
 import { t, type LocalizedText } from '../lib/i18n';
@@ -28,7 +19,7 @@ interface Props {
 }
 
 const { project, locale } = Astro.props;
-const { hero, sections } = project.data;
+const { hero, sections, changelog } = project.data;
 const isMigrated = hero !== undefined && sections.length > 0;
 
 const site = await getEntry('site', `main-${locale}`);
@@ -39,7 +30,7 @@ const { backLabel } = site!.data.nav;
 // 版位規則集中在 lib/image-slots.mjs，後台顯示「第 N 格是哪個區塊」也是讀同一支，
 // 兩邊不會各自算一套而失去同步。資料夾沒圖時取值為 undefined，Media 會顯示佔位框。
 const images = getProjectImageMap(project.id);
-const { hero: heroImage, bySection } = assignImages(project.data, images);
+const { hero: heroImage, bySection, byChangelog } = assignImages(project.data, images);
 const imagesFor = (i: number) => bySection[i] ?? [];
 const deviceShowcaseDarkImage = getDeviceShowcaseDarkImage(project.id);
 
@@ -60,15 +51,6 @@ const videoFor = (i: number) => videoBySection[i]?.[0];
 const tr = (v: LocalizedText | undefined) => t(v, locale);
 const trReq = (v: LocalizedText) => t(v, locale);
 
-// 陣列型欄位裡的文字也要逐項取值，其餘設定原樣帶過
-const trAlt = <T extends { alt: LocalizedText }>(items: T[]) =>
-  items.map((item) => ({ ...item, alt: trReq(item.alt) }));
-const trColumns = (
-  cols: { heading: LocalizedText; body: LocalizedText; ratio: string; alt: LocalizedText }[]
-) => cols.map((c) => ({ ...c, heading: trReq(c.heading), body: trReq(c.body), alt: trReq(c.alt) }));
-const trThemes = (themes: { title: LocalizedText; description?: LocalizedText }[]) =>
-  themes.map((x) => ({ ...x, title: trReq(x.title), description: tr(x.description) }));
-
 /*
   側邊章節導覽的項目。優先用 eyebrow（那是這一段的分類名，最短也最像目錄），
   沒有就退回 heading；兩個都沒有的段落（例如純圖的 deviceShowcase）不列入——
@@ -81,6 +63,10 @@ const navItems = sections
     return label ? { id: `sec-${i}`, label } : null;
   })
   .filter((x): x is { id: string; label: string } => x !== null);
+
+// 更新日誌也列進側邊導覽（排在最後），收合著的區塊才找得到
+const CHANGELOG_ID = 'changelog';
+if (changelog.length > 0) navItems.push({ id: CHANGELOG_ID, label: site!.data.changelog.eyebrow });
 
 const { Content } = await render(project);
 ---
@@ -99,159 +85,35 @@ const { Content } = await render(project);
           image={heroImage}
         />
 
-        {sections.map((section, sectionIndex) => {
+        {sections.map((section, sectionIndex) => (
           /*
-            包一層只帶 id 的容器當錨點。不直接在十一個段落元件上各加一個 id prop，
-            那要改十一個檔案，而且 id 是「這一頁怎麼被導覽」的事，不是元件自己的事。
+            包一層只帶 id 的容器當錨點。不直接在每個段落元件上各加一個 id prop，
+            id 是「這一頁怎麼被導覽」的事，不是元件自己的事。
             這層 div 沒有樣式，不會動到段落元件自己的版面。
           */
-          const anchor = (node: unknown) => (
-            <div class="project-anchor" id={`sec-${sectionIndex}`}>{node}</div>
-          );
-          switch (section.type) {
-            case 'textSection':
-              return anchor(
-                <TextSection
-                  eyebrow={tr(section.eyebrow)}
-                  heading={trReq(section.heading)}
-                  paragraphs={section.paragraphs.map(trReq)}
-                  ctaLabel={tr(section.ctaLabel)}
-                  ctaHref={section.ctaHref}
-                />
-              );
-            case 'deviceShowcase':
-              return anchor(<DeviceShowcase
-                  image={imagesFor(sectionIndex)[0]}
-                  imageDark={deviceShowcaseDarkImage}
-                  ratio={section.ratio}
-                  alt={trReq(section.alt)}
-                  eyebrow={tr(section.eyebrow)}
-                  heading={tr(section.heading)}
-                  ctaLabel={tr(section.ctaLabel)}
-                  ctaHref={section.ctaHref}
-                />);
-            case 'experienceDemo':
-              return anchor(
-                <ExperienceDemo
-                  eyebrow={tr(section.eyebrow)}
-                  heading={trReq(section.heading)}
-                  body={trReq(section.body)}
-                  image={imagesFor(sectionIndex)[0]}
-                  video={videoFor(sectionIndex)}
-                  ratio={section.ratio}
-                  alt={trReq(section.alt)}
-                  ctaLabel={tr(section.ctaLabel)}
-                  ctaHref={section.ctaHref}
-                  layout={section.layout}
-                />
-              );
-            case 'featureSplit':
-              return anchor(
-                <FeatureSplit
-                  eyebrow={tr(section.eyebrow)}
-                  heading={trReq(section.heading)}
-                  body={trReq(section.body)}
-                  imagePosition={section.imagePosition}
-                  image={imagesFor(sectionIndex)[0]}
-                  ratio={section.ratio}
-                  alt={trReq(section.alt)}
-                  ctaLabel={tr(section.ctaLabel)}
-                  ctaHref={section.ctaHref}
-                />
-              );
-            case 'featureGrid':
-              return anchor(
-                <FeatureGrid
-                  eyebrow={tr(section.eyebrow)}
-                  heading={tr(section.heading)}
-                  columns={trColumns(section.columns)}
-                  direction={section.direction}
-                  uniform={section.uniform}
-                  images={imagesFor(sectionIndex)}
-                  ctaLabel={tr(section.ctaLabel)}
-                  ctaHref={section.ctaHref}
-                />
-              );
-            case 'imageRow':
-              return anchor(
-                <ImageRow
-                  rows={trAlt(section.images)}
-                  direction={section.direction}
-                  images={imagesFor(sectionIndex)}
-                  eyebrow={tr(section.eyebrow)}
-                  heading={tr(section.heading)}
-                  ctaLabel={tr(section.ctaLabel)}
-                  ctaHref={section.ctaHref}
-                />
-              );
-            case 'illustrationGrid':
-              return anchor(
-                <IllustrationGrid
-                  eyebrow={tr(section.eyebrow)}
-                  heading={trReq(section.heading)}
-                  body={tr(section.body)}
-                  alt={trReq(section.alt)}
-                  images={imagesFor(sectionIndex)}
-                  ctaLabel={tr(section.ctaLabel)}
-                  ctaHref={section.ctaHref}
-                />
-              );
-            case 'researchFramework':
-              return anchor(
-                <ResearchFramework
-                  eyebrow={tr(section.eyebrow)}
-                  heading={trReq(section.heading)}
-                  paragraphs={section.paragraphs.map(trReq)}
-                  image={imagesFor(sectionIndex)[0]}
-                  ratio={section.ratio}
-                  alt={trReq(section.alt)}
-                  layout={section.layout}
-                  ctaLabel={tr(section.ctaLabel)}
-                  ctaHref={section.ctaHref}
-                />
-              );
-            case 'persona':
-              return anchor(
-                <Persona
-                  eyebrow={tr(section.eyebrow)}
-                  heading={trReq(section.heading)}
-                  personas={trAlt(section.personas)}
-                  images={imagesFor(sectionIndex)}
-                  ctaLabel={tr(section.ctaLabel)}
-                  ctaHref={section.ctaHref}
-                />
-              );
-            case 'designThemes':
-              return anchor(
-                <DesignThemes
-                  eyebrow={tr(section.eyebrow)}
-                  heading={trReq(section.heading)}
-                  themes={trThemes(section.themes)}
-                  direction={section.direction}
-                  layout={section.layout}
-                  images={imagesFor(sectionIndex)}
-                  ctaLabel={tr(section.ctaLabel)}
-                  ctaHref={section.ctaHref}
-                />
-              );
-            case 'flow':
-              return anchor(
-                <Flow
-                  eyebrow={tr(section.eyebrow)}
-                  heading={trReq(section.heading)}
-                  body={tr(section.body)}
-                  steps={trAlt(section.steps)}
-                  direction={section.direction}
-                  uniform={section.uniform}
-                  images={imagesFor(sectionIndex)}
-                  ctaLabel={tr(section.ctaLabel)}
-                  ctaHref={section.ctaHref}
-                />
-              );
-            default:
-              return null;
-          }
-        })}
+          <div class="project-anchor" id={`sec-${sectionIndex}`}>
+            <ProjectSection
+              section={section}
+              locale={locale}
+              images={imagesFor(sectionIndex)}
+              video={videoFor(sectionIndex)}
+              imageDark={section.type === 'deviceShowcase' ? deviceShowcaseDarkImage : undefined}
+            />
+          </div>
+        ))}
+
+        {changelog.length > 0 && (
+          <div class="project-anchor" id={CHANGELOG_ID}>
+            <Changelog
+              headingId={`${CHANGELOG_ID}-heading`}
+              eyebrow={site!.data.changelog.eyebrow}
+              heading={site!.data.changelog.heading}
+              entries={changelog}
+              images={byChangelog}
+              locale={locale}
+            />
+          </div>
+        )}
 
         <ProjectQuote quote={projectQuote.quote} name={projectQuote.name} tagline={projectQuote.tagline} />
         <SectionNav items={navItems} toTopLabel={site!.data.nav.toTop} />
