@@ -68,12 +68,12 @@
     "reachCaption": "Hey — I see you.",
     "aboutHeading": "About me",
     "aboutSubheading": "Making complex systems feel simple",
-    "aboutIntro": "I did my master's in Information Management at NKUST, working somewhere between UI/UX design and human factors. As a data analysis intern at e-Excellence, I kept coming back to one question: how do you get a dashboard full of numbers to just tell you what matters? An exchange year in Computer Science at THWS in Germany then showed me how differently people read the same button depending on where they grew up. For my thesis, I took on Taiwan's OSCE medical assessment system and used user-centered design to untangle its back-office workflows. Drawing the new flow was the easy part. Getting it adopted is the work I'm still pushing on.",
-    "aboutResearch": "Most of my research comes back to one idea: bringing human factors into clinical settings. It began in 2023 with a gesture-controlled AR ordering interface, then moved into hospitals, where I used eye tracking and usability testing on a medication recognition system. The projects changed; the question didn't. When the pressure is high and there's little room for error, can an interface spare someone one more mistake?",
+    "aboutIntro": "I did my master's in Information Management at NKUST, and most of my work is in UI/UX design and human factors. As a data analysis intern at e-Excellence, I kept working on how to make the important numbers on a dashboard easy to spot. During an exchange year in Computer Science at THWS in Germany, I saw how differently people read the same button depending on where they grew up. My thesis was on Taiwan's OSCE medical assessment system, where I used user-centered design to rework the back-office workflows from scratch. Drawing the new flow was the easy part. Getting it adopted is harder, and I'm still working on it.",
+    "aboutResearch": "My research keeps returning to one goal: bringing human factors into clinical settings. In 2023 I built an immersive ordering interface for AR glasses, controlled by hand gestures. Later I moved into hospitals, using eye tracking and usability testing to improve a medication recognition system. Across those projects the question has stayed the same: whether an interface can help someone make one fewer mistake when the pressure is high and there's little room for error.",
     "beyondGridHeading": "Beyond the Grid",
     "beyondGridParagraphs": [
-      "When I'm not nudging pixels or digging through data, I'm usually drawing. The two never stay apart for long. Halfway through a web page a character pops into my head, and more often than not it ends up living on that page.",
-      "I've been a student ambassador, an international volunteer, and for a while a resident of Würzburg. Living somewhere new means relearning the small things, like buying bread or catching a tram, and once the ordinary stops being obvious, you start actually seeing it. For a designer, that's a pretty good trade."
+      "When I'm not adjusting pixels or working with data, I'm usually drawing. The two have always overlapped. Halfway through building a web page, a character comes to mind, I can't help drawing it, and it often ends up on that page.",
+      "I've been a student ambassador and an international volunteer, and I lived in Würzburg for a while. Living somewhere new meant relearning small things like buying bread or catching a tram, and things I used to take for granted started to need a second look. For a designer, that unfamiliarity is a pretty good deal."
     ],
     "experience": [
       {
@@ -160,7 +160,7 @@
   "portfolio": {
     "eyebrow": "Somewhere between technical logic and human intuition.",
     "headline": "Portfolio",
-    "intro": "Honestly, what hooks me isn't how things look. It's how people actually work. So I design from evidence: eye tracking, emotional responses, user interviews, all pointed at one question — does this layout actually help? Some weeks that means tearing apart a chaotic technical interface; some nights it's trying the same dark-mode gray over and over. Big job or small, the goal doesn't change: find where people get stuck, and get it out of their way."
+    "intro": "I'm more interested in how people use things than in how they look. So I start from evidence: eye tracking, emotional responses and user interviews tell me whether a layout works. Sometimes that means taking a messy technical interface apart and rebuilding it; sometimes it means trying the same dark-mode gray for several nights. Either way, the goal is to find where people get stuck and remove it."
   },
   "projectQuote": {
     "quote": "A great interface is like an 8px grid: invisible to the eye, but felt in every seamless interaction.",
@@ -170,14 +170,14 @@
   "gallery": {
     "eyebrow": "Life, Framed",
     "headline": "Gallery",
-    "intro": "A good photo starts with a story. I move between film and digital — film makes me slow down, digital lets me take the extra frame. This is the archive: ongoing projects, places along the way, and days I did not edit much :)",
+    "intro": "I think a good photo has its story before the shutter clicks. I shoot both film and digital: film slows me down, digital lets me take the extra frame. Here you'll find ongoing projects, places I passed along the way, and some everyday shots I barely edited :)",
     "albums": [
       {
         "slug": "film-project",
         "title": "Film project",
         "dateLabel": "2024-Now",
         "eyebrow": "Shot on film",
-        "intro": "Thirty-six frames, no screen to check. Film makes me slow down and decide before I press — most of what is here was worth the wait."
+        "intro": "Thirty-six frames and no way to see them until the roll is done, so I think before I press. Most of what's here was worth the wait."
       },
       {
         "slug": "digital-cam-project",
@@ -196,7 +196,7 @@
     },
     "cta": {
       "heading": "Seen something you'd have shot?",
-      "body": "Most of these were taken on the way to somewhere else. If you shoot too — or just want someone to go shooting with — drop me a line.",
+      "body": "Most of these were taken on the way to somewhere else. If you shoot too, or just want someone to go shooting with, drop me a line.",
       "ctaLabel": "Say hello",
       "ctaHref": "mailto:hungnoah730@gmail.com"
     }
