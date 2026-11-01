@@ -200,6 +200,394 @@ sections:
       en: Try it out
       zh: 來試試看
     ctaHref: 'https://new-formosa-sport.netlify.app/index.html#home'
+  - type: dataViz
+    eyebrow:
+      en: USABILITY TEST
+      zh: 可用性測試
+    heading:
+      en: >-
+        Six people, four tasks, and whether customers can reach a sent inquiry
+        on their own
+      zh: 六個人、四個任務，看客人能不能自己走到送出詢價
+    body:
+      en: >-
+        After launch I ran a moderated, think-aloud usability test on the live
+        site. Six participants covered three customer groups (school buyers,
+        team or cycling-club coaches, and general shoppers), two of each, split
+        evenly between desktop and mobile. Each did four tasks, with T1,
+        requesting a quote for team apparel, as the core conversion. The success
+        criteria were set before testing: at least 5 of 6 completing T1 unaided,
+        a median T1 time of 120 seconds or less, and an average SEQ of 5.5 or
+        higher on every task.
+      zh: >-
+        網站上線後，我用正式站做了一輪主持式、放聲思考的可用性測試。六位受測者分成三種客群：學校採購、球隊或車隊教練、一般消費者，每種兩人，桌機和手機各半。每人做四個任務，T1「幫球隊詢價團體服」是核心轉換。成功標準在測試前就訂好：T1
+        至少 5/6 人獨立完成、中位數時間不超過 120 秒，每個任務的 SEQ 平均至少 5.5。
+    outcomes:
+      independent:
+        en: Unaided
+        zh: 獨立完成
+      assisted:
+        en: With help
+        zh: 需協助
+      failed:
+        en: Failed
+        zh: 失敗
+    participants:
+      - id: P1
+        label:
+          en: school buyer · desktop
+          zh: 學校採購・桌機
+      - id: P2
+        label:
+          en: school buyer · mobile
+          zh: 學校採購・手機
+      - id: P3
+        label:
+          en: team coach · desktop
+          zh: 球隊教練・桌機
+      - id: P4
+        label:
+          en: team coach · mobile
+          zh: 球隊教練・手機
+      - id: P5
+        label:
+          en: general shopper · desktop
+          zh: 一般消費者・桌機
+      - id: P6
+        label:
+          en: general shopper · mobile
+          zh: 一般消費者・手機
+    charts:
+      - kind: outcomeBars
+        title:
+          en: Task success
+          zh: 任務成功率
+        description:
+          en: >-
+            Five of six participants completed T1 unaided, meeting the 5-of-6
+            target. The one who needed help was P2: on mobile, the homepage
+            quote form sat below the first screen, and on the service page the
+            quote button was only at the very bottom. In T2, P5 couldn't tell
+            venue construction from facility planning and maintenance and also
+            needed help. Everyone completed T3 and T4 unaided.
+          zh: >-
+            T1 有五位受測者獨立完成，達到 5/6 的目標。唯一需要協助的是
+            P2：在手機上，首頁的報價表單落在第一屏以下，進到服務頁後，報價按鈕又只在頁面最下方。T2 的 P5
+            分不清「運動場館工程」和「場地規劃與維修」，同樣需要協助。T3、T4 六個人都獨立完成。
+        rowHeading:
+          en: Task
+          zh: 任務
+        total: 6
+        target:
+          value: 5
+          row: T1
+          label:
+            en: Target 5/6
+            zh: 目標 5/6
+        rows:
+          - label: T1
+            name: &ref_0
+              en: Request a team-apparel quote
+              zh: 幫球隊詢價團體服
+            independent: 5
+            assisted: 1
+            failed: 0
+          - label: T2
+            name: &ref_1
+              en: Check the service area
+              zh: 確認服務範圍
+            independent: 5
+            assisted: 1
+            failed: 0
+          - label: T3
+            name: &ref_2
+              en: Contact without the form
+              zh: 不填表，直接聯絡
+            independent: 6
+            assisted: 0
+            failed: 0
+          - label: T4
+            name: &ref_3
+              en: Understand a service
+              zh: 看懂一項服務
+            independent: 6
+            assisted: 0
+            failed: 0
+      - kind: funnel
+        title:
+          en: T1 quote funnel
+          zh: T1 詢價漏斗
+        description:
+          en: >-
+            All six eventually sent an inquiry, five of them unaided. The only
+            drop-off was at finding the quote entry: P2 couldn't find it on
+            mobile and reached the form only after help. P3's "30 sets" was
+            rejected by the quantity field; they changed it to a number
+            themselves, so it doesn't count as a drop-off.
+          zh: >-
+            六個人最後都送出了詢價，獨立完成的有五位。唯一的流失點在「找到報價入口」：P2 在手機上找不到入口，協助之後才進到表單。P3
+            在數量欄填了「30 套」被擋下，自己改成數字後通過，不算流失。
+        rowHeading:
+          en: Stage
+          zh: 階段
+        total: 6
+        reachedLabel:
+          en: Reached (including with help)
+          zh: 最後有走到（含協助）
+        independentLabel:
+          en: Reached unaided
+          zh: 獨立走到
+        stages:
+          - label:
+              en: Started the task
+              zh: 開始任務
+            reached: 6
+            independent: 6
+          - label:
+              en: Found the quote entry
+              zh: 找到報價入口
+            reached: 6
+            independent: 5
+            note:
+              en: P2 couldn't find it on mobile; reached the form after help
+              zh: P2 手機上找不到，協助後才進表單
+          - label:
+              en: Chose the right service
+              zh: 選對服務類型
+            reached: 6
+            independent: 5
+          - label:
+              en: Filled in required fields
+              zh: 填完必填欄位
+            reached: 6
+            independent: 5
+            note:
+              en: P3's quantity was rejected once; fixed it alone (not a drop-off)
+              zh: P3 數量欄被擋一次，自行修正（不算流失）
+          - label:
+              en: Submitted
+              zh: 送出成功
+            reached: 6
+            independent: 5
+      - kind: dots
+        title:
+          en: Time on task
+          zh: 任務完成時間
+        description:
+          en: >-
+            T1's median was 100 seconds, inside the 120-second target; the
+            slowest, 186 seconds, was P2, who needed help. T3 was fastest, with
+            a median of 24 seconds, helped by tap-to-call on mobile. In T2, P5
+            took 150 seconds, stuck between the two venue services.
+          zh: >-
+            T1 的中位數是 100 秒，在 120 秒的目標內；最慢的 186 秒就是需要協助的 P2。T3 最快，中位數 24
+            秒，手機版的電話可以直接點撥。T2 的 P5 花了 150 秒，卡在兩條場地服務之間。
+        rowHeading:
+          en: Task
+          zh: 任務
+        min: 0
+        max: 210
+        step: 30
+        unit:
+          en: s
+          zh: ' 秒'
+        axisLabel:
+          en: seconds
+          zh: 秒
+        summary: median
+        summaryLabel:
+          en: Median
+          zh: 中位數
+        rangeLabel:
+          en: Fastest to slowest
+          zh: 最快到最慢
+        reference:
+          value: 120
+          row: T1
+          label:
+            en: T1 target 120s
+            zh: T1 目標 120 秒
+        rows:
+          - label: T1
+            name: *ref_0
+            points:
+              - who: P1
+                value: 84
+                outcome: independent
+              - who: P2
+                value: 186
+                outcome: assisted
+              - who: P3
+                value: 72
+                outcome: independent
+              - who: P4
+                value: 118
+                outcome: independent
+              - who: P5
+                value: 96
+                outcome: independent
+              - who: P6
+                value: 104
+                outcome: independent
+          - label: T2
+            name: *ref_1
+            points:
+              - who: P1
+                value: 70
+                outcome: independent
+              - who: P2
+                value: 95
+                outcome: independent
+              - who: P3
+                value: 64
+                outcome: independent
+              - who: P4
+                value: 88
+                outcome: independent
+              - who: P5
+                value: 150
+                outcome: assisted
+              - who: P6
+                value: 80
+                outcome: independent
+          - label: T3
+            name: *ref_2
+            points:
+              - who: P1
+                value: 22
+                outcome: independent
+              - who: P2
+                value: 18
+                outcome: independent
+              - who: P3
+                value: 25
+                outcome: independent
+              - who: P4
+                value: 20
+                outcome: independent
+              - who: P5
+                value: 30
+                outcome: independent
+              - who: P6
+                value: 35
+                outcome: independent
+          - label: T4
+            name: *ref_3
+            points:
+              - who: P1
+                value: 48
+                outcome: independent
+              - who: P2
+                value: 60
+                outcome: independent
+              - who: P3
+                value: 40
+                outcome: independent
+              - who: P4
+                value: 55
+                outcome: independent
+              - who: P5
+                value: 75
+                outcome: independent
+              - who: P6
+                value: 58
+                outcome: independent
+      - kind: dots
+        title:
+          en: SEQ scores
+          zh: SEQ 分數
+        description:
+          en: >-
+            SEQ is one question asked after each task: "Overall, how easy was
+            this task?", from 1 (very difficult) to 7 (very easy). T2 averaged
+            4.8, the only task below 5.5: three participants clicked the wrong
+            service or went back and forth between venue construction and
+            facility planning. The other three tasks all averaged 5.8 or higher.
+          zh: >-
+            SEQ 是每個任務做完後問的一題：「整體來說，這題有多容易？」1 是非常困難，7 是非常容易。T2 平均 4.8，是唯一低於 5.5
+            的任務：三個人在「運動場館工程」和「場地規劃與維修」之間點錯或來回。其他三個任務的平均都在 5.8 以上。
+        rowHeading:
+          en: Task
+          zh: 任務
+        min: 1
+        max: 7
+        step: 1
+        unit:
+          en: ' / 7'
+          zh: ' 分'
+        axisLabel:
+          en: score
+          zh: 分數
+        summary: mean
+        summaryLabel:
+          en: Average
+          zh: 平均
+        reference:
+          value: 5.5
+          label:
+            en: Reference 5.5
+            zh: 參考線 5.5
+        rows:
+          - label: T1
+            name: *ref_0
+            points:
+              - who: P1
+                value: 6
+              - who: P2
+                value: 4
+              - who: P3
+                value: 7
+              - who: P4
+                value: 6
+              - who: P5
+                value: 6
+              - who: P6
+                value: 6
+          - label: T2
+            name: *ref_1
+            points:
+              - who: P1
+                value: 5
+              - who: P2
+                value: 5
+              - who: P3
+                value: 6
+              - who: P4
+                value: 5
+              - who: P5
+                value: 3
+              - who: P6
+                value: 5
+          - label: T3
+            name: *ref_2
+            points:
+              - who: P1
+                value: 7
+              - who: P2
+                value: 7
+              - who: P3
+                value: 6
+              - who: P4
+                value: 7
+              - who: P5
+                value: 6
+              - who: P6
+                value: 5
+          - label: T4
+            name: *ref_3
+            points:
+              - who: P1
+                value: 6
+              - who: P2
+                value: 6
+              - who: P3
+                value: 7
+              - who: P4
+                value: 6
+              - who: P5
+                value: 5
+              - who: P6
+                value: 6
   - type: featureSplit
     heading:
       en: 'Built for the Corridor, Not the Desk'
