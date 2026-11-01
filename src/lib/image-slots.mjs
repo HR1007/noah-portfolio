@@ -278,7 +278,44 @@ export const SECTION_META = {
       steps: [{ label: `${TBD} Step`, ratio: '3/4', alt: `${TBD} Flow step` }],
     }),
   },
+
+  /*
+    圖表是用內容裡的數值直接畫出來的，不是圖片，所以 images 為 0、清單是 text：
+    這個區塊插在哪裡都不會讓後面段落的圖片編號錯開。
+    新增的圖表一律從最簡單的 outcomeBars 開始，其他圖型到後台 Content 頁改 kind 與欄位。
+  */
+  dataViz: {
+    label: '資料視覺化',
+    images: 0,
+    list: {
+      key: 'charts',
+      kind: 'text',
+      label: '圖表',
+      min: 1,
+      max: null,
+      create: () => newOutcomeChart(),
+    },
+    create: () => ({
+      type: 'dataViz',
+      eyebrow: 'DATA',
+      heading: `${TBD} 標題`,
+      outcomes: { independent: '獨立完成', assisted: '需協助', failed: '失敗' },
+      participants: [],
+      charts: [newOutcomeChart()],
+    }),
+  },
 };
+
+function newOutcomeChart() {
+  return {
+    kind: 'outcomeBars',
+    title: `${TBD} 圖表標題`,
+    description: `${TBD} 圖表說明，待補`,
+    rowHeading: '任務',
+    total: 1,
+    rows: [{ label: 'T1', name: `${TBD} 任務名稱`, independent: 0, assisted: 0, failed: 0 }],
+  };
+}
 
 /** 後台「新增段落」的下拉選單：型別 + 中文名稱。 */
 export function sectionTypeOptions() {

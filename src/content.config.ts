@@ -200,6 +200,91 @@ const flowBlock = z.object({
   ctaHref: z.string().optional(),
 });
 
+/*
+  資料視覺化輪播：一次一張圖，左右箭頭切換。圖表在 build 時直接畫成 HTML／CSS，
+  不需要圖片檔，所以這個區塊不佔圖片版位（見 lib/image-slots.mjs）。
+
+  數值寫在內容裡，中位數、平均這類衍生值由元件算，避免兩邊對不上。
+  三種圖型：
+    outcomeBars  每列一個任務，堆疊出「獨立完成／需協助／失敗」的人數
+    funnel       每列一個階段，「最後有走到」與「獨立走到」疊在一起看流失
+    dots         每列一個任務，每位受測者一個點，再標中位數或平均
+*/
+const vizOutcome = z.enum(['independent', 'assisted', 'failed']);
+// 參考線（目標值）。row 填列的 label（例如 T1）就只畫在那一列；不填則每一列都畫。
+const vizReference = z.object({ value: z.number(), label: localized(), row: z.string().optional() });
+const vizChartBase = {
+  title: localized(),
+  description: localized(),
+  rowHeading: localized(), // 數據表第一欄的欄名，例如「任務」「階段」
+};
+const dataVizChart = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('outcomeBars'),
+    ...vizChartBase,
+    total: z.number(),
+    target: vizReference.optional(),
+    rows: z.array(
+      z.object({
+        label: z.string(),
+        name: localized(),
+        independent: z.number(),
+        assisted: z.number(),
+        failed: z.number(),
+      })
+    ),
+  }),
+  z.object({
+    kind: z.literal('funnel'),
+    ...vizChartBase,
+    total: z.number(),
+    reachedLabel: localized(), // 淺色長條：最後有走到（含協助）
+    independentLabel: localized(), // 深色長條：獨立走到
+    stages: z.array(
+      z.object({
+        label: localized(),
+        reached: z.number(),
+        independent: z.number(),
+        note: localized().optional(),
+      })
+    ),
+  }),
+  z.object({
+    kind: z.literal('dots'),
+    ...vizChartBase,
+    min: z.number(),
+    max: z.number(),
+    step: z.number(),
+    unit: localized(), // 接在數值後面，例如「 秒」「s」
+    axisLabel: localized(),
+    summary: z.enum(['median', 'mean']),
+    summaryLabel: localized(),
+    rangeLabel: localized().optional(), // 有填才畫「最快到最慢」的範圍軌道
+    reference: vizReference.optional(),
+    rows: z.array(
+      z.object({
+        label: z.string(),
+        name: localized(),
+        points: z.array(z.object({ who: z.string(), value: z.number(), outcome: vizOutcome.optional() })),
+      })
+    ),
+  }),
+]);
+
+const dataVizBlock = z.object({
+  type: z.literal('dataViz'),
+  eyebrow: localized().optional(),
+  heading: localized(),
+  body: localized().optional(),
+  // 三種結果的圖例文字，各張圖共用
+  outcomes: z.object({ independent: localized(), assisted: localized(), failed: localized() }),
+  // 受測者代號對應的描述，用在滑鼠提示與數據表，例如 P2 → 學校採購・手機
+  participants: z.array(z.object({ id: z.string(), label: localized() })).default([]),
+  charts: z.array(dataVizChart).min(1),
+  ctaLabel: localized().optional(),
+  ctaHref: z.string().optional(),
+});
+
 const projectSection = z.discriminatedUnion('type', [
   textSectionBlock,
   deviceShowcaseBlock,
@@ -212,6 +297,7 @@ const projectSection = z.discriminatedUnion('type', [
   personaBlock,
   designThemesBlock,
   flowBlock,
+  dataVizBlock,
 ]);
 
 const projects = defineCollection({
@@ -293,6 +379,12 @@ const site = defineCollection({
       prev: z.string(),
       next: z.string(),
       hint: z.string(),
+    }),
+    /* 案例頁資料視覺化輪播的操作文案 */
+    dataViz: z.object({
+      prev: z.string(),
+      next: z.string(),
+      table: z.string(), // 展開數據表的按鈕
     }),
     marquee: z.object({
       items: z.array(z.string()),

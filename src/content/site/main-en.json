@@ -46,6 +46,11 @@
     "next": "Next image",
     "hint": "Scroll to zoom · Drag to pan · Esc to close"
   },
+  "dataViz": {
+    "prev": "Previous chart",
+    "next": "Next chart",
+    "table": "View data table"
+  },
   "marquee": {
     "items": [
       "UI/UX DESIGNER",

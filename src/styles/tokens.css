@@ -199,6 +199,31 @@
   --radius: 16px;
   --radius-pill: 999px; /* [需確認] 目前站上沒有藥丸形元件，先保留備用 */
 
+  /*
+    資料視覺化（DataViz.astro）。
+
+    配色是「順序型」三階：同一個墨色由深到淺，對應「獨立完成 → 需協助 → 失敗」
+    這種有先後的分類。作品集本身是單色的，不另外引進彩色；身分辨識靠圖例與
+    直接標註，不只靠顏色。三階都用 dataviz 的 validate_palette.js --ordinal 驗過：
+    light 對 #ffffff，最淺一階 2.17:1；dark 對 #222225，最淺一階 2.52:1，都過 2:1。
+    改色時請重跑驗證，不要目測。
+
+    記號尺寸照 dataviz 的記號規格：長條不超過 24px、資料端 4px 圓角、
+    相鄰色塊之間 2px 的底色間隙、線 2px、圓點至少 8px、滑鼠熱區至少 24px。
+  */
+  --chart-step-1: #333333; /* 最深：獨立完成、主要數值 */
+  --chart-step-2: #7a7a7a; /* 中：需協助 */
+  --chart-step-3: #b0b0b0; /* 最淺：失敗、範圍軌道、漏斗的「最後有走到」 */
+  --chart-bar: 24px;
+  --chart-end-radius: 4px;
+  --chart-gap: 2px;
+  --chart-line: 2px;
+  --chart-range: 6px; /* 點狀圖裡「最快到最慢」的範圍軌道粗細 */
+  --chart-dot: 10px;
+  --chart-hit: 24px;
+  --chart-label-width: 180px; /* 每列左側的任務／階段名稱欄 */
+  --viz-card-height: 440px; /* 圖表卡片的固定高度：切換時版面不跳動，箭頭也能對齊卡片中線 */
+
   /* 斷點（僅供 JS 或註解參考，CSS 仍用 @media 明寫數值） */
   --breakpoint-sm: 375px;
   --breakpoint-md: 768px;
@@ -221,6 +246,11 @@
   --color-ink: #f2f2f2;
   --color-muted: rgba(242, 242, 242, 0.6);
   --color-border: rgba(242, 242, 242, 0.14);
+
+  /* 深色的順序型三階：一樣由「最顯眼」到「最安靜」，所以 step-1 是最亮的那一階 */
+  --chart-step-1: #f2f2f2;
+  --chart-step-2: #9a9a9a;
+  --chart-step-3: #606060;
 }
 
 /*

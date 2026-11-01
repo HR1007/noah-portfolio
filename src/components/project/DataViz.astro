@@ -1,0 +1,1079 @@
+---
+/*
+  資料視覺化輪播：一次顯示一張圖，左右箭頭切換上一張／下一張，圖下方是名稱與說明。
+
+  圖表在 build 時直接畫成 HTML／CSS（百分比定位），不用圖表函式庫、也不產生圖片：
+  文字維持真正的字級 token，手機上不會像整張縮小的 SVG 那樣字小到讀不到。
+
+  繪圖規格照 dataviz：順序型配色（深→淺＝獨立完成→需協助→失敗）、2px 底色間隙、
+  資料端 4px 圓角、圖例一定在、只挑重點直接標數字；每張圖都附數據表，
+  滑鼠提示只是加分，不是唯一讀到數值的方式。
+
+  為什麼需要 JS：切換圖表與滑鼠提示一定得在瀏覽器端做。沒有 JS 時四張圖全部
+  依序攤開，內容一樣讀得到（漸進增強）。script 只做這兩件事。
+*/
+import { getEntry, type CollectionEntry } from 'astro:content';
+import SectionCta from './SectionCta.astro';
+import { t, type Locale, type LocalizedText } from '../../lib/i18n';
+
+type Section = Extract<CollectionEntry<'projects'>['data']['sections'][number], { type: 'dataViz' }>;
+type Chart = Section['charts'][number];
+type Outcome = 'independent' | 'assisted' | 'failed';
+
+interface Props {
+  section: Section;
+  locale: Locale;
+}
+
+const { section, locale } = Astro.props;
+const site = await getEntry('site', `main-${locale}`);
+const ui = site!.data.dataViz;
+
+const tr = (v: LocalizedText) => t(v, locale);
+const trOpt = (v: LocalizedText | undefined) => t(v, locale);
+
+const OUTCOMES: Outcome[] = ['independent', 'assisted', 'failed'];
+// 順序型三階：獨立完成最深、失敗最淺（見 tokens.css 的 --chart-step-*）
+const STEP: Record<Outcome, number> = { independent: 1, assisted: 2, failed: 3 };
+const outcomeLabel: Record<Outcome, string> = {
+  independent: tr(section.outcomes.independent),
+  assisted: tr(section.outcomes.assisted),
+  failed: tr(section.outcomes.failed),
+};
+
+// 中文用全形括號，英文用半形加空格；這是標點規則，不是文案
+const paren = (s: string) => (locale === 'zh' ? `（${s}）` : ` (${s})`);
+const participant = new Map(section.participants.map((p) => [p.id, tr(p.label)]));
+const whoText = (id: string) => (participant.has(id) ? `${id}${paren(participant.get(id)!)}` : id);
+
+const pct = (v: number, min: number, max: number) => ((v - min) / (max - min)) * 100;
+const median = (xs: number[]) => {
+  const s = [...xs].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+};
+const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
+
+/*
+  點狀圖的避讓：數值太接近（或相同，例如 SEQ 有四個人都給 6 分）的點往上下錯開，
+  不讓它們疊成一個點。門檻是座標範圍的 2.5%：桌機上大約一顆點的寬度，
+  再大會把只是相近、其實沒有重疊的點也拆成好幾層，反而顯得散亂。
+*/
+function dotLayout<T extends { value: number }>(points: T[], min: number, max: number) {
+  const threshold = (max - min) * 0.025;
+  const laneEnds: number[] = [];
+  const placed = [...points]
+    .sort((a, b) => a.value - b.value)
+    .map((p) => {
+      let lane = laneEnds.findIndex((end) => p.value - end >= threshold);
+      if (lane === -1) {
+        lane = laneEnds.length;
+        laneEnds.push(p.value);
+      } else {
+        laneEnds[lane] = p.value;
+      }
+      return { ...p, lane };
+    });
+  const lanes = Math.max(1, laneEnds.length);
+  return { lanes, points: placed.map((p) => ({ ...p, offset: p.lane - (lanes - 1) / 2 })) };
+}
+
+const ticks = (min: number, max: number, step: number) => {
+  const out: number[] = [];
+  for (let v = min; v <= max + 1e-9; v += step) out.push(Math.round(v * 1000) / 1000);
+  return out;
+};
+
+// 標籤放得進色塊才放（約一個數字加左右留白）；放不下就交給圖例、提示與數據表
+const fitsInside = (share: number) => share >= 0.15;
+
+const charts = section.charts.map((chart: Chart) => {
+  const base = {
+    title: tr(chart.title),
+    description: tr(chart.description),
+    rowHeading: tr(chart.rowHeading),
+  };
+
+  if (chart.kind === 'outcomeBars') {
+    const target = chart.target && { ...chart.target, label: tr(chart.target.label) };
+    return {
+      ...base,
+      kind: 'outcomeBars' as const,
+      total: chart.total,
+      rows: chart.rows.map((r) => {
+        const name = tr(r.name);
+        const counted = r.independent + r.assisted + r.failed;
+        return {
+          label: r.label,
+          name,
+          counts: r,
+          segments: [
+            ...OUTCOMES.filter((o) => r[o] > 0).map((o) => ({
+              outcome: o as Outcome | 'empty',
+              n: r[o],
+              inside: fitsInside(r[o] / chart.total),
+              tip: `${r[o]} / ${chart.total} · ${r.label} ${name} · ${outcomeLabel[o]}`,
+            })),
+            ...(chart.total > counted
+              ? [{ outcome: 'empty' as const, n: chart.total - counted, inside: false, tip: '' }]
+              : []),
+          ],
+          target: target && (!target.row || target.row === r.label) ? target : undefined,
+        };
+      }),
+    };
+  }
+
+  if (chart.kind === 'funnel') {
+    const reachedLabel = tr(chart.reachedLabel);
+    const independentLabel = tr(chart.independentLabel);
+    return {
+      ...base,
+      kind: 'funnel' as const,
+      total: chart.total,
+      reachedLabel,
+      independentLabel,
+      stages: chart.stages.map((s) => {
+        const label = tr(s.label);
+        return {
+          label,
+          reached: s.reached,
+          independent: s.independent,
+          note: trOpt(s.note),
+          reachedTip: `${s.reached} / ${chart.total} · ${label} · ${reachedLabel}`,
+          independentTip: `${s.independent} / ${chart.total} · ${label} · ${independentLabel}`,
+        };
+      }),
+    };
+  }
+
+  // dots
+  const unit = tr(chart.unit);
+  const summaryLabel = tr(chart.summaryLabel);
+  const reference = chart.reference && { ...chart.reference, label: tr(chart.reference.label) };
+  const fmt = (v: number) => (chart.summary === 'median' ? String(Math.round(v)) : v.toFixed(1));
+  const hasOutcomes = chart.rows.some((r) => r.points.some((p) => p.outcome));
+  const usedOutcomes = OUTCOMES.filter((o) => chart.rows.some((r) => r.points.some((p) => p.outcome === o)));
+  const columns = chart.rows[0]?.points.map((p) => p.who) ?? [];
+  return {
+    ...base,
+    kind: 'dots' as const,
+    min: chart.min,
+    max: chart.max,
+    unit,
+    axisLabel: tr(chart.axisLabel),
+    summaryLabel,
+    rangeLabel: trOpt(chart.rangeLabel),
+    reference,
+    hasOutcomes,
+    usedOutcomes,
+    columns,
+    ticks: ticks(chart.min, chart.max, chart.step).map((v) => ({ v, at: pct(v, chart.min, chart.max) })),
+    rows: chart.rows.map((r) => {
+      const name = tr(r.name);
+      const values = r.points.map((p) => p.value);
+      const summary = chart.summary === 'median' ? median(values) : mean(values);
+      const layout = dotLayout(r.points, chart.min, chart.max);
+      return {
+        label: r.label,
+        name,
+        lanes: layout.lanes,
+        rangeFrom: pct(Math.min(...values), chart.min, chart.max),
+        rangeTo: pct(Math.max(...values), chart.min, chart.max),
+        summaryAt: pct(summary, chart.min, chart.max),
+        summaryText: `${fmt(summary)}${unit}`,
+        summaryTip: `${fmt(summary)}${unit} · ${r.label} ${name} · ${summaryLabel}`,
+        reference: reference && (!reference.row || reference.row === r.label) ? reference : undefined,
+        referenceAt: reference ? pct(reference.value, chart.min, chart.max) : 0,
+        points: layout.points.map((p) => ({
+          at: pct(p.value, chart.min, chart.max),
+          offset: p.offset,
+          step: p.outcome ? STEP[p.outcome] : 1,
+          tip: [`${p.value}${unit}`, whoText(p.who), p.outcome && outcomeLabel[p.outcome]]
+            .filter(Boolean)
+            .join(' · '),
+        })),
+        cells: r.points.map((p) => ({
+          who: p.who,
+          text: `${p.value}${p.outcome && p.outcome !== 'independent' ? paren(outcomeLabel[p.outcome]) : ''}`,
+        })),
+        summaryValue: fmt(summary),
+      };
+    }),
+  };
+});
+
+const eyebrow = trOpt(section.eyebrow);
+const heading = tr(section.heading);
+const body = trOpt(section.body);
+---
+
+<section class="viz" data-viz aria-label={heading}>
+  <div class="viz__intro">
+    {eyebrow && <p class="viz__eyebrow">{eyebrow}</p>}
+    <h2 class="viz__heading">{heading}</h2>
+    {body && <p class="viz__body">{body}</p>}
+  </div>
+
+  <div class="viz__stage">
+    <button class="viz__nav viz__nav--prev" type="button" data-viz-prev aria-label={ui.prev} hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"></path></svg>
+    </button>
+
+    <div class="viz__slides">
+      {
+        charts.map((chart, index) => (
+          <figure
+            class="viz__slide"
+            data-viz-slide
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${index + 1} / ${charts.length} · ${chart.title}`}
+          >
+            <div class="viz__card">
+              <div class="chart" role="img" aria-label={chart.title}>
+                {chart.kind === 'outcomeBars' && (
+                  <>
+                    <ul class="chart__legend">
+                      {OUTCOMES.map((o) => (
+                        <li>
+                          <span class:list={['chart__key', `chart__key--step${STEP[o]}`]} />
+                          {outcomeLabel[o]}
+                        </li>
+                      ))}
+                    </ul>
+                    <div class="chart__rows">
+                      {chart.rows.map((row) => (
+                        <div class="chart__row">
+                          <div class="chart__label">
+                            <span class="chart__code">{row.label}</span>
+                            <span class="chart__name">{row.name}</span>
+                          </div>
+                          <div class="chart__track">
+                            <div class="chart__stack">
+                              {row.segments.map((seg) => (
+                                <span
+                                  class:list={[
+                                    'chart__seg',
+                                    seg.outcome === 'empty' ? 'chart__seg--empty' : `chart__seg--step${STEP[seg.outcome]}`,
+                                  ]}
+                                  style={`flex-grow: ${seg.n}`}
+                                  data-tip={seg.tip || undefined}
+                                >
+                                  {seg.inside && seg.n}
+                                </span>
+                              ))}
+                            </div>
+                            {row.target && (
+                              <span class="chart__ref" style={`left: ${(row.target.value / chart.total) * 100}%`}>
+                                <span class="chart__ref-label">{row.target.label}</span>
+                              </span>
+                            )}
+                          </div>
+                          <span class="chart__value">
+                            {row.counts.independent}/{chart.total}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {chart.kind === 'funnel' && (
+                  <>
+                    <ul class="chart__legend">
+                      <li>
+                        <span class="chart__key chart__key--step3" />
+                        {chart.reachedLabel}
+                      </li>
+                      <li>
+                        <span class="chart__key chart__key--step1" />
+                        {chart.independentLabel}
+                      </li>
+                    </ul>
+                    <div class="chart__rows">
+                      {chart.stages.map((stage) => (
+                        <div class="chart__row">
+                          <div class="chart__label">
+                            <span class="chart__name chart__name--strong">{stage.label}</span>
+                          </div>
+                          <div class="chart__track">
+                            <span
+                              class="chart__bar chart__bar--step3"
+                              style={`width: ${(stage.reached / chart.total) * 100}%`}
+                              data-tip={stage.reachedTip}
+                            />
+                            <span
+                              class="chart__bar chart__bar--step1"
+                              style={`width: ${(stage.independent / chart.total) * 100}%`}
+                              data-tip={stage.independentTip}
+                            />
+                            {stage.note && <span class="chart__note">{stage.note}</span>}
+                          </div>
+                          <span class="chart__value">
+                            {stage.independent}/{chart.total}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {chart.kind === 'dots' && (
+                  <>
+                    <ul class="chart__legend">
+                      {chart.usedOutcomes.map((o) => (
+                        <li>
+                          <span class:list={['chart__key', 'chart__key--dot', `chart__key--step${STEP[o]}`]} />
+                          {outcomeLabel[o]}
+                        </li>
+                      ))}
+                      <li>
+                        <span class="chart__key chart__key--tick" />
+                        {chart.summaryLabel}
+                      </li>
+                      {chart.rangeLabel && (
+                        <li>
+                          <span class="chart__key chart__key--range" />
+                          {chart.rangeLabel}
+                        </li>
+                      )}
+                      {chart.reference && (
+                        <li>
+                          <span class="chart__key chart__key--ref" />
+                          {chart.reference.label}
+                        </li>
+                      )}
+                    </ul>
+                    <div class="chart__rows chart__rows--dots">
+                      {chart.rows.map((row) => (
+                        <div class="chart__row">
+                          <div class="chart__label">
+                            <span class="chart__code">{row.label}</span>
+                            <span class="chart__name">{row.name}</span>
+                          </div>
+                          <div class="chart__plot" style={`--lanes: ${row.lanes}`}>
+                            {chart.ticks.map((tick) => (
+                              <span class="chart__grid" style={`left: ${tick.at}%`} />
+                            ))}
+                            {chart.rangeLabel && (
+                              <span
+                                class="chart__range"
+                                style={`left: ${row.rangeFrom}%; width: ${row.rangeTo - row.rangeFrom}%`}
+                              />
+                            )}
+                            {row.reference && <span class="chart__ref" style={`left: ${row.referenceAt}%`} />}
+                            <span class="chart__tick" style={`left: ${row.summaryAt}%`} data-tip={row.summaryTip}>
+                              <span class="chart__tick-label">{row.summaryText}</span>
+                            </span>
+                            {row.points.map((point) => (
+                              <span
+                                class:list={['chart__dot', `chart__dot--step${point.step}`]}
+                                style={`left: ${point.at}%; --o: ${point.offset}`}
+                                data-tip={point.tip}
+                              />
+                            ))}
+                          </div>
+                          <span class="chart__value" aria-hidden="true" />
+                        </div>
+                      ))}
+                      <div class="chart__row chart__row--axis">
+                        <span />
+                        <div class="chart__axis">
+                          {chart.ticks.map((tick) => (
+                            <span class="chart__axis-tick" style={`left: ${tick.at}%`}>
+                              {tick.v}
+                            </span>
+                          ))}
+                        </div>
+                        <span class="chart__axis-label">{chart.axisLabel}</span>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <figcaption class="viz__caption">
+              <h3 class="viz__title">{chart.title}</h3>
+              <p class="viz__description">{chart.description}</p>
+              <details class="viz__table">
+                <summary>{ui.table}</summary>
+                <div class="viz__table-scroll">
+                  <table>
+                    {chart.kind === 'outcomeBars' && (
+                      <>
+                        <thead>
+                          <tr>
+                            <th scope="col">{chart.rowHeading}</th>
+                            {OUTCOMES.map((o) => (
+                              <th scope="col">{outcomeLabel[o]}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {chart.rows.map((row) => (
+                            <tr>
+                              <th scope="row">
+                                {row.label} {row.name}
+                              </th>
+                              {OUTCOMES.map((o) => (
+                                <td>{row.counts[o]}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </>
+                    )}
+                    {chart.kind === 'funnel' && (
+                      <>
+                        <thead>
+                          <tr>
+                            <th scope="col">{chart.rowHeading}</th>
+                            <th scope="col">{chart.independentLabel}</th>
+                            <th scope="col">{chart.reachedLabel}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {chart.stages.map((stage) => (
+                            <tr>
+                              <th scope="row">{stage.label}</th>
+                              <td>{stage.independent}</td>
+                              <td>{stage.reached}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </>
+                    )}
+                    {chart.kind === 'dots' && (
+                      <>
+                        <thead>
+                          <tr>
+                            <th scope="col">{chart.rowHeading}</th>
+                            {chart.columns.map((who) => (
+                              <th scope="col">{who}</th>
+                            ))}
+                            <th scope="col">{chart.summaryLabel}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {chart.rows.map((row) => (
+                            <tr>
+                              <th scope="row">
+                                {row.label} {row.name}
+                              </th>
+                              {row.cells.map((cell) => (
+                                <td>{cell.text}</td>
+                              ))}
+                              <td>{row.summaryValue}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </>
+                    )}
+                  </table>
+                </div>
+              </details>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+
+    <button class="viz__nav viz__nav--next" type="button" data-viz-next aria-label={ui.next} hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"></path></svg>
+    </button>
+
+    <p class="viz__count" data-viz-count aria-live="polite" hidden></p>
+  </div>
+
+  <div class="viz__tip" data-viz-tip role="tooltip" hidden></div>
+
+  <SectionCta label={trOpt(section.ctaLabel)} href={section.ctaHref} />
+</section>
+
+<script>
+  /*
+    兩件事：一次只顯示一張圖並用箭頭／鍵盤切換；滑鼠移到記號上時顯示數值提示。
+    提示文字用 textContent 寫入（內容來自後台可編輯的資料，不用 innerHTML）。
+  */
+  document.querySelectorAll<HTMLElement>('[data-viz]').forEach((root) => {
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-viz-slide]'));
+    const prev = root.querySelector<HTMLButtonElement>('[data-viz-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-viz-next]');
+    const count = root.querySelector<HTMLElement>('[data-viz-count]');
+    const tip = root.querySelector<HTMLElement>('[data-viz-tip]');
+
+    if (slides.length > 1 && prev && next && count) {
+      let current = 0;
+      const show = (index: number) => {
+        current = (index + slides.length) % slides.length;
+        slides.forEach((slide, i) => {
+          slide.hidden = i !== current;
+        });
+        count.textContent = `${current + 1} / ${slides.length}`;
+      };
+
+      root.classList.add('is-carousel');
+      prev.hidden = false;
+      next.hidden = false;
+      count.hidden = false;
+      prev.addEventListener('click', () => show(current - 1));
+      next.addEventListener('click', () => show(current + 1));
+      root.addEventListener('keydown', (event) => {
+        const target = event.target as HTMLElement;
+        if (target.closest('summary, table')) return;
+        if (event.key === 'ArrowLeft') show(current - 1);
+        if (event.key === 'ArrowRight') show(current + 1);
+      });
+      show(0);
+    }
+
+    if (!tip) return;
+    const place = (event: PointerEvent) => {
+      tip.style.left = `${event.clientX}px`;
+      tip.style.top = `${event.clientY}px`;
+    };
+    root.addEventListener('pointerover', (event) => {
+      const mark = (event.target as HTMLElement).closest<HTMLElement>('[data-tip]');
+      if (!mark || !root.contains(mark)) return;
+      tip.textContent = mark.dataset.tip ?? '';
+      tip.hidden = false;
+      place(event);
+    });
+    root.addEventListener('pointermove', (event) => {
+      if (!tip.hidden) place(event);
+    });
+    root.addEventListener('pointerout', (event) => {
+      const from = (event.target as HTMLElement).closest('[data-tip]');
+      const to = (event.relatedTarget as HTMLElement | null)?.closest?.('[data-tip]');
+      if (from && from !== to) tip.hidden = true;
+    });
+  });
+</script>
+
+<style>
+  .viz {
+    max-width: var(--content-width);
+    margin: 0 auto;
+    padding: var(--sp-6) var(--content-gutter);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+  }
+
+  .viz__intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+
+  .viz__eyebrow {
+    font-size: var(--font-size-label);
+    color: var(--color-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .viz__body {
+    max-width: var(--prose-width);
+    font-size: var(--font-size-body);
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+
+  /* ---------- 輪播骨架 ---------- */
+
+  /* 沒有 JS 時：圖表依序往下排，沒有箭頭 */
+  .viz__slides {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-6);
+    min-width: 0;
+  }
+
+  .viz.is-carousel .viz__stage {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'prev slides next' '. count .';
+    column-gap: var(--sp-4);
+    row-gap: var(--sp-2);
+  }
+
+  .viz.is-carousel .viz__slides {
+    grid-area: slides;
+  }
+
+  .viz__nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-size-lg);
+    height: var(--control-size-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: border-color var(--motion-fast) var(--motion-ease);
+  }
+
+  .viz__nav:hover,
+  .viz__nav:focus-visible {
+    border-color: var(--color-ink);
+  }
+
+  .viz__nav svg {
+    width: var(--icon-md);
+    height: var(--icon-md);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* 箭頭對齊圖表卡片的中線，不是整張（含說明文字）的中線 */
+  .viz__nav--prev {
+    grid-area: prev;
+    align-self: start;
+    margin-top: calc((var(--viz-card-height) - var(--control-size-lg)) / 2);
+  }
+
+  .viz__nav--next {
+    grid-area: next;
+    align-self: start;
+    margin-top: calc((var(--viz-card-height) - var(--control-size-lg)) / 2);
+  }
+
+  .viz__count {
+    grid-area: count;
+    justify-self: center;
+    font-size: var(--font-size-meta);
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .viz__slide {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .viz.is-carousel .viz__slide:not([hidden]) {
+      animation: viz-in var(--reveal-duration) var(--reveal-easing);
+    }
+  }
+
+  @keyframes viz-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .viz__card {
+    min-height: var(--viz-card-height);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--sp-4);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
+  .viz__caption {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    max-width: var(--prose-width);
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .viz__title {
+    font-size: var(--font-size-body-lg);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .viz__description {
+    font-size: var(--font-size-label);
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+
+  .viz__table {
+    margin-top: var(--sp-1);
+    font-size: var(--font-size-meta);
+    color: var(--color-muted);
+  }
+
+  .viz__table summary {
+    cursor: pointer;
+  }
+
+  .viz__table-scroll {
+    overflow-x: auto;
+    margin-top: var(--sp-2);
+  }
+
+  .viz__table table {
+    border-collapse: collapse;
+    margin-inline: auto;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink);
+  }
+
+  .viz__table th,
+  .viz__table td {
+    padding: var(--sp-1) var(--sp-2);
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .viz__table thead th {
+    color: var(--color-muted);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .viz__tip {
+    position: fixed;
+    z-index: 10;
+    pointer-events: none;
+    transform: translate(-50%, calc(-100% - var(--sp-2)));
+    padding: var(--sp-1) var(--sp-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: var(--font-size-meta);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* ---------- 圖表 ---------- */
+
+  .chart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    font-size: var(--font-size-meta);
+    color: var(--color-muted);
+  }
+
+  .chart__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chart__legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+  }
+
+  /* 圖例的樣式跟著記號走：長條用方塊、點用圓、線用線 */
+  .chart__key {
+    width: var(--chart-dot);
+    height: var(--chart-dot);
+    border-radius: var(--chart-gap);
+  }
+
+  .chart__key--step1 {
+    background: var(--chart-step-1);
+  }
+  .chart__key--step2 {
+    background: var(--chart-step-2);
+  }
+  .chart__key--step3 {
+    background: var(--chart-step-3);
+  }
+
+  .chart__key--dot {
+    border-radius: var(--radius-pill);
+  }
+
+  .chart__key--tick {
+    width: var(--chart-line);
+    height: var(--sp-2);
+    border-radius: 0;
+    background: var(--color-ink);
+  }
+
+  .chart__key--range {
+    width: var(--sp-3);
+    height: var(--chart-range);
+    border-radius: var(--radius-pill);
+    background: var(--chart-step-3);
+  }
+
+  .chart__key--ref {
+    width: 0;
+    height: var(--sp-2);
+    border-radius: 0;
+    border-left: 1px dashed var(--color-ink);
+  }
+
+  .chart__rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+
+  /* 點狀圖的列之間不留空隙，格線才會上下連成一條 */
+  .chart__rows--dots {
+    gap: 0;
+  }
+
+  .chart__row {
+    display: grid;
+    grid-template-columns: var(--chart-label-width) minmax(0, 1fr) var(--sp-6);
+    align-items: center;
+    column-gap: var(--sp-2);
+  }
+
+  .chart__label {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chart__code {
+    color: var(--color-ink);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .chart__name--strong {
+    color: var(--color-ink);
+  }
+
+  .chart__value {
+    color: var(--color-ink);
+    font-weight: var(--font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .chart__track {
+    position: relative;
+  }
+
+  /* 堆疊長條：段與段之間是底色間隙，不是描邊；資料端 4px 圓角、基線端方角 */
+  .chart__stack {
+    display: flex;
+    gap: var(--chart-gap);
+    height: var(--chart-bar);
+  }
+
+  .chart__seg {
+    flex-basis: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    color: var(--color-surface);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .chart__seg:last-child {
+    border-radius: 0 var(--chart-end-radius) var(--chart-end-radius) 0;
+  }
+
+  .chart__seg--step1 {
+    background: var(--chart-step-1);
+  }
+  .chart__seg--step2 {
+    background: var(--chart-step-2);
+  }
+  /* 最淺的一階上面的字用墨色，才有足夠對比 */
+  .chart__seg--step3 {
+    background: var(--chart-step-3);
+    color: var(--color-ink);
+  }
+  .chart__seg--empty {
+    background: transparent;
+    border: 1px solid var(--color-border);
+  }
+
+  /* 漏斗：淺色的「最後有走到」在下、深色的「獨立走到」疊在上面 */
+  .chart__bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: var(--chart-bar);
+    border-radius: 0 var(--chart-end-radius) var(--chart-end-radius) 0;
+  }
+
+  .chart__bar--step1 {
+    background: var(--chart-step-1);
+  }
+  .chart__bar--step3 {
+    background: var(--chart-step-3);
+  }
+
+  .chart__row:has(.chart__bar) .chart__track {
+    min-height: var(--chart-bar);
+  }
+
+  .chart__note {
+    display: block;
+    padding-top: calc(var(--chart-bar) + var(--chart-gap));
+  }
+
+  /* 參考線（目標值）：虛線表示門檻，跟實線的格線區分開 */
+  .chart__ref {
+    position: absolute;
+    top: calc(var(--chart-gap) * -2);
+    bottom: calc(var(--chart-gap) * -2);
+    border-left: 1px dashed var(--color-ink);
+  }
+
+  .chart__ref-label {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    transform: translateX(-50%);
+    padding-top: var(--chart-gap);
+    white-space: nowrap;
+    color: var(--color-ink);
+  }
+
+  /* 點狀圖 */
+  .chart__plot {
+    position: relative;
+    height: calc(var(--lanes) * (var(--chart-dot) + var(--chart-gap) * 2) + var(--sp-6));
+  }
+
+  .chart__grid {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid var(--color-border);
+  }
+
+  .chart__range {
+    position: absolute;
+    top: 50%;
+    height: var(--chart-range);
+    transform: translateY(-50%);
+    border-radius: var(--radius-pill);
+    background: var(--chart-step-3);
+  }
+
+  .chart__tick {
+    position: absolute;
+    top: var(--sp-3);
+    bottom: var(--sp-2);
+    width: var(--chart-line);
+    transform: translateX(-50%);
+    background: var(--color-ink);
+  }
+
+  .chart__tick-label {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: var(--color-ink);
+    font-weight: var(--font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 點：2px 底色外圈，重疊時還分得開；熱區放大到 24px，不必精準瞄準 */
+  .chart__dot {
+    position: absolute;
+    top: calc(50% + var(--o) * (var(--chart-dot) + var(--chart-gap) * 2));
+    width: var(--chart-dot);
+    height: var(--chart-dot);
+    transform: translate(-50%, -50%);
+    border-radius: var(--radius-pill);
+    box-shadow: 0 0 0 var(--chart-gap) var(--color-surface);
+  }
+
+  .chart__dot::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--chart-hit);
+    height: var(--chart-hit);
+    transform: translate(-50%, -50%);
+  }
+
+  .chart__dot--step1 {
+    background: var(--chart-step-1);
+  }
+  .chart__dot--step2 {
+    background: var(--chart-step-2);
+  }
+  .chart__dot--step3 {
+    background: var(--chart-step-3);
+  }
+
+  [data-tip]:hover {
+    filter: brightness(1.15);
+  }
+
+  .chart__row--axis {
+    padding-top: var(--sp-1);
+  }
+
+  .chart__axis {
+    position: relative;
+    height: var(--sp-3);
+  }
+
+  .chart__axis-tick {
+    position: absolute;
+    transform: translateX(-50%);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- 小螢幕：名稱欄移到長條上方，箭頭移到圖表下方 ---------- */
+  @media (max-width: 767px) {
+    .viz.is-carousel .viz__stage {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: 'slides slides slides' 'prev count next';
+      row-gap: var(--sp-3);
+    }
+
+    .viz__nav--prev,
+    .viz__nav--next {
+      margin-top: 0;
+    }
+
+    .viz.is-carousel .viz__count {
+      align-self: center;
+    }
+
+    .viz__card {
+      min-height: 0;
+      padding: var(--sp-3);
+    }
+
+    /* 窄螢幕上置中的長段落很難讀，改回靠左 */
+    .viz__caption {
+      text-align: left;
+    }
+
+    .chart__row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      row-gap: var(--sp-1);
+    }
+
+    .chart__label {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      gap: var(--sp-1);
+    }
+
+    .chart__row--axis > span:first-child {
+      display: none;
+    }
+  }
+</style>

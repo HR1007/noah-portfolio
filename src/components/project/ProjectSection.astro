@@ -16,6 +16,7 @@ import ResearchFramework from './ResearchFramework.astro';
 import Persona from './Persona.astro';
 import DesignThemes from './DesignThemes.astro';
 import Flow from './Flow.astro';
+import DataViz from './DataViz.astro';
 import { t, type Locale, type LocalizedText } from '../../lib/i18n';
 
 type Section = CollectionEntry<'projects'>['data']['sections'][number];
@@ -168,5 +169,8 @@ const trThemes = (themes: { title: LocalizedText; description?: LocalizedText }[
       ctaLabel={tr(section.ctaLabel)}
       ctaHref={section.ctaHref}
     />
+  ) : section.type === 'dataViz' ? (
+    // 圖表內的文字層層巢狀（每張圖、每一列），交給元件自己依 locale 取值
+    <DataViz section={section} locale={locale} />
   ) : null
 }
