@@ -67,7 +67,7 @@ export const SECTION_OPTIONS = {
   flow: { direction: ['horizontal', 'vertical'] },
   featureGrid: { direction: ['horizontal', 'vertical'] },
   imageRow: { direction: ['horizontal', 'vertical'] },
-  designThemes: { direction: ['vertical', 'horizontal'], layout: ['stacked', 'split'] },
+  designThemes: { direction: ['vertical', 'horizontal'], layout: ['stacked', 'split', 'carousel'] },
 };
 
 export const SECTION_META = {

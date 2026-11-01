@@ -2,6 +2,8 @@
 import type { ImageMetadata } from 'astro';
 import Media from '../Media.astro';
 import SectionCta from './SectionCta.astro';
+import Carousel from '../Carousel.astro';
+import { getEntry } from 'astro:content';
 
 interface Theme {
   title: string;
@@ -16,8 +18,11 @@ interface Props {
   themes: Theme[];
   images?: (ImageMetadata | undefined)[];
   direction?: 'vertical' | 'horizontal';
-  /** stacked（預設）：圖在上文在下。split：圖文左右並排，主題依序交錯左右邊 */
-  layout?: 'stacked' | 'split';
+  /**
+   * stacked（預設）：圖在上文在下。split：圖文左右並排，主題依序交錯左右邊。
+   * carousel：一次一個主題，左右箭頭切換（共用 Carousel 元件）。
+   */
+  layout?: 'stacked' | 'split' | 'carousel';
   ctaLabel?: string;
   ctaHref?: string;
 }
@@ -32,6 +37,11 @@ const {
   ctaLabel,
   ctaHref,
 } = Astro.props;
+
+// 輪播箭頭的文案沿用全螢幕圖片檢視的「上一張／下一張」：這裡切換的也是圖
+const locale = Astro.currentLocale ?? 'en';
+const site = await getEntry('site', `main-${locale}`);
+const { prev, next } = site!.data.viewer;
 ---
 
 <section class="design-themes" data-direction={direction} data-layout={layout}>
@@ -40,34 +50,69 @@ const {
     <h2 class="design-themes__heading">{heading}</h2>
   </div>
   <SectionCta label={ctaLabel} href={ctaHref} />
-  <div class="design-themes__grid" style={`--columns: ${themes.length}`}>
-    {
-      themes.map((theme, i) => (
-        <article
-          class="design-themes__item"
-          data-reverse={layout === 'split' && i % 2 === 1 ? '' : undefined}
-        >
-          {/*
-            maxHeight 給 none，刻意不設高度上限。natural 模式下 max-height 一旦撞到，
-            寬度會跟著等比縮小——而這一區的圖長寬比各不相同（有橫有直），全部先撞到
-            同一個高度上限後就各縮各的寬度，同一段落裡的圖左右邊緣對不齊。
-            只讓容器寬度當唯一的約束，才會齊寬。split 模式下每張圖各自在自己的半欄裡，
-            同一道理依然成立——半欄寬度就是唯一的約束。
-          */}
-          <Media image={images[i]} ratio="4/3" alt={theme.title} fit="natural" label="" maxHeight="none" />
-          {/*
-            圖說用的就是後台既有的「主題標題」與「主題說明」兩個欄位，沒有另外開新欄位——
-            那兩欄本來就存在、後台也一直編得到，先前只是沒有渲染出來而已。
-            description 是選填，沒填就只出標題，不留一塊空白。
-          */}
-          <div class="design-themes__caption">
-            <h3 class="design-themes__title">{theme.title}</h3>
-            {theme.description && <p class="design-themes__text">{theme.description}</p>}
-          </div>
-        </article>
-      ))
-    }
-  </div>
+  {
+    layout === 'carousel' && (
+      <Carousel prevLabel={prev} nextLabel={next}>
+        {themes.map((theme, i) => (
+          <article
+            class="design-themes__slide"
+            data-carousel-slide
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${i + 1} / ${themes.length} · ${theme.title}`}
+          >
+            {/* 圖片收進固定高度的區塊：直的規格板縮到這個高度，橫的就維持滿寬 */}
+            <div class="design-themes__stage">
+              <Media
+                image={images[i]}
+                ratio="4/3"
+                alt={theme.title}
+                fit="natural"
+                label=""
+                maxHeight="var(--theme-carousel-height)"
+              />
+            </div>
+            <div class="design-themes__caption">
+              <h3 class="design-themes__title">{theme.title}</h3>
+              {theme.description && <p class="design-themes__text">{theme.description}</p>}
+            </div>
+          </article>
+        ))}
+      </Carousel>
+    )
+  }
+  {
+    layout !== 'carousel' && (
+    <div class="design-themes__grid" style={`--columns: ${themes.length}`}>
+      {
+        themes.map((theme, i) => (
+          <article
+            class="design-themes__item"
+            data-reverse={layout === 'split' && i % 2 === 1 ? '' : undefined}
+          >
+            {/*
+              maxHeight 給 none，刻意不設高度上限。natural 模式下 max-height 一旦撞到，
+              寬度會跟著等比縮小——而這一區的圖長寬比各不相同（有橫有直），全部先撞到
+              同一個高度上限後就各縮各的寬度，同一段落裡的圖左右邊緣對不齊。
+              只讓容器寬度當唯一的約束，才會齊寬。split 模式下每張圖各自在自己的半欄裡，
+              同一道理依然成立——半欄寬度就是唯一的約束。
+            */}
+            <Media image={images[i]} ratio="4/3" alt={theme.title} fit="natural" label="" maxHeight="none" />
+            {/*
+              圖說用的就是後台既有的「主題標題」與「主題說明」兩個欄位，沒有另外開新欄位——
+              那兩欄本來就存在、後台也一直編得到，先前只是沒有渲染出來而已。
+              description 是選填，沒填就只出標題，不留一塊空白。
+            */}
+            <div class="design-themes__caption">
+              <h3 class="design-themes__title">{theme.title}</h3>
+              {theme.description && <p class="design-themes__text">{theme.description}</p>}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+    )
+  }
 </section>
 
 <style>
@@ -165,6 +210,37 @@ const {
     direction: ltr;
   }
 
+  /*
+    carousel：一次一個主題。圖片區固定高度，箭頭對齊它的中線；
+    標題與說明置中放在圖片下方，跟資料視覺化輪播是同一套排法。
+  */
+  .design-themes[data-layout='carousel'] {
+    --carousel-anchor: var(--theme-carousel-height);
+  }
+
+  .design-themes__slide {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+  }
+
+  .design-themes__stage {
+    min-height: var(--theme-carousel-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .design-themes__stage > :global(*) {
+    width: 100%;
+  }
+
+  .design-themes[data-layout='carousel'] .design-themes__caption {
+    max-width: var(--prose-width);
+    margin-inline: auto;
+    text-align: center;
+  }
+
   /* 小螢幕一律單欄：橫排在 375 上每欄只剩幾十 px，等於看不到內容 */
   @media (max-width: 767px) {
     .design-themes__grid {
@@ -174,6 +250,15 @@ const {
     .design-themes[data-layout='split'] .design-themes__item {
       grid-template-columns: 1fr;
       direction: ltr;
+    }
+
+    /* 輪播在手機上不鎖高度，箭頭移到下方（見 Carousel）；長段落改回靠左 */
+    .design-themes__stage {
+      min-height: 0;
+    }
+
+    .design-themes[data-layout='carousel'] .design-themes__caption {
+      text-align: left;
     }
   }
 </style>

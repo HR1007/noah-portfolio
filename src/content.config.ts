@@ -169,7 +169,7 @@ const designThemesBlock = z.object({
     每個主題依序交錯左右邊（奇數在左、偶數在右），用的是跟 experienceDemo／
     researchFramework 同一套 layout 命名習慣，後台也用同一套下拉選單元件。
   */
-  layout: z.enum(['stacked', 'split']).default('stacked'),
+  layout: z.enum(['stacked', 'split', 'carousel']).default('stacked'),
   themes: z.array(
     z.object({
       title: localized(),

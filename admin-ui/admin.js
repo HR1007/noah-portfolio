@@ -1438,6 +1438,7 @@ const OPTION_LABELS = {
   stacked: 'stacked — 文字在上、圖片在下',
   split: 'split — 文字在左、圖片在右',
   'split-reverse': 'split-reverse — 圖片在左、文字在右',
+  carousel: 'carousel — 一次一個，左右箭頭切換',
   left: 'left — 圖片在左',
   right: 'right — 圖片在右',
 };

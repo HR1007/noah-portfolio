@@ -223,6 +223,8 @@
   --chart-hit: 24px;
   --chart-label-width: 180px; /* 每列左側的任務／階段名稱欄 */
   --viz-card-height: 440px; /* 圖表卡片的固定高度：切換時版面不跳動，箭頭也能對齊卡片中線 */
+  /* 設計主軸輪播的圖片區高度：規格板比例有橫有直，全部收進同一個高度，切換時版面不跳 */
+  --theme-carousel-height: 560px;
 
   /* 斷點（僅供 JS 或註解參考，CSS 仍用 @media 明寫數值） */
   --breakpoint-sm: 375px;
