@@ -114,7 +114,7 @@ sections:
             palette, each defined with the states it ships with.
           zh: 所有控制項整理在一張表上：按鈕、比例預設、數量滑桿、六種星形和吸色色票，每一個都和上線後會用到的狀態一起定義。
     direction: vertical
-    layout: stacked
+    layout: carousel
   - type: flow
     eyebrow:
       en: FLOW

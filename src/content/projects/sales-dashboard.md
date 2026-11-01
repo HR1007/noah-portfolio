@@ -102,7 +102,7 @@ sections:
       en: Responsive and auto layout specification page
       zh: 響應式與 auto layout 規格頁
   - type: designThemes
-    layout: split
+    layout: carousel
     eyebrow:
       en: DESIGN SYSTEM
       zh: 設計系統

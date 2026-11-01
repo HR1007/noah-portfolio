@@ -101,7 +101,7 @@ sections:
             state, and all five business lines use the same components.
           zh: 按鈕、輸入框、標籤和服務卡的每一種狀態都事先定義好，五條業務線使用同一套元件。
     direction: vertical
-    layout: stacked
+    layout: carousel
   - type: flow
     eyebrow:
       en: FLOW

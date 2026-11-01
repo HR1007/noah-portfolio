@@ -150,7 +150,7 @@ sections:
             and light colour sets were defined at the same time.
           zh: 考試常在燈光調暗的模擬情境室裡連續進行好幾個小時，所以深色和淺色兩套配色是同時定義的。
     direction: vertical
-    layout: stacked
+    layout: carousel
   - type: flow
     eyebrow:
       en: FLOW

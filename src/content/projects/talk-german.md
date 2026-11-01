@@ -138,7 +138,7 @@ sections:
             never has to guess.
           zh: 每個畫面都標好尺寸，實作時照著做就好，不用猜。
     direction: vertical
-    layout: stacked
+    layout: carousel
   - type: experienceDemo
     layout: split
     eyebrow:
