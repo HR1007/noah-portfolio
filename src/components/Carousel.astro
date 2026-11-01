@@ -1,0 +1,175 @@
+---
+/*
+  一次顯示一張的輪播：左右箭頭（或鍵盤方向鍵）切換，下方顯示「2 / 4」頁碼，到頭會循環。
+  資料視覺化（DataViz）與設計主軸（DesignThemes 的 carousel 版型）共用這一份，
+  切換邏輯與箭頭樣式只維護一處。
+
+  用法：每一張用 data-carousel-slide 標起來，放進這個元件的 slot。
+  箭頭會對齊「--carousel-anchor」高度的中線（由使用的段落設定，例如圖表卡片或圖片區的高度），
+  不是整張（含下方說明文字）的中線。
+
+  為什麼需要 JS：一次只顯示一張、切換與頁碼都得在瀏覽器端做。
+  沒有 JS 時所有內容依序往下排，沒有箭頭，內容一樣讀得到（漸進增強）。
+*/
+interface Props {
+  prevLabel: string;
+  nextLabel: string;
+}
+
+const { prevLabel, nextLabel } = Astro.props;
+---
+
+<div class="carousel" data-carousel>
+  <button class="carousel__nav carousel__nav--prev" type="button" data-carousel-prev aria-label={prevLabel} hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"></path></svg>
+  </button>
+
+  <div class="carousel__slides">
+    <slot />
+  </div>
+
+  <button class="carousel__nav carousel__nav--next" type="button" data-carousel-next aria-label={nextLabel} hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"></path></svg>
+  </button>
+
+  <p class="carousel__count" data-carousel-count aria-live="polite" hidden></p>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+    // 只抓這一層的 slide，不碰巢狀在裡面的其他輪播
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-carousel-slide]')).filter(
+      (slide) => slide.closest('[data-carousel]') === root
+    );
+    const prev = root.querySelector<HTMLButtonElement>('[data-carousel-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-carousel-next]');
+    const count = root.querySelector<HTMLElement>('[data-carousel-count]');
+    if (slides.length < 2 || !prev || !next || !count) return;
+
+    let current = 0;
+    const show = (index: number) => {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => {
+        slide.hidden = i !== current;
+      });
+      count.textContent = `${current + 1} / ${slides.length}`;
+    };
+
+    root.classList.add('is-carousel');
+    prev.hidden = false;
+    next.hidden = false;
+    count.hidden = false;
+    prev.addEventListener('click', () => show(current - 1));
+    next.addEventListener('click', () => show(current + 1));
+    root.addEventListener('keydown', (event) => {
+      const target = event.target as HTMLElement;
+      // 展開的數據表、表單元素裡的方向鍵留給它們自己
+      if (target.closest('summary, table, input, textarea, select')) return;
+      if (event.key === 'ArrowLeft') show(current - 1);
+      if (event.key === 'ArrowRight') show(current + 1);
+    });
+    show(0);
+  });
+</script>
+
+<style>
+  /* 沒有 JS：內容依序往下排 */
+  .carousel__slides {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-6);
+    min-width: 0;
+  }
+
+  .carousel.is-carousel {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'prev slides next' '. count .';
+    column-gap: var(--sp-4);
+    row-gap: var(--sp-2);
+  }
+
+  .carousel.is-carousel .carousel__slides {
+    grid-area: slides;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .carousel.is-carousel :global([data-carousel-slide]:not([hidden])) {
+      animation: carousel-in var(--reveal-duration) var(--reveal-easing);
+    }
+  }
+
+  @keyframes carousel-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .carousel__nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-size-lg);
+    height: var(--control-size-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: border-color var(--motion-fast) var(--motion-ease);
+  }
+
+  .carousel__nav:hover,
+  .carousel__nav:focus-visible {
+    border-color: var(--color-ink);
+  }
+
+  .carousel__nav svg {
+    width: var(--icon-md);
+    height: var(--icon-md);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .carousel__nav--prev,
+  .carousel__nav--next {
+    align-self: start;
+    margin-top: calc((var(--carousel-anchor, var(--control-size-lg)) - var(--control-size-lg)) / 2);
+  }
+
+  .carousel__nav--prev {
+    grid-area: prev;
+  }
+
+  .carousel__nav--next {
+    grid-area: next;
+  }
+
+  .carousel__count {
+    grid-area: count;
+    justify-self: center;
+    font-size: var(--font-size-meta);
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 小螢幕：把寬度讓給內容，箭頭和頁碼移到下方排成一列 */
+  @media (max-width: 767px) {
+    .carousel.is-carousel {
+      grid-template-areas: 'slides slides slides' 'prev count next';
+      row-gap: var(--sp-3);
+    }
+
+    .carousel__nav--prev,
+    .carousel__nav--next {
+      margin-top: 0;
+    }
+
+    .carousel.is-carousel .carousel__count {
+      align-self: center;
+    }
+  }
+</style>

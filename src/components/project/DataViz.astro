@@ -9,11 +9,12 @@
   資料端 4px 圓角、圖例一定在、只挑重點直接標數字；每張圖都附數據表，
   滑鼠提示只是加分，不是唯一讀到數值的方式。
 
-  為什麼需要 JS：切換圖表與滑鼠提示一定得在瀏覽器端做。沒有 JS 時四張圖全部
-  依序攤開，內容一樣讀得到（漸進增強）。script 只做這兩件事。
+  切換交給共用的 Carousel 元件；這裡的 script 只負責滑鼠提示。
+  沒有 JS 時四張圖全部依序攤開，內容一樣讀得到（漸進增強）。
 */
 import { getEntry, type CollectionEntry } from 'astro:content';
 import SectionCta from './SectionCta.astro';
+import Carousel from '../Carousel.astro';
 import { t, type Locale, type LocalizedText } from '../../lib/i18n';
 
 type Section = Extract<CollectionEntry<'projects'>['data']['sections'][number], { type: 'dataViz' }>;
@@ -216,17 +217,12 @@ const body = trOpt(section.body);
     {body && <p class="viz__body">{body}</p>}
   </div>
 
-  <div class="viz__stage">
-    <button class="viz__nav viz__nav--prev" type="button" data-viz-prev aria-label={ui.prev} hidden>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"></path></svg>
-    </button>
-
-    <div class="viz__slides">
+  <Carousel prevLabel={ui.prev} nextLabel={ui.next}>
       {
         charts.map((chart, index) => (
           <figure
             class="viz__slide"
-            data-viz-slide
+            data-carousel-slide
             role="group"
             aria-roledescription="slide"
             aria-label={`${index + 1} / ${charts.length} · ${chart.title}`}
@@ -485,14 +481,7 @@ const body = trOpt(section.body);
           </figure>
         ))
       }
-    </div>
-
-    <button class="viz__nav viz__nav--next" type="button" data-viz-next aria-label={ui.next} hidden>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"></path></svg>
-    </button>
-
-    <p class="viz__count" data-viz-count aria-live="polite" hidden></p>
-  </div>
+  </Carousel>
 
   <div class="viz__tip" data-viz-tip role="tooltip" hidden></div>
 
@@ -501,41 +490,11 @@ const body = trOpt(section.body);
 
 <script>
   /*
-    兩件事：一次只顯示一張圖並用箭頭／鍵盤切換；滑鼠移到記號上時顯示數值提示。
+    滑鼠移到記號上時顯示數值提示。圖表的切換由共用的 Carousel 元件處理。
     提示文字用 textContent 寫入（內容來自後台可編輯的資料，不用 innerHTML）。
   */
   document.querySelectorAll<HTMLElement>('[data-viz]').forEach((root) => {
-    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-viz-slide]'));
-    const prev = root.querySelector<HTMLButtonElement>('[data-viz-prev]');
-    const next = root.querySelector<HTMLButtonElement>('[data-viz-next]');
-    const count = root.querySelector<HTMLElement>('[data-viz-count]');
     const tip = root.querySelector<HTMLElement>('[data-viz-tip]');
-
-    if (slides.length > 1 && prev && next && count) {
-      let current = 0;
-      const show = (index: number) => {
-        current = (index + slides.length) % slides.length;
-        slides.forEach((slide, i) => {
-          slide.hidden = i !== current;
-        });
-        count.textContent = `${current + 1} / ${slides.length}`;
-      };
-
-      root.classList.add('is-carousel');
-      prev.hidden = false;
-      next.hidden = false;
-      count.hidden = false;
-      prev.addEventListener('click', () => show(current - 1));
-      next.addEventListener('click', () => show(current + 1));
-      root.addEventListener('keydown', (event) => {
-        const target = event.target as HTMLElement;
-        if (target.closest('summary, table')) return;
-        if (event.key === 'ArrowLeft') show(current - 1);
-        if (event.key === 'ArrowRight') show(current + 1);
-      });
-      show(0);
-    }
-
     if (!tip) return;
     const place = (event: PointerEvent) => {
       tip.style.left = `${event.clientX}px`;
@@ -589,76 +548,9 @@ const body = trOpt(section.body);
     color: var(--color-muted);
   }
 
-  /* ---------- 輪播骨架 ---------- */
-
-  /* 沒有 JS 時：圖表依序往下排，沒有箭頭 */
-  .viz__slides {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-6);
-    min-width: 0;
-  }
-
-  .viz.is-carousel .viz__stage {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-areas: 'prev slides next' '. count .';
-    column-gap: var(--sp-4);
-    row-gap: var(--sp-2);
-  }
-
-  .viz.is-carousel .viz__slides {
-    grid-area: slides;
-  }
-
-  .viz__nav {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--control-size-lg);
-    height: var(--control-size-lg);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-pill);
-    background: transparent;
-    color: var(--color-ink);
-    cursor: pointer;
-    transition: border-color var(--motion-fast) var(--motion-ease);
-  }
-
-  .viz__nav:hover,
-  .viz__nav:focus-visible {
-    border-color: var(--color-ink);
-  }
-
-  .viz__nav svg {
-    width: var(--icon-md);
-    height: var(--icon-md);
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* 箭頭對齊圖表卡片的中線，不是整張（含說明文字）的中線 */
-  .viz__nav--prev {
-    grid-area: prev;
-    align-self: start;
-    margin-top: calc((var(--viz-card-height) - var(--control-size-lg)) / 2);
-  }
-
-  .viz__nav--next {
-    grid-area: next;
-    align-self: start;
-    margin-top: calc((var(--viz-card-height) - var(--control-size-lg)) / 2);
-  }
-
-  .viz__count {
-    grid-area: count;
-    justify-self: center;
-    font-size: var(--font-size-meta);
-    color: var(--color-muted);
-    font-variant-numeric: tabular-nums;
+  /* 箭頭對齊圖表卡片的中線（Carousel 讀這個變數） */
+  .viz {
+    --carousel-anchor: var(--viz-card-height);
   }
 
   .viz__slide {
@@ -666,18 +558,6 @@ const body = trOpt(section.body);
     display: flex;
     flex-direction: column;
     gap: var(--sp-3);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .viz.is-carousel .viz__slide:not([hidden]) {
-      animation: viz-in var(--reveal-duration) var(--reveal-easing);
-    }
-  }
-
-  @keyframes viz-in {
-    from {
-      opacity: 0;
-    }
   }
 
   .viz__card {
@@ -1064,23 +944,8 @@ const body = trOpt(section.body);
     font-variant-numeric: tabular-nums;
   }
 
-  /* ---------- 小螢幕：名稱欄移到長條上方，箭頭移到圖表下方 ---------- */
+  /* ---------- 小螢幕：名稱欄移到長條上方 ---------- */
   @media (max-width: 767px) {
-    .viz.is-carousel .viz__stage {
-      grid-template-columns: auto minmax(0, 1fr) auto;
-      grid-template-areas: 'slides slides slides' 'prev count next';
-      row-gap: var(--sp-3);
-    }
-
-    .viz__nav--prev,
-    .viz__nav--next {
-      margin-top: 0;
-    }
-
-    .viz.is-carousel .viz__count {
-      align-self: center;
-    }
-
     .viz__card {
       min-height: 0;
       padding: var(--sp-3);
