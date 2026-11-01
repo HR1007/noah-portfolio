@@ -274,6 +274,18 @@ sections:
             T1 有五位受測者獨立完成，達到 5/6 的目標。唯一需要協助的是
             P2：在手機上，首頁的報價表單落在第一屏以下，進到服務頁後，報價按鈕又只在頁面最下方。T2 的 P5
             分不清「運動場館工程」和「場地規劃與維修」，同樣需要協助。T3、T4 六個人都獨立完成。
+        insight:
+          en: >-
+            The main path mostly works, and the trouble sits in two specific
+            places: the quote entry is too far down on mobile, and "venue
+            construction" and "facility planning and maintenance" sound too
+            alike. Both were rated high severity. The fixes are a quote button
+            on the first mobile screen that scrolls to the form, a quote button
+            in the service-page hero, and a one-line subtitle under each venue
+            service, with each page linking to the other.
+          zh: >-
+            主要路徑大致走得通，卡關集中在兩個具體的地方：手機版的報價入口位置太低，以及「運動場館工程」和「場地規劃與維修」兩個名稱太接近。這兩點都列為高嚴重度，對應的修正是在手機首屏加一顆直接捲到表單的報價按鈕、服務頁的
+            Hero 也放報價按鈕，並在兩條場地服務的名稱下各加一行副標，兩頁互相連結。
         rowHeading:
           en: Task
           zh: 任務
@@ -327,6 +339,17 @@ sections:
           zh: >-
             六個人最後都送出了詢價，獨立完成的有五位。唯一的流失點在「找到報價入口」：P2 在手機上找不到入口，協助之後才進到表單。P3
             在數量欄填了「30 套」被擋下，自己改成數字後通過，不算流失。
+        insight:
+          en: >-
+            Drop-off happened only at finding the entry; once people reached the
+            form, all six submitted it. The fix belongs at the entry, and the
+            form itself needs little change. Opening the quote form from a
+            service page pre-fills the service type, and nobody picked the wrong
+            service this round. The quantity field accepting only digits without
+            saying so is a low-severity issue, solved by showing the unit and an
+            error message.
+          zh: >-
+            流失只發生在「找到入口」這一步，進到表單之後，六個人都順利送出。所以要改的是入口好不好找，表單本身不用大改。從服務頁按「立即免費報價」時服務類型會自動帶入，這次沒有人選錯服務。數量欄只接受數字卻沒有提示，屬於低嚴重度的小問題，加上單位「件」和錯誤訊息就能解決。
         rowHeading:
           en: Stage
           zh: 階段
@@ -382,6 +405,20 @@ sections:
           zh: >-
             T1 的中位數是 100 秒，在 120 秒的目標內；最慢的 186 秒就是需要協助的 P2。T3 最快，中位數 24
             秒，手機版的電話可以直接點撥。T2 的 P5 花了 150 秒，卡在兩條場地服務之間。
+        insight:
+          en: >-
+            The time spread shows how much each problem costs. On T1, all three
+            mobile participants (104, 118 and 186 seconds) were slower than all
+            three desktop participants (72, 84 and 96 seconds), which matches
+            the mobile entry problem in the success chart. T2's only long tail
+            is P5 at 150 seconds, the participant who went back and forth
+            between the two venue services. T3 took a median of just 24 seconds,
+            and both mobile participants mentioned being able to tap the phone
+            number to call.
+          zh: >-
+            時間分布把卡關的程度量化了。T1 的三位手機受測者（104、118、186 秒）都比三位桌機受測者（72、84、96
+            秒）慢，和成功率那張圖指出的手機入口問題一致。T2 唯一的長尾是 P5 的 150 秒，正是在兩條場地服務之間來回的那一位。T3
+            中位數只要 24 秒，兩位手機受測者都提到可以直接點撥電話。
         rowHeading:
           en: Task
           zh: 任務
@@ -506,6 +543,16 @@ sections:
           zh: >-
             SEQ 是每個任務做完後問的一題：「整體來說，這題有多容易？」1 是非常困難，7 是非常容易。T2 平均 4.8，是唯一低於 5.5
             的任務：三個人在「運動場館工程」和「場地規劃與維修」之間點錯或來回。其他三個任務的平均都在 5.8 以上。
+        insight:
+          en: >-
+            SEQ shows what the success rate hides. Everyone completed T2, yet it
+            averaged only 4.8: P5 gave it a 3, and four of the other five gave
+            it a 5, so getting through took effort. That is why the T2 naming
+            problem ranks near the top of the fix list even though nobody failed
+            the task.
+          zh: >-
+            成功率看不出來的地方，SEQ 補上了。T2 六個人都完成，平均卻只有 4.8：P5 給了 3 分，其他五人裡有四位給 5
+            分，過程並不輕鬆。這也是為什麼 T2 的名稱問題排在修正清單前面，即使它沒有讓任何人失敗。
         rowHeading:
           en: Task
           zh: 任務
