@@ -92,6 +92,7 @@ const charts = section.charts.map((chart: Chart) => {
     title: tr(chart.title),
     description: tr(chart.description),
     rowHeading: tr(chart.rowHeading),
+    insight: trOpt(chart.insight),
   };
 
   if (chart.kind === 'outcomeBars') {
@@ -397,6 +398,12 @@ const body = trOpt(section.body);
             <figcaption class="viz__caption">
               <h3 class="viz__title">{chart.title}</h3>
               <p class="viz__description">{chart.description}</p>
+              {chart.insight && (
+                <div class="viz__insight">
+                  <p class="viz__insight-label">{ui.insight}</p>
+                  <p class="viz__insight-text">{chart.insight}</p>
+                </div>
+              )}
               <details class="viz__table">
                 <summary>{ui.table}</summary>
                 <div class="viz__table-scroll">
@@ -701,6 +708,29 @@ const body = trOpt(section.body);
     font-size: var(--font-size-label);
     line-height: 1.7;
     color: var(--color-muted);
+  }
+
+  /* 「這代表什麼」：跟上面「數據顯示了什麼」分開，用一條細線和小標題隔出來 */
+  .viz__insight {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+    margin-top: var(--sp-2);
+    padding-top: var(--sp-2);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .viz__insight-label {
+    font-size: var(--font-size-meta);
+    color: var(--color-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .viz__insight-text {
+    font-size: var(--font-size-label);
+    line-height: 1.7;
+    color: var(--color-ink);
   }
 
   .viz__table {

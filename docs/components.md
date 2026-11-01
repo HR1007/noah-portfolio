@@ -95,4 +95,5 @@
 - **配色**：`--chart-step-1/2/3` 順序型三階（單色，深色主題另有一組），用 dataviz `validate_palette.js --ordinal` 驗過；改色要重跑驗證。
 - **JS**：只有切換與滑鼠提示兩件事（原生 script）。沒有 JS 時所有圖表依序攤開，內容一樣讀得到。
 - **無障礙**：每張圖都有數據表；圖例與直接標註並存，不只靠顏色辨識；滑鼠提示只是加分。
-- **文案**：按鈕與「查看數據表」在 `src/content/site/main-*.json` 的 `dataViz`。
+- **說明分兩層**：`description` 寫數據顯示了什麼；選填的 `insight` 寫這代表什麼、因此要改什麼，顯示在說明下方並加小標題。
+- **文案**：按鈕、「查看數據表」與「這代表什麼」小標題在 `src/content/site/main-*.json` 的 `dataViz`。

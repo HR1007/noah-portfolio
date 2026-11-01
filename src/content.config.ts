@@ -217,6 +217,9 @@ const vizChartBase = {
   title: localized(),
   description: localized(),
   rowHeading: localized(), // 數據表第一欄的欄名，例如「任務」「階段」
+  // 選填：這張圖背後的意思與因此要改什麼，顯示在說明下方、加小標題。
+  // description 講數據顯示了什麼，insight 講所以呢——兩件事分開寫。
+  insight: localized().optional(),
 };
 const dataVizChart = z.discriminatedUnion('kind', [
   z.object({
@@ -385,6 +388,7 @@ const site = defineCollection({
       prev: z.string(),
       next: z.string(),
       table: z.string(), // 展開數據表的按鈕
+      insight: z.string(), // 每張圖「這代表什麼」段落的小標題
     }),
     marquee: z.object({
       items: z.array(z.string()),

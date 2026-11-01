@@ -311,6 +311,7 @@ function newOutcomeChart() {
     kind: 'outcomeBars',
     title: `${TBD} 圖表標題`,
     description: `${TBD} 圖表說明，待補`,
+    insight: `${TBD} 這代表什麼，待補`,
     rowHeading: '任務',
     total: 1,
     rows: [{ label: 'T1', name: `${TBD} 任務名稱`, independent: 0, assisted: 0, failed: 0 }],
