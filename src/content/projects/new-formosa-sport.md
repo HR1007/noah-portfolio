@@ -1,7 +1,7 @@
 ---
 title:
   en: New Formosa Sport — Sports Platform Website Design
-  zh: 新寶島——運動用品平台網站設計
+  zh: 新寶島──運動用品平台網站設計
 order: 3
 summary:
   en: >-
@@ -21,7 +21,7 @@ sections:
       zh: 起點與靈感
     heading:
       en: New Formosa Sport — Sports Platform Website Design
-      zh: 新寶島——運動用品平台網站設計
+      zh: 新寶島──運動用品平台網站設計
     paragraphs:
       - en: >-
           New Formosa Sport is a long-established sporting goods business in
