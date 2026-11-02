@@ -311,21 +311,6 @@ sections:
           en: Follow-up tasks page
           zh: 跟進任務頁
     direction: horizontal
-  - type: imageRow
-    eyebrow:
-      en: RESPONSIVE
-      zh: 三個斷點
-    heading:
-      en: 'One screen, three breakpoints at once'
-      zh: 同一個畫面，三個斷點同時成立
-    images:
-      - ratio: 5920/2480
-        alt:
-          en: >-
-            Desktop, tablet and phone device mockups side by side, all showing
-            the same overview screen
-          zh: 桌機、平板、手機三個裝置 mockup 並排，都是同一個總覽畫面
-    direction: vertical
   - type: featureSplit
     eyebrow:
       en: HANDOFF
@@ -354,5 +339,20 @@ sections:
       en: Try it out
       zh: 來試試看
     ctaHref: 'https://hr1007.github.io/Sales-War-Room/'
+  - type: imageRow
+    eyebrow:
+      en: RESPONSIVE
+      zh: 三個斷點
+    heading:
+      en: 'One screen, three breakpoints at once'
+      zh: 同一個畫面，三個斷點同時成立
+    images:
+      - ratio: 5920/2480
+        alt:
+          en: >-
+            Desktop, tablet and phone device mockups side by side, all showing
+            the same overview screen
+          zh: 桌機、平板、手機三個裝置 mockup 並排，都是同一個總覽畫面
+    direction: vertical
 ---
 
