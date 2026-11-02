@@ -541,8 +541,8 @@ const body = trOpt(section.body);
     text-transform: uppercase;
   }
 
+  /* 內文寬度跟其他段落一致，延伸到內容欄右緣，不另外限寬 */
   .viz__body {
-    max-width: var(--prose-width);
     font-size: var(--font-size-body);
     line-height: 1.7;
     color: var(--color-muted);
@@ -772,7 +772,7 @@ const body = trOpt(section.body);
     position: relative;
   }
 
-  /* 堆疊長條：段與段之間是底色間隙，不是描邊；資料端 4px 圓角、基線端方角 */
+  /* 堆疊長條：段與段之間是底色間隙，不是描邊；整條長條的兩端都是 4px 圓角 */
   .chart__stack {
     display: flex;
     gap: var(--chart-gap);
@@ -789,8 +789,14 @@ const body = trOpt(section.body);
     font-weight: var(--font-weight-semibold);
   }
 
+  .chart__seg:first-child {
+    border-top-left-radius: var(--chart-end-radius);
+    border-bottom-left-radius: var(--chart-end-radius);
+  }
+
   .chart__seg:last-child {
-    border-radius: 0 var(--chart-end-radius) var(--chart-end-radius) 0;
+    border-top-right-radius: var(--chart-end-radius);
+    border-bottom-right-radius: var(--chart-end-radius);
   }
 
   .chart__seg--step1 {
@@ -815,7 +821,7 @@ const body = trOpt(section.body);
     top: 0;
     left: 0;
     height: var(--chart-bar);
-    border-radius: 0 var(--chart-end-radius) var(--chart-end-radius) 0;
+    border-radius: var(--chart-end-radius);
   }
 
   .chart__bar--step1 {
