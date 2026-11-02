@@ -209,10 +209,8 @@ sections:
       en: USABILITY TEST
       zh: 可用性測試
     heading:
-      en: >-
-        Six people, four tasks, and whether customers can reach a sent inquiry
-        on their own
-      zh: 六個人、四個任務，看客人能不能自己走到送出詢價
+      en: 'Usability test results: 6 participants, 4 tasks'
+      zh: 可用性測試結果：6 位受測者、4 個任務
     body:
       en: >-
         After launch I ran a moderated, think-aloud usability test on the live
