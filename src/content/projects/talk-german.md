@@ -100,9 +100,10 @@ sections:
       zh: 設計主軸
     heading:
       en: >-
-        A small but complete design system: colour, type, spacing and redlines
-        that keep every screen consistent across both themes.
-      zh: 一套小而完整的設計系統：色彩、字體、間距和標註都有規範，每個畫面在兩種主題下都一致。
+        A small but complete design system: colour, type, spacing, redlines,
+        components and icons that keep every screen consistent across both
+        themes.
+      zh: 一套小而完整的設計系統：色彩、字體、間距、標註、元件和圖示都有規範，每個畫面在兩種主題下都一致。
     themes:
       - title:
           en: Colour
@@ -137,6 +138,24 @@ sections:
             Every screen is specced with measurements, so whoever builds it
             never has to guess.
           zh: 每個畫面都標好尺寸，實作時照著做就好，不用猜。
+      - title:
+          en: Components
+          zh: 元件
+        description:
+          en: >-
+            The pieces behind Daily Words, drawn in light and dark: the sliding
+            tab pill, der/die/das tags, word cards, flashcards, quiz answer
+            states and the cloud-sync button.
+          zh: 每日單字用到的元件，淺色深色各一套：滑動分頁泡泡、der／die／das 冠詞標籤、單字卡、學習卡、測驗答案狀態和雲端同步按鈕。
+      - title:
+          en: Icons
+          zh: 圖示
+        description:
+          en: >-
+            One icon set throughout: 29 lucide icons at stroke 2, used at 22,
+            18 and 14px, taking their colour from the text so both themes share
+            them.
+          zh: 全站只用一套圖示：29 個 lucide 圖示，線寬 2，用在 22、18、14px 三種尺寸；顏色跟著文字走，兩種主題共用。
     direction: vertical
     layout: carousel
   - type: experienceDemo
