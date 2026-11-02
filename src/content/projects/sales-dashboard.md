@@ -228,6 +228,10 @@ sections:
     alt:
       en: The assign follow-up dialog over the overview screen
       zh: 指派跟進對話框疊在總覽畫面上
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://hr1007.github.io/Sales-War-Room/'
   - type: featureSplit
     eyebrow:
       en: DATA LINEAGE
@@ -346,5 +350,9 @@ sections:
     alt:
       en: Core components rebuilt with real auto layout
       zh: 用原生 auto layout 重建的核心元件
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://hr1007.github.io/Sales-War-Room/'
 ---
 
