@@ -151,7 +151,7 @@ sections:
         colours. Headlines and body text each have four sizes, enough for every
         screen and few enough to stay consistent.
       zh: 主色是溫暖的琥珀色，搭配固定的深淺階、淡色階和狀態色。標題和內文各有四個級距，足夠組出所有畫面，數量也少到容易維持一致。
-    imagePosition: right
+    imagePosition: left
     ratio: 3/4
     alt:
       en: Foodlet colour palette and type scale
@@ -186,7 +186,7 @@ sections:
         as the reward. A collectible has to look worth keeping, not like a
         receipt.
       zh: 圓潤的 3D 角色負責說明，像素風的食物當作獎勵。收藏品要看起來值得收藏，不能像一張收據。
-    imagePosition: right
+    imagePosition: left
     ratio: 3/4
     alt:
       en: Illustration set — 3D characters and pixel-art food collectibles
@@ -204,7 +204,7 @@ sections:
         claimed with one tap. The checkout moment that used to be a single beep
         now leaves something to collect.
       zh: 付款完成後，第一個收藏品就會出現：一塊像素餅乾，點一下就能領取。原本只有一聲「嗶」的結帳時刻，現在多了一樣可以收藏的東西。
-    imagePosition: left
+    imagePosition: right
     ratio: 3/4
     alt:
       en: Mobile screen awarding the first Foodlet NFT collectible
