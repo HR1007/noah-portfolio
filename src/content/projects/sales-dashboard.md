@@ -206,7 +206,7 @@ sections:
           zh: 從推播通知到結案跟進任務的手機動線
     direction: vertical
   - type: experienceDemo
-    layout: split
+    layout: split-reverse
     eyebrow:
       en: THE MOMENT
       zh: 收斂點
