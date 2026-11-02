@@ -161,6 +161,10 @@ sections:
     alt:
       en: Quote form confirmation screen after an inquiry is sent
       zh: 詢價送出後的「已收到您的需求」確認畫面
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://new-formosa-sport.netlify.app/index.html#home'
   - type: featureSplit
     heading:
       en: Zero-Build Deployment
