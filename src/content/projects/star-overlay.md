@@ -1,7 +1,7 @@
 ---
 title:
   en: A design language for the Star Overlay editor
-  zh: Star Overlay 編輯器的設計語言
+  zh: Star Overlay
 order: 2
 summary:
   en: >-
@@ -20,7 +20,7 @@ sections:
       zh: 起點與靈感
     heading:
       en: A design language for the Star Overlay editor
-      zh: Star Overlay 編輯器的設計語言
+      zh: Star Overlay
     paragraphs:
       - en: >-
           Star Overlay turns a photo into a split composition. On the left, the
