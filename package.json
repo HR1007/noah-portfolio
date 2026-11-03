@@ -15,7 +15,8 @@
     "report": "node scripts/build-report.mjs",
     "hooks:install": "node scripts/install-hooks.mjs",
     "publish": "node scripts/publish.mjs",
-    "test:admin": "node scripts/test-admin-drag.mjs"
+    "test:admin": "node scripts/test-admin-drag.mjs",
+    "test:ui": "node scripts/test-ui.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

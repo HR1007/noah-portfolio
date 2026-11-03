@@ -41,3 +41,6 @@ raw-assets/
 # 網站不依賴它們（在 src/ 與 public/ 之外，Astro 不會 build），
 # 留著只會把發布面板的檔案清單塞滿雜訊——那份清單是發布前唯一的人工檢查。
 .designagent-tmp/
+
+# npm run test:ui 的測試結果，每次跑都會覆蓋
+.ui-test/
