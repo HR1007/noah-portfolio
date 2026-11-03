@@ -131,7 +131,7 @@ const navItems = [
     <div class="about__grid">
       <div
         class="about__photo"
-        style={aboutImage ? `aspect-ratio:${aboutImage.width}/${aboutImage.height}; max-height:${aboutImage.height}px` : undefined}
+        style={aboutImage ? `aspect-ratio:${aboutImage.width}/${aboutImage.height}; max-width:${aboutImage.width}px` : undefined}
       >
         {
           aboutImage ? (
@@ -472,22 +472,24 @@ const navItems = [
   }
 
   /*
-    .about__photo 用行內 style 帶入圖片原始寬高比（aspect-ratio）與原始像素高度
-    （max-height），讓 Grid 在 auto-track 階段就能算出寬度，避免其寬度依賴
-    尚未 resolve 的 stretch 高度造成的循環相依（img width:auto + height:100% 會讓寬度塌陷為 0）。
-    文字比較長時，欄位會被 align-items:stretch 撐到跟文字一樣高，但不會超過
-    max-height（原始像素高度），所以不會被放大過原始解析度；文字比較短時，
-    照片維持自己的原始比例與高度，不強制裁切。
+    照片尺寸只由寬度決定：.about__photo 用行內 style 帶入圖片原始寬高比（aspect-ratio）
+    與原始像素寬度（max-width），width:100% 填滿欄位但不超過原圖，高度由比例算出。
+    auto 欄因此直接等於原圖寬度，跟文字多長無關。
+
+    先前的做法是讓照片高度跟著文字（align-items:stretch + height:100%），再由高度反推
+    auto 欄的寬度——欄寬依賴列高、列高又依賴欄寬，瀏覽器算出來的結果會隨載入時機變動：
+    1440 有時是 431px 有時是 483px，1200～1280 照片蓋到文字，768 文字被擠到剩 102px 寬、
+    整段溢出到下一個區塊，連「閱讀更多」都被蓋住。
   */
   .about__grid {
     display: grid;
     grid-template-columns: auto 1fr;
     gap: var(--sp-5);
-    align-items: stretch;
+    align-items: start;
   }
 
   .about__photo {
-    height: 100%;
+    width: 100%;
     border-radius: var(--radius);
     overflow: hidden;
   }
@@ -588,11 +590,17 @@ const navItems = [
     }
   }
 
-  @media (max-width: 767px) {
+  /*
+    1199 以下照片疊在文字上面。兩欄時照片固定是原圖寬度，平板上剩給文字的欄寬
+    太窄（1024 只剩約 180px）；照片靠左，跟標題、文字的左緣對齊。
+  */
+  @media (max-width: 1199px) {
     .about__grid {
       grid-template-columns: 1fr;
     }
+  }
 
+  @media (max-width: 767px) {
     /* 手機上一個一列，靠左對齊比置中好讀（值的長度差很多） */
     .connect__channels {
       flex-direction: column;
