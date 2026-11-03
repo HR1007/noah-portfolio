@@ -1,7 +1,7 @@
 ---
 /*
   相簿內頁的直向跑馬燈：照片分成幾欄持續往上流動，滑鼠停在牆面上就整片停住，
-  讓人可以好好看那一張。
+  讓人可以好好看那一張。手機上不跑，改成一條手指左右滑的照片列（見最下面的樣式）。
 
   為什麼不用 JS 驅動位移：那要每一幀改 transform，長長一牆照片很容易掉幀。
   純 CSS animation 交給合成執行緒跑，而且「暫停」只是 animation-play-state，
@@ -25,10 +25,11 @@ interface Props {
 const { images, labelPrefix, placeholderCount = 9 } = Astro.props;
 
 const items = images.length > 0
-  ? images.map((image, i) => ({ image, alt: `${labelPrefix} ${String(i + 1).padStart(2, '0')}` }))
+  ? images.map((image, i) => ({ image, alt: `${labelPrefix} ${String(i + 1).padStart(2, '0')}`, order: i }))
   : Array.from({ length: placeholderCount }, (_, i) => ({
       image: undefined,
       alt: `${labelPrefix} ${String(i + 1).padStart(2, '0')}`,
+      order: i,
     }));
 
 // 輪流分配到各欄，而不是切成連續幾段：同一欄裡才不會整排都是直幅或整排都是橫幅
@@ -48,7 +49,7 @@ items.forEach((item, i) => columns[i % COLUMNS].push(item));
         */}
         <div class="photo-marquee__track" data-marquee-track>
           {column.map((item) => (
-            <figure class="photo-marquee__item">
+            <figure class="photo-marquee__item" style={`--order: ${item.order}`}>
               {item.image ? (
                 <Image src={item.image} alt={item.alt} loading="lazy" />
               ) : (
@@ -180,8 +181,9 @@ items.forEach((item, i) => columns[i % COLUMNS].push(item));
   }
 
   /*
-    小螢幕與「減少動態」都退回一般的直向堆疊：手機上一欄流動的牆很難點中某一張，
+    小螢幕與「減少動態」都不跑動畫：手機上流動的牆很難點中某一張，
     而會動的內容對前庭敏感的人是實際的障礙。這時只顯示第一份，複本要藏起來。
+    桌機寬度的減少動態退回直向堆疊；手機寬度在下一段另外排成左右滑。
   */
   @media (max-width: 767px), (prefers-reduced-motion: reduce) {
     .photo-marquee {
@@ -191,12 +193,59 @@ items.forEach((item, i) => columns[i % COLUMNS].push(item));
       mask-image: none;
     }
 
-    .photo-marquee__track {
+    /*
+      選擇器要跟上面開動畫的那條一樣具體（含 [data-ready]）。只寫 .photo-marquee__track
+      的話權重比較低、蓋不過去，手機與減少動態時照片其實一直在往上跑。
+    */
+    .photo-marquee[data-ready] .photo-marquee__track {
       animation: none;
     }
 
     .photo-marquee__item[aria-hidden='true'] {
       display: none;
+    }
+  }
+
+  /*
+    手機：所有照片排成一條，手指左右滑，一次停在一張的正中央。
+
+    欄與軌道用 display: contents 拆掉，照片直接成為這一條的項目。照片在建置時是
+    輪流分到各欄的，DOM 順序是 01、06、11…，用 --order 排回原本的 01、02、03。
+    order 只在這裡套用：桌機的軌道裡原圖與複本共用同一個 --order，
+    套了就會把同一張照片排在一起，無縫循環就斷了。
+
+    整條往左右延伸到螢幕邊緣（抵銷內容邊距），照片滑出去時不會在內文邊界被切一刀；
+    padding 與 scroll-padding 讓第一張仍然對齊標題左緣。
+  */
+  @media (max-width: 767px) {
+    .photo-marquee {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      margin-inline: calc(-1 * var(--content-gutter));
+      padding-inline: var(--content-gutter);
+      scroll-padding-inline: var(--content-gutter);
+    }
+
+    .photo-marquee::-webkit-scrollbar {
+      display: none;
+    }
+
+    .photo-marquee__col,
+    .photo-marquee__track {
+      display: contents;
+    }
+
+    /* 每張一樣寬、高度依照片比例，直幅照片會比橫幅高；左右露出一點鄰居，看得出可以滑 */
+    .photo-marquee__item {
+      flex: none;
+      width: 85vw;
+      margin: 0;
+      order: var(--order);
+      scroll-snap-align: center;
     }
   }
 </style>
