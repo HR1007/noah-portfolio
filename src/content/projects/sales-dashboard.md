@@ -8,7 +8,7 @@ summary:
     An internship dashboard, rebuilt as a design system. The focus is the path
     from spotting a problem to assigning someone to follow it up; the charts are
     only one part of that.
-  zh: 把實習時做的銷售儀表板重新設計成一套系統。這個案子在意的是怎麼讓人從發現問題，一路走到把跟進指派出去，圖表只是其中一段。
+  zh: 把實習時做的銷售儀表板重新設計成一套系統。這個案子在意的是怎麼讓人從發現問題，一路走到把任務指派出去，而圖表只是其中一段。
 hero:
   ctaLabel:
     en: Try it out
@@ -75,7 +75,7 @@ sections:
       zh: 架構
     heading:
       en: 'Seven principles, turned into rules you can check'
-      zh: 七個原則，變成可以逐條檢查的硬規則
+      zh: 將七個原則變成可以逐條檢查的硬規則
     layout: stacked
     paragraphs:
       - en: >-
@@ -87,7 +87,7 @@ sections:
           colour, and a dedicated screen for each of the four data states.
         zh: >-
           資訊層級、KPI
-          選擇、圖表適配、篩選互動、視覺清楚、數據脈絡、操作回饋，這七個原則聽起來都對，也因為太理所當然而常被跳過。我把每一條都改寫成可以檢查的規則：一個畫面最多九個區塊；每個數字都帶單位和比較基準；一個語意色只代表一種意思；四種資料狀態各有自己的畫面。
+          選擇、圖表適配、篩選互動、視覺清楚、數據脈絡、操作回饋，這七個原則在表面上聽起來沒有問題，但也因為太理所當然而常被跳過。於是我把每一條都改寫成可以檢查的規則：一個畫面最多九個區塊；每個數字都帶單位和比較基準；一個語意色只代表一種意思；四種資料狀態各有自己的畫面。
       - en: >-
           There are three breakpoints, 375, 768 and 1200, for three real
           situations: at a desk seeing everything, in a meeting with a tablet,
