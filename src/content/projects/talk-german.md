@@ -230,6 +230,9 @@ sections:
           zh: 左右對照結果畫面
     direction: horizontal
   - type: featureSplit
+    eyebrow:
+      en: LIGHT MODE
+      zh: 淺色模式
     heading:
       en: Daylight Accessibility
       zh: 白天的易讀性
@@ -248,6 +251,9 @@ sections:
       zh: 來試試看
     ctaHref: 'https://hr1007.github.io/talk-german/'
   - type: featureSplit
+    eyebrow:
+      en: DARK MODE
+      zh: 深色模式
     heading:
       en: Nightfall Immersion
       zh: 入夜之後
