@@ -175,10 +175,10 @@ sections:
       zh: >-
         這段 demo
         走過核心流程：先是安全但簡單的登入，接著擷取語音，可以現場錄音或上傳音檔，最後是左右對照的翻譯結果，學習者能馬上確認自己聽懂多少。這樣設計是為了降低壓力，讓注意力留在聽懂這句話上。
-    ratio: 16/10
+    ratio: 390/844
     alt:
-      en: Talk German translation screen demo on a single phone
-      zh: 單台手機展示 Talk German 的翻譯結果畫面
+      en: Talk German demo on a phone, from sign-in and translation to flashcards and a quiz
+      zh: Talk German 手機操作示範，從登入、翻譯到學習卡與測驗
     ctaLabel:
       en: Try it out
       zh: 來試試看
