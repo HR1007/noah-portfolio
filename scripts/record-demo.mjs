@@ -25,7 +25,7 @@
 
   敏感資訊：每次都用全新的空白 Chrome 設定檔（沒有任何登入狀態、cookie、紀錄），
   只錄網頁內容、不錄網址列。腳本裡輸入的一律是假資料；頁面上有不該公開的內容時
-  用 demo.mask(選擇器) 模糊掉。錄完會另外輸出一張每 3 秒抽一格的總覽圖
+  用 demo.mask(選擇器) 模糊掉；會寄信給真人的表單用 demo.fakeResponse 攔下，畫面照樣走到送出成功。錄完會另外輸出一張每 3 秒抽一格的總覽圖
   （.demo-out/<名稱>-sheet.jpg），上傳前逐格看過一遍。
 
   輸出到 .demo-out/<名稱>.mp4（不進版控），確認沒問題再複製到案例的圖片資料夾。
@@ -268,6 +268,7 @@ const clock = { firstTs: null, firstWall: 0, paused: 0 };
 const videoTime = () => (clock.firstTs === null ? 0 : Date.now() / 1000 - clock.firstWall - clock.paused);
 const focusKeys = []; // { t, z, x, y }：從 t 開始，鏡頭在 FOCUS_MS 內移到中心 (x, y)、倍率 z（CSS px）
 const captions = []; // { t, zh, en, top }：zh 為 null 代表收起字幕
+const fakes = []; // { urlPattern, method, status, body }：demo.fakeResponse 登記的假回應
 
 async function connect() {
   let port, target;
@@ -292,6 +293,13 @@ async function connect() {
       ws.send(JSON.stringify({ id: ++id, method: 'Page.screencastFrameAck', params: { sessionId: d.params.sessionId } }));
     }
     if (d.method === 'Page.loadEventFired') { loadWaiters.forEach((r) => r()); loadWaiters = []; }
+    // demo.fakeResponse 攔下的請求：方法對得上就在瀏覽器裡直接回應，其他照常放行
+    if (d.method === 'Fetch.requestPaused') {
+      const fake = fakes.find((x) => x.method === d.params.request.method);
+      ws.send(JSON.stringify(fake
+        ? { id: ++id, method: 'Fetch.fulfillRequest', params: { requestId: d.params.requestId, responseCode: fake.status, responseHeaders: [{ name: 'Content-Type', value: 'text/plain' }], body: Buffer.from(fake.body).toString('base64') } }
+        : { id: ++id, method: 'Fetch.continueRequest', params: { requestId: d.params.requestId } }));
+    }
     // 頁面跳出 alert／confirm 會卡住整個錄影，一律直接關掉
     if (d.method === 'Page.javascriptDialogOpening') ws.send(JSON.stringify({ id: ++id, method: 'Page.handleJavaScriptDialog', params: { accept: true } }));
   });
@@ -455,6 +463,16 @@ const actions = {
   async caption(zh, en, { top = false } = {}) {
     captions.push({ t: videoTime(), zh, en, top });
     await sleep(300);
+  },
+
+  /*
+    攔下符合網址的請求，在瀏覽器裡直接回一個假的回應，請求不會送出去。
+    用在「送出表單」這種會寄信給真人的動作：畫面照樣走到送出成功，對方什麼都收不到。
+    被攔下的請求在這裡回應之前會一直停著、不會自己送出，所以就算出錯也不會漏出去。
+  */
+  async fakeResponse(urlPattern, { method = 'POST', status = 200, body = '' } = {}) {
+    fakes.push({ urlPattern, method, status, body });
+    await send('Fetch.enable', { patterns: fakes.map((x) => ({ urlPattern: x.urlPattern, requestStage: 'Request' })) });
   },
 
   // 把符合選擇器的元素模糊掉（之後出現的也會套到），錄到個資或不該公開的資料時用
