@@ -1,4 +1,6 @@
 import type { ImageMetadata } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import { assignImages } from './image-slots.mjs';
 
 type ImageModule = { default: ImageMetadata };
 
@@ -106,6 +108,20 @@ export function getProjectVideoMap(slug: string): Record<number, string> {
   }
 
   return map;
+}
+
+/**
+ * 作品的主要示範影片（首頁作品輪播用）：第一個放了影片檔的 experienceDemo 段落。
+ * 版位對照跟案例頁用同一支 assignImages，首頁播的一定就是案例頁那一段的影片。
+ * 連那一段一起回傳，比例（ratio）和替代文字（alt）直接沿用，不在首頁另外維護一份。
+ */
+export function getProjectDemoVideo(project: CollectionEntry<'projects'>) {
+  const { bySection } = assignImages(project.data, getProjectVideoMap(project.id));
+  for (const [i, section] of project.data.sections.entries()) {
+    const src = bySection[i]?.[0];
+    if (section.type === 'experienceDemo' && src) return { src, section };
+  }
+  return undefined;
 }
 
 /**

@@ -1,0 +1,441 @@
+---
+/*
+  首頁的作品影片輪播：每個案例的示範影片站在聚光燈舞台上，下面是作品類型（eyebrow）
+  和作品名稱（連到案例頁）。左右滑動切換，只有正中間那一部在播。
+
+  滑動用瀏覽器原生的橫向捲動＋scroll-snap：手機手指滑、觸控板橫向滑都是系統本身的
+  手感與慣性，不用自己寫拖曳。JS 只負責三件事：判斷哪一張在正中間（播它、暫停其他）、
+  箭頭與鍵盤方向鍵、頁碼。沒有 JS 時一樣可以滑，只是沒有箭頭、不會自動播放。
+
+  影片一開始完全不下載（DemoVideo 的 managed 模式 preload="none"），段落快捲到時
+  才替正中間和左右相鄰的那幾部抓第一格畫面，首頁不會因為多了六支影片而變重。
+*/
+import DemoVideo from './project/DemoVideo.astro';
+
+export interface ShowreelSlide {
+  href: string;
+  title: string;
+  eyebrow?: string;
+  src: string;
+  ratio: string;
+  alt: string;
+}
+
+interface Props {
+  heading: string;
+  prevLabel: string;
+  nextLabel: string;
+  slides: ShowreelSlide[];
+}
+
+const { heading, prevLabel, nextLabel, slides } = Astro.props;
+
+/*
+  每張卡片的寬度跟著影片比例走（舞台高度全部一樣）：手機直式影片的卡片窄、橫式的寬。
+  如果全部用同一個寬舞台，直式影片在中間只佔一小條，旁邊露出來的一角都是空舞台，
+  看不出還有下一部。比例在這裡換算成數字，交給 CSS 算寬度。
+*/
+const shape = (ratio: string) => {
+  const [w, h] = ratio.split('/').map(Number);
+  return { style: `--ratio: ${w / h}`, portrait: w < h ? '' : undefined };
+};
+const first = slides[0] ? shape(slides[0].ratio) : undefined;
+const last = slides.at(-1) ? shape(slides.at(-1)!.ratio) : undefined;
+---
+
+<div class="showreel" data-showreel>
+  <h2 class="showreel__heading">{heading}</h2>
+  <div class="showreel__controls" data-showreel-controls hidden>
+    <button class="showreel__nav" type="button" data-showreel-prev aria-label={prevLabel}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"></path></svg>
+    </button>
+    <p class="showreel__count" data-showreel-count aria-live="polite"></p>
+    <button class="showreel__nav" type="button" data-showreel-next aria-label={nextLabel}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"></path></svg>
+    </button>
+  </div>
+
+  <ul class="showreel__track" data-showreel-track>
+    {/* 前後各墊一塊空白，寬度算到剛好讓第一張、最後一張也能停在正中間 */}
+    {first && <li class="showreel__spacer" aria-hidden="true" data-portrait={first.portrait} style={first.style} />}
+    {
+      slides.map((slide) => (
+        <li class="showreel__slide" data-showreel-slide data-portrait={shape(slide.ratio).portrait} style={shape(slide.ratio).style}>
+          <div class="showreel__stage" data-showreel-stage>
+            <DemoVideo src={slide.src} ratio={slide.ratio} alt={slide.alt} stage managed />
+          </div>
+          {slide.eyebrow && <p class="showreel__eyebrow">{slide.eyebrow}</p>}
+          <a class="showreel__title" href={slide.href}>
+            {slide.title}
+          </a>
+        </li>
+      ))
+    }
+    {last && <li class="showreel__spacer" aria-hidden="true" data-portrait={last.portrait} style={last.style} />}
+  </ul>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-showreel]').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('[data-showreel-track]');
+    const controls = root.querySelector<HTMLElement>('[data-showreel-controls]');
+    const prev = root.querySelector<HTMLButtonElement>('[data-showreel-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-showreel-next]');
+    const count = root.querySelector<HTMLElement>('[data-showreel-count]');
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-showreel-slide]'));
+    if (!track || !controls || !prev || !next || !count || slides.length === 0) return;
+
+    const videos = slides.map((slide) => slide.querySelector<HTMLVideoElement>('video'));
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let current = -1;
+    let near = false; // 段落接近畫面：開始抓影片的第一格
+    let visible = false; // 段落真的在畫面上：正中間那部才播
+
+    // 哪一張在正中間：中心點離捲動區中線最近的那張（track 是 position: relative，offsetLeft 以它為準）
+    const centered = () => {
+      const mid = track.scrollLeft + track.clientWidth / 2;
+      let best = 0;
+      let bestDistance = Infinity;
+      slides.forEach((slide, i) => {
+        const distance = Math.abs(slide.offsetLeft + slide.offsetWidth / 2 - mid);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = i;
+        }
+      });
+      return best;
+    };
+
+    const sync = () => {
+      videos.forEach((video, i) => {
+        if (!video) return;
+        // 從 none 改成 metadata 後要 load() 一次，Safari 才會真的去抓
+        if (near && Math.abs(i - current) <= 1 && video.preload === 'none') {
+          video.preload = 'metadata';
+          video.load();
+        }
+        if (i === current && visible && !reduceMotion.matches) video.play().catch(() => {});
+        else video.pause();
+      });
+    };
+
+    const setCurrent = (index: number) => {
+      if (index === current) return;
+      current = index;
+      slides.forEach((slide, i) => slide.classList.toggle('is-active', i === index));
+      // 控制列只留給正中間那部；旁邊淡出的那幾部露出一條播放列會很雜
+      videos.forEach((video, i) => {
+        if (video) video.controls = i === index;
+      });
+      count.textContent = `${index + 1} / ${slides.length}`;
+      prev.disabled = index === 0;
+      next.disabled = index === slides.length - 1;
+      sync();
+    };
+
+    const goTo = (index: number) => {
+      const slide = slides[Math.max(0, Math.min(slides.length - 1, index))];
+      track.scrollTo({
+        left: slide.offsetLeft - (track.clientWidth - slide.offsetWidth) / 2,
+        behavior: reduceMotion.matches ? 'auto' : 'smooth',
+      });
+    };
+
+    let frame = 0;
+    track.addEventListener(
+      'scroll',
+      () => {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => setCurrent(centered()));
+      },
+      { passive: true }
+    );
+    prev.addEventListener('click', () => goTo(current - 1));
+    next.addEventListener('click', () => goTo(current + 1));
+    root.addEventListener('keydown', (event) => {
+      // 影片自己的控制列也吃方向鍵（快轉），焦點在影片上時不搶
+      if ((event.target as HTMLElement).closest('video')) return;
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        goTo(current - 1);
+      }
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        goTo(current + 1);
+      }
+    });
+    // 點旁邊露出一角的那部：先把它滑到中間，而不是直接按到它的播放鍵
+    slides.forEach((slide, i) => {
+      slide.querySelector('[data-showreel-stage]')?.addEventListener(
+        'click',
+        (event) => {
+          if (i === current) return;
+          event.preventDefault();
+          event.stopPropagation();
+          goTo(i);
+        },
+        { capture: true }
+      );
+    });
+
+    new IntersectionObserver(
+      ([entry]) => {
+        near = entry.isIntersecting;
+        sync();
+      },
+      { rootMargin: '50% 0px' }
+    ).observe(root);
+    // 用實際可見比例判斷：isIntersecting 在比例掉到門檻以下、但還露出一點時仍是 true
+    new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.intersectionRatio >= 0.3;
+        sync();
+      },
+      { threshold: [0, 0.3] }
+    ).observe(track);
+    reduceMotion.addEventListener('change', sync);
+
+    root.classList.add('is-ready');
+    controls.hidden = false;
+    setCurrent(centered());
+  });
+</script>
+
+<style>
+  /*
+    尺寸：
+    --showreel-slide  橫式影片卡片的寬度上限（寬螢幕取 token，左右各露出一角）
+    --showreel-stage-h 舞台高度，所有卡片一樣高；桌機剛好讓 16:10 影片填滿最寬的卡片
+    --pad-x           舞台左右留白；直式影片留多一點，聚光燈才不會擠成一條
+    百分比寬度用 cqi（捲動區自己是 container），因為卡片寬要跟著捲動區寬算。
+  */
+  .showreel {
+    --showreel-slide: min(78cqi, var(--showreel-slide-width));
+    --showreel-stage-h: calc(var(--showreel-slide) * 10 / 16);
+    --showreel-pad: var(--sp-4);
+    --showreel-gap: var(--sp-3);
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'heading controls' 'track track';
+    align-items: end;
+    column-gap: var(--sp-3);
+    row-gap: var(--sp-4);
+  }
+
+  .showreel__heading {
+    grid-area: heading;
+    font-size: var(--font-size-h2);
+  }
+
+  .showreel__controls {
+    grid-area: controls;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .showreel__controls[hidden] {
+    display: none;
+  }
+
+  /* 箭頭的樣子跟 Carousel.astro 一致：細框圓鈕，hover／focus 框線變實 */
+  .showreel__nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-size-lg);
+    height: var(--control-size-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-ink);
+    cursor: pointer;
+    transition:
+      border-color var(--motion-fast) var(--motion-ease),
+      opacity var(--motion-fast) var(--motion-ease);
+  }
+
+  .showreel__nav:hover:not(:disabled),
+  .showreel__nav:focus-visible {
+    border-color: var(--color-ink);
+  }
+
+  .showreel__nav:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .showreel__nav svg {
+    width: var(--icon-md);
+    height: var(--icon-md);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .showreel__count {
+    min-width: var(--control-size-lg);
+    text-align: center;
+    font-size: var(--font-size-meta);
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+    捲動區往左右推到段落的外框（抵掉段落的左右留白），旁邊露出的那一角才會貼到邊，
+    不是在留白裡被切掉。
+  */
+  .showreel__track {
+    grid-area: track;
+    position: relative;
+    container-type: inline-size;
+    display: flex;
+    gap: var(--showreel-gap);
+    margin-inline: calc(var(--content-gutter) * -1);
+    padding-block: var(--sp-1);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    list-style: none;
+  }
+
+  .showreel__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 卡片寬＝舞台裡影片的寬（由舞台高度和比例算出）＋左右留白，最寬不超過 --showreel-slide */
+  .showreel__slide,
+  .showreel__spacer {
+    --pad-x: var(--showreel-pad);
+    --w: min(
+      var(--showreel-slide),
+      calc((var(--showreel-stage-h) - 2 * var(--showreel-pad)) * var(--ratio) + 2 * var(--pad-x))
+    );
+  }
+
+  .showreel__slide[data-portrait],
+  .showreel__spacer[data-portrait] {
+    --pad-x: var(--sp-5);
+  }
+
+  .showreel__spacer {
+    flex: 0 0 calc((100% - var(--w)) / 2 - var(--showreel-gap));
+  }
+
+  .showreel__slide {
+    flex: 0 0 var(--w);
+    scroll-snap-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* 有 JS 時旁邊的那幾部退後、變淡，視線落在正中間 */
+  .showreel.is-ready .showreel__slide {
+    opacity: 0.35;
+    transform: scale(0.94);
+    transition:
+      opacity var(--reveal-duration) var(--reveal-easing),
+      transform var(--reveal-duration) var(--reveal-easing);
+  }
+
+  .showreel.is-ready .showreel__slide.is-active {
+    opacity: 1;
+    transform: none;
+  }
+
+  .showreel.is-ready .showreel__slide:not(.is-active) .showreel__stage {
+    cursor: pointer;
+  }
+
+  /*
+    舞台內層用絕對定位撐滿：.showreel__slide 是直向 flex，舞台的高度在那裡不算
+    「確定值」，影片的 max-height: 100% 會失效，直式影片就會撐滿寬度、變得超高。
+    絕對定位的 inset: 0 高度是確定的，影片才會在舞台裡等比縮放。
+    聚光燈本身是 DemoVideo 的 [data-stage]。
+  */
+  .showreel__stage {
+    position: relative;
+    width: 100%;
+    height: var(--showreel-stage-h);
+  }
+
+  .showreel .showreel__stage :global(.demo-video[data-stage]) {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--showreel-pad) var(--pad-x);
+  }
+
+  .showreel .showreel__stage :global(.demo-video__video) {
+    max-height: 100%;
+  }
+
+  .showreel__eyebrow {
+    margin-top: var(--sp-3);
+    font-size: var(--font-size-meta);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* 作品名稱是連到案例頁的連結：hover 時底線從左展開，跟作品集卡片的 CTA 同一套語言 */
+  .showreel__title {
+    margin-top: var(--sp-1);
+    font-size: var(--font-size-h3);
+    color: inherit;
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0 1px;
+    transition: background-size var(--motion-fast) var(--motion-ease);
+  }
+
+  .showreel__title:hover,
+  .showreel__title:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .showreel.is-ready .showreel__slide {
+      transition: none;
+    }
+  }
+
+  /*
+    手機：舞台改成接近正方形的高度，直式影片才夠大；橫式影片改由卡片寬度（86%）限制。
+    箭頭和頁碼移到影片下方排成一列，標題不用跟它們擠同一行。
+  */
+  @media (max-width: 767px) {
+    .showreel {
+      --showreel-slide: 86cqi;
+      --showreel-stage-h: 92cqi;
+      --showreel-pad: var(--sp-2);
+      --showreel-gap: var(--sp-2);
+
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: 'heading' 'track' 'controls';
+    }
+
+    .showreel__slide[data-portrait],
+    .showreel__spacer[data-portrait] {
+      --pad-x: var(--sp-3);
+    }
+
+    .showreel__controls {
+      justify-self: center;
+    }
+
+    .showreel__title {
+      font-size: var(--font-size-body-lg);
+    }
+  }
+</style>

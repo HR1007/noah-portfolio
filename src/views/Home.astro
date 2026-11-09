@@ -1,5 +1,5 @@
 ---
-import { getEntry } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Media from '../components/Media.astro';
@@ -10,7 +10,9 @@ import ConnectChannel from '../components/ConnectChannel.astro';
 import ReadMore from '../components/ReadMore.astro';
 import ScrollVideo from '../components/ScrollVideo.astro';
 import SectionNav from '../components/project/SectionNav.astro';
-import { getHomeImage, getHomeImageSet, getHomeVideo } from '../lib/media';
+import Showreel, { type ShowreelSlide } from '../components/Showreel.astro';
+import { getHomeImage, getHomeImageSet, getHomeVideo, getProjectDemoVideo } from '../lib/media';
+import { t } from '../lib/i18n';
 
 interface Props {
   locale: 'en' | 'zh';
@@ -28,12 +30,33 @@ const reachVideo = getHomeVideo('character-reach');
 const reachPoster = getHomeImage('character-reach-poster');
 
 /*
+  About 下面的作品影片輪播：每個案例取它的主要示範影片（案例頁 experienceDemo 那一段），
+  順序跟作品集頁一樣照 order 排。還沒有示範影片的案例不放進來，不會出現空舞台。
+*/
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const reel: ShowreelSlide[] = projects.flatMap((project) => {
+  const demo = getProjectDemoVideo(project);
+  if (!demo) return [];
+  return [
+    {
+      href: `/${locale}/projects/${project.id}`,
+      title: t(project.data.title, locale),
+      eyebrow: t(project.data.eyebrow, locale),
+      src: demo.src,
+      ratio: demo.section.ratio,
+      alt: t(demo.section.alt, locale),
+    },
+  ];
+});
+
+/*
   側邊章節導覽項目，跟案例頁（ProjectDetail.astro）用同一顆 SectionNav、同一條規則：
   只收有標題文字的段落，才有東西可以當目錄的字。hero／quote／捲動影片都沒有標題
   （案例頁的 hero 同樣不列入 navItems），略過。
 */
 const navItems = [
   { id: 'about', label: home.aboutHeading },
+  ...(reel.length > 0 ? [{ id: 'showreel', label: home.showreelHeading }] : []),
   { id: 'beyond-grid', label: home.beyondGridHeading },
   { id: 'activities', label: home.activitiesHeading },
   { id: 'connect', label: home.connectHeading },
@@ -151,6 +174,19 @@ const navItems = [
       </div>
     </div>
   </section>
+
+  {
+    reel.length > 0 && (
+      <section class="showreel" id="showreel">
+        <Showreel
+          heading={home.showreelHeading}
+          prevLabel={home.showreelPrev}
+          nextLabel={home.showreelNext}
+          slides={reel}
+        />
+      </section>
+    )
+  }
 
   <section class="beyond-grid" id="beyond-grid">
     <div class="beyond-grid__text">
@@ -454,10 +490,15 @@ const navItems = [
     是側邊導覽（SectionNav）這個元件在本站的固定搭配值，不是這裡另外調的。
   */
   .about,
+  .showreel,
   .beyond-grid,
   .activities,
   .connect {
     scroll-margin-top: var(--sp-7);
+  }
+
+  .showreel {
+    border-top: 1px solid var(--color-border);
   }
 
   .about {
