@@ -89,6 +89,10 @@ sections:
     alt:
       en: 'Exam folder list, searchable by candidate name and date'
       zh: 測驗資料夾列表，可依考生姓名與日期搜尋
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://hr1007.github.io/vr-medication-admin/'
   - type: featureSplit
     eyebrow:
       en: OVERVIEW
@@ -107,6 +111,10 @@ sections:
     alt:
       en: Exam overview table with advanced filters and export
       zh: 測驗總覽表格，含進階篩選與匯出
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://hr1007.github.io/vr-medication-admin/'
   - type: persona
     eyebrow:
       en: PERSONA
@@ -193,6 +201,10 @@ sections:
     alt:
       en: Unified task surface dashboard screenshot
       zh: 收攏後的單一操作面後台畫面
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://hr1007.github.io/vr-medication-admin/'
   - type: featureSplit
     eyebrow:
       en: DARK MODE
@@ -210,6 +222,10 @@ sections:
     alt:
       en: Dark mode dashboard screenshot
       zh: 深色模式的後台畫面
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://hr1007.github.io/vr-medication-admin/'
   - type: experienceDemo
     eyebrow:
       en: EXPERIENCE DEMO
