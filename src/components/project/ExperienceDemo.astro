@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro';
 import Media from '../Media.astro';
+import DemoVideo from './DemoVideo.astro';
 import Button from '../Button.astro';
 import ReadMore from '../ReadMore.astro';
 
@@ -31,9 +32,6 @@ const {
   layout = 'stacked',
 } = Astro.props;
 
-// 直式版位（寬小於高）就是手機畫面：置中、背後打一圈舞台聚光燈，見樣式裡的 [data-stage]
-const [ratioW, ratioH] = ratio.split('/').map(Number);
-const isPortrait = ratioW < ratioH;
 ---
 
 <section class="experience-demo" data-layout={layout}>
@@ -52,61 +50,17 @@ const isPortrait = ratioW < ratioH;
     </ReadMore>
     {ctaLabel && ctaHref && <Button label={ctaLabel} href={ctaHref} variant="primary" />}
   </div>
-  {/*
-    靜音自動播放、循環，像 GIF 一樣——這一段本來就是「看產品實際怎麼動」，
-    不需要訪客自己按播放。controls 一律保留：減少動態偏好的訪客不會被
-    自動播放打擾（下面的 script 只在沒開減少動態時才呼叫 play()），
-    但仍然可以自己手動播放，不會完全看不到這段內容。
-    aspect-ratio 用內容裡的 ratio 欄位頂著版面——影片的 metadata 要等
-    載入後才知道真正尺寸，沒有這個會在載入完成那一刻跳一下版。
-
-    preload 只抓 metadata（連帶第一格畫面）：示範影片是 30 秒以上、約 10MB，
-    用 auto 的話訪客一打開頁面就得整支下載，不管有沒有捲到這一段。
-  */}
-  <div class="experience-demo__media" data-reveal data-stage={isPortrait ? '' : undefined}>
+  {/* 有版位影片就播影片（播放規則見 DemoVideo.astro），沒有就顯示圖片 */}
+  <div class="experience-demo__media" data-reveal>
     {
       video ? (
-        <video
-          class="experience-demo__video"
-          src={video}
-          style={`aspect-ratio: ${ratio}`}
-          muted
-          loop
-          playsinline
-          controls
-          preload="metadata"
-          aria-label={alt}
-        />
+        <DemoVideo src={video} ratio={ratio} alt={alt} />
       ) : (
         <Media fit="natural" image={image} ratio={ratio} alt={alt} />
       )
     }
   </div>
 </section>
-
-{
-  video && (
-    <script>
-      /*
-        捲到影片（露出四分之一）才播放，離開畫面就暫停：沒看到的時候不必一直解碼、
-        也不會在背景把整支影片抓下來。減少動態時不自動播放，但離開畫面一樣會暫停
-        訪客自己按下的播放。
-      */
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      const observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            const video = entry.target as HTMLVideoElement;
-            if (!entry.isIntersecting) video.pause();
-            else if (!reduceMotion.matches) video.play().catch(() => {});
-          }
-        },
-        { threshold: 0.25 }
-      );
-      document.querySelectorAll<HTMLVideoElement>('.experience-demo__video').forEach((v) => observer.observe(v));
-    </script>
-  )
-}
 
 <style>
   .experience-demo {
@@ -175,39 +129,6 @@ const isPortrait = ratioW < ratioH;
     font-size: var(--font-size-body);
     line-height: 1.7;
     color: var(--color-muted);
-  }
-
-  /*
-    跟 Media.astro 的 natural 模式用同一套邏輯：width/height 都 auto、只用
-    max-* 設上限，等比例縮放、不裁切、不放大過原始解析度。aspect-ratio 讓
-    瀏覽器在影片 metadata 真正載入前就能算出正確空間，不會跳版。影片本身
-    不需要經過 Safari 的 overflow:hidden 裁切問題——圓角直接套在它自己身上，
-    沒有「父層裁子層」的關係，不會踩到 Media.astro 註解提到的那個雷。
-  */
-  .experience-demo__video {
-    display: block;
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: var(--hero-max-height);
-    margin-inline: auto;
-    border-radius: var(--radius);
-  }
-
-  /*
-    直式版位（手機畫面）的舞台。影片置中，左右直接露出網頁背景，深淺色自動跟著換——
-    MP4 沒有透明通道，「去背」靠的是只錄手機畫面本身，背景交給網頁。
-    兩層漸層組成舞台：上方往下打的一束光、手機腳下的一圈光（淺色主題是影子）。
-    最上層再疊一道「頁面底色 → 透明」：光源在版位最頂端最亮，少了這層，
-    方框上緣會切出一條明顯的水平線。尺寸全用百分比，跟著版位大小縮放。
-  */
-  .experience-demo__media[data-stage] {
-    padding-block: var(--sp-5);
-    border-radius: var(--radius);
-    background:
-      linear-gradient(var(--color-bg), transparent 20%),
-      radial-gradient(ellipse 24% 6% at 50% 95%, var(--color-stage-floor), transparent),
-      radial-gradient(ellipse 36% 100% at 50% 0%, var(--color-stage-light), transparent 75%);
   }
 
   /*
