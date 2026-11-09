@@ -40,6 +40,31 @@ sections:
     alt:
       en: Foodlet website homepage screenshot on laptop
       zh: 筆電上的 Foodlet 首頁畫面
+  - type: experienceDemo
+    eyebrow:
+      en: EXPERIENCE DEMO
+      zh: 體驗展示
+    heading:
+      en: See Foodlet in Action
+      zh: 實際走一遍 Foodlet
+    body:
+      en: >-
+        The demo follows one route: land on the brand story, connect a wallet
+        with a single tap instead of a form, pay for a meal, and collect the
+        first keepsake. Each screen addresses the same point: what the diner
+        gets to keep.
+      zh: >-
+        這段 demo
+        走過一條完整路線：從品牌故事進站，點一下就連好錢包，不用填表單，接著付一餐的錢，領到第一個收藏品。每個畫面都在回應同一件事：用餐者能帶走什麼。
+    ratio: 16/10
+    alt:
+      en: Foodlet demo, from signing up to claiming the first NFT and browsing the collection
+      zh: Foodlet 操作示範，從註冊、領取第一個 NFT 到瀏覽收藏
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://hr1007.github.io/foodlet/#/join'
+    layout: split
   - type: persona
     eyebrow:
       en: PERSONA
@@ -72,31 +97,6 @@ sections:
           en: Foodlet flow — connecting a wallet in one tap
           zh: Foodlet 流程——一次點擊連結錢包
     direction: horizontal
-  - type: experienceDemo
-    eyebrow:
-      en: EXPERIENCE DEMO
-      zh: 體驗展示
-    heading:
-      en: See Foodlet in Action
-      zh: 實際走一遍 Foodlet
-    body:
-      en: >-
-        The demo follows one route: land on the brand story, connect a wallet
-        with a single tap instead of a form, pay for a meal, and collect the
-        first keepsake. Each screen addresses the same point: what the diner
-        gets to keep.
-      zh: >-
-        這段 demo
-        走過一條完整路線：從品牌故事進站，點一下就連好錢包，不用填表單，接著付一餐的錢，領到第一個收藏品。每個畫面都在回應同一件事：用餐者能帶走什麼。
-    ratio: 16/10
-    alt:
-      en: Foodlet demo, from signing up to claiming the first NFT and browsing the collection
-      zh: Foodlet 操作示範，從註冊、領取第一個 NFT 到瀏覽收藏
-    ctaLabel:
-      en: Try it out
-      zh: 來試試看
-    ctaHref: 'https://hr1007.github.io/foodlet/#/join'
-    layout: split
   - type: featureGrid
     columns:
       - heading:

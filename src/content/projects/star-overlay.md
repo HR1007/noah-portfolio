@@ -38,6 +38,32 @@ sections:
         Star Overlay desktop editor showing the control panel and split preview
         canvas
       zh: Star Overlay 桌面版編輯器，含控制面板與左右對照的預覽畫布
+  - type: experienceDemo
+    eyebrow:
+      en: EXPERIENCE DEMO
+      zh: 體驗展示
+    heading:
+      en: See the Star Overlay Editor in Action
+      zh: 實際走一遍 Star Overlay 編輯器
+    body:
+      en: >-
+        Photos like this are all over Instagram: punched with star, heart and
+        circle shapes, as if someone had pressed a hole-punch into a printed
+        snapshot, which gives a digital image a handmade feel. Almost no photo
+        editor offers the effect, though. Getting the look means switching
+        between apps, hunting for the right tool, and working with controls that
+        were never designed for it. Star Overlay puts those steps into one
+        simple tool: pick a shape, scatter it, export.
+      zh: >-
+        最近在 Instagram
+        上常看到這種照片：上面打滿星星、愛心和圓形的洞，看起來像用打洞機壓在沖洗出來的相片上，讓數位照片多了手作感。不過，市面上的修圖 app
+        幾乎都沒有這個效果。想做出來，得在好幾個 app 之間切換、找合適的工具，還要使用不是為這個效果設計的控制項。Star Overlay
+        把這些步驟整合成一個簡單的工具：選形狀、灑上去、輸出。
+    ratio: 390/844
+    alt:
+      en: Star Overlay demo on a phone, from picking a photo to shuffling, styling and downloading the stars
+      zh: Star Overlay 手機操作示範，從選照片、隨機排列、調整樣式到下載
+    layout: stacked
   - type: researchFramework
     eyebrow:
       en: RESEARCH FRAMEWORK
@@ -150,32 +176,6 @@ sections:
             finished overlay
           zh: 六格畫面依序呈現畫布從空白到完成疊圖的變化
     direction: vertical
-  - type: experienceDemo
-    eyebrow:
-      en: EXPERIENCE DEMO
-      zh: 體驗展示
-    heading:
-      en: See the Star Overlay Editor in Action
-      zh: 實際走一遍 Star Overlay 編輯器
-    body:
-      en: >-
-        Photos like this are all over Instagram: punched with star, heart and
-        circle shapes, as if someone had pressed a hole-punch into a printed
-        snapshot, which gives a digital image a handmade feel. Almost no photo
-        editor offers the effect, though. Getting the look means switching
-        between apps, hunting for the right tool, and working with controls that
-        were never designed for it. Star Overlay puts those steps into one
-        simple tool: pick a shape, scatter it, export.
-      zh: >-
-        最近在 Instagram
-        上常看到這種照片：上面打滿星星、愛心和圓形的洞，看起來像用打洞機壓在沖洗出來的相片上，讓數位照片多了手作感。不過，市面上的修圖 app
-        幾乎都沒有這個效果。想做出來，得在好幾個 app 之間切換、找合適的工具，還要使用不是為這個效果設計的控制項。Star Overlay
-        把這些步驟整合成一個簡單的工具：選形狀、灑上去、輸出。
-    ratio: 390/844
-    alt:
-      en: Star Overlay demo on a phone, from picking a photo to shuffling, styling and downloading the stars
-      zh: Star Overlay 手機操作示範，從選照片、隨機排列、調整樣式到下載
-    layout: stacked
   - type: featureSplit
     heading:
       en: Experience the Intuitive Flow

@@ -42,6 +42,28 @@ sections:
     alt:
       en: OSCE Medical Assessment Platform dashboard screenshot
       zh: OSCE 醫學考評平台的後台畫面
+  - type: experienceDemo
+    eyebrow:
+      en: EXPERIENCE DEMO
+      zh: 體驗展示
+    heading:
+      en: See the OSCE Platform in Action
+      zh: 實際走一遍 OSCE 平台
+    body:
+      en: >-
+        A walk through the redesigned backend: advanced filters expand in place,
+        status is marked with semantic colour, and bulk actions sit next to the
+        selected data.
+      zh: 這段展示走一遍改版後的後台：進階篩選在原地展開，狀態用語意化色彩標示，批次操作就在選取的資料旁邊。
+    ratio: 16/10
+    alt:
+      en: OSCE back office demo, from signing in to filtering, bulk-selecting and opening a student record
+      zh: OSCE 後台操作示範，從登入、篩選、批次勾選到開啟學生作答記錄
+    layout: stacked
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://hr1007.github.io/vr-medication-admin/'
   - type: researchFramework
     layout: stacked
     eyebrow:
@@ -222,28 +244,6 @@ sections:
     alt:
       en: Dark mode dashboard screenshot
       zh: 深色模式的後台畫面
-    ctaLabel:
-      en: Try it out
-      zh: 來試試看
-    ctaHref: 'https://hr1007.github.io/vr-medication-admin/'
-  - type: experienceDemo
-    eyebrow:
-      en: EXPERIENCE DEMO
-      zh: 體驗展示
-    heading:
-      en: See the OSCE Platform in Action
-      zh: 實際走一遍 OSCE 平台
-    body:
-      en: >-
-        A walk through the redesigned backend: advanced filters expand in place,
-        status is marked with semantic colour, and bulk actions sit next to the
-        selected data.
-      zh: 這段展示走一遍改版後的後台：進階篩選在原地展開，狀態用語意化色彩標示，批次操作就在選取的資料旁邊。
-    ratio: 16/10
-    alt:
-      en: OSCE back office demo, from signing in to filtering, bulk-selecting and opening a student record
-      zh: OSCE 後台操作示範，從登入、篩選、批次勾選到開啟學生作答記錄
-    layout: stacked
     ctaLabel:
       en: Try it out
       zh: 來試試看

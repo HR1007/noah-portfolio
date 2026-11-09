@@ -69,6 +69,32 @@ sections:
     alt:
       en: Sales war room overview in the light theme
       zh: 銷售戰情室總覽（亮色主題）
+  - type: experienceDemo
+    eyebrow:
+      en: EXPERIENCE DEMO
+      zh: 體驗展示
+    heading:
+      en: See Sales War Room in Action
+      zh: 實際走一遍銷售戰情室
+    body:
+      en: >-
+        The demo follows one manager's routine: the overview puts the gap at the
+        top, the Central region details show where it comes from, and the
+        insight card turns it into a follow-up with an owner and a due date. It
+        then opens the rule behind the card to show why it appeared, and ends
+        with a custom report built from the same data.
+      zh: >-
+        這段 demo
+        走過主管的日常：總覽把缺口放在最上面，中區明細說明缺口從哪裡來，洞察卡把它變成有負責人、有到期日的跟進任務。接著打開這張卡背後的規則，看它為什麼會出現，最後用同一份資料組出自己的報表。
+    ratio: 16/10
+    alt:
+      en: Sales War Room demo, from the overview to assigning a follow-up
+      zh: 銷售戰情室操作示範，從總覽到指派跟進
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://hr1007.github.io/Sales-War-Room/'
+    layout: stacked
   - type: researchFramework
     eyebrow:
       en: FRAMEWORK
@@ -205,32 +231,6 @@ sections:
           en: Mobile flow from push notification to closing a follow-up task
           zh: 從推播通知到結案跟進任務的手機動線
     direction: vertical
-  - type: experienceDemo
-    eyebrow:
-      en: EXPERIENCE DEMO
-      zh: 體驗展示
-    heading:
-      en: See Sales War Room in Action
-      zh: 實際走一遍銷售戰情室
-    body:
-      en: >-
-        The demo follows one manager's routine: the overview puts the gap at the
-        top, the Central region details show where it comes from, and the
-        insight card turns it into a follow-up with an owner and a due date. It
-        then opens the rule behind the card to show why it appeared, and ends
-        with a custom report built from the same data.
-      zh: >-
-        這段 demo
-        走過主管的日常：總覽把缺口放在最上面，中區明細說明缺口從哪裡來，洞察卡把它變成有負責人、有到期日的跟進任務。接著打開這張卡背後的規則，看它為什麼會出現，最後用同一份資料組出自己的報表。
-    ratio: 16/10
-    alt:
-      en: Sales War Room demo, from the overview to assigning a follow-up
-      zh: 銷售戰情室操作示範，從總覽到指派跟進
-    ctaLabel:
-      en: Try it out
-      zh: 來試試看
-    ctaHref: 'https://hr1007.github.io/Sales-War-Room/'
-    layout: stacked
   - type: experienceDemo
     layout: split-reverse
     eyebrow:

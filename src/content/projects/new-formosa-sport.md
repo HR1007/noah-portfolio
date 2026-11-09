@@ -40,6 +40,28 @@ sections:
     alt:
       en: New Formosa Sport website homepage screenshot
       zh: 新寶島網站首頁畫面
+  - type: experienceDemo
+    layout: stacked
+    eyebrow:
+      en: EXPERIENCE DEMO
+      zh: 體驗展示
+    heading:
+      en: The Quote Lives on the First Screen
+      zh: 報價就放在第一個畫面
+    body:
+      en: >-
+        The inquiry form sits right beside the homepage hero, so visitors don't
+        have to look for a contact page. They can describe what they need and
+        send it without scrolling.
+      zh: 詢價表單直接放在首頁 hero 旁邊，訪客不必另外找聯絡頁面，填完需求就能送出，不用往下捲。
+    ratio: 16/10
+    alt:
+      en: New Formosa Sport demo, from sending a quote request on the homepage to a service page
+      zh: 新寶島操作示範，從首頁送出報價需求到服務介紹頁
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://new-formosa-sport.netlify.app/index.html#home'
   - type: persona
     eyebrow:
       en: PERSONA
@@ -124,28 +146,6 @@ sections:
             inquiry, with four branches off the main path
           zh: 新寶島詢價動線——從進站到送出詢價的六個畫面，加上四條從主線岔出去的分支
     direction: horizontal
-  - type: experienceDemo
-    layout: stacked
-    eyebrow:
-      en: EXPERIENCE DEMO
-      zh: 體驗展示
-    heading:
-      en: The Quote Lives on the First Screen
-      zh: 報價就放在第一個畫面
-    body:
-      en: >-
-        The inquiry form sits right beside the homepage hero, so visitors don't
-        have to look for a contact page. They can describe what they need and
-        send it without scrolling.
-      zh: 詢價表單直接放在首頁 hero 旁邊，訪客不必另外找聯絡頁面，填完需求就能送出，不用往下捲。
-    ratio: 16/10
-    alt:
-      en: New Formosa Sport demo, from sending a quote request on the homepage to a service page
-      zh: 新寶島操作示範，從首頁送出報價需求到服務介紹頁
-    ctaLabel:
-      en: Try it out
-      zh: 來試試看
-    ctaHref: 'https://new-formosa-sport.netlify.app/index.html#home'
   - type: featureSplit
     heading:
       en: Automated Lead Pipeline

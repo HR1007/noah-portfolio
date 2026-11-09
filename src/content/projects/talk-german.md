@@ -54,6 +54,31 @@ sections:
     alt:
       en: Talk German app screens shown across three phone mockups
       zh: 三台手機模擬畫面展示 Talk German 的 app 介面
+  - type: experienceDemo
+    layout: split
+    eyebrow:
+      en: EXPERIENCE DEMO
+      zh: 體驗展示
+    heading:
+      en: See Talk German in Action
+      zh: 實際走一遍 Talk German
+    body:
+      en: >-
+        The demo follows the core flow: a secure but simple sign-in, audio
+        capture by live recording or file upload, and a side-by-side translation
+        where learners can check right away how much they understood. The design
+        keeps the pressure low so attention stays on understanding the sentence.
+      zh: >-
+        這段 demo
+        走過核心流程：先是安全但簡單的登入，接著擷取語音，可以現場錄音或上傳音檔，最後是左右對照的翻譯結果，學習者能馬上確認自己聽懂多少。這樣設計是為了降低壓力，讓注意力留在聽懂這句話上。
+    ratio: 390/844
+    alt:
+      en: Talk German demo on a phone, from sign-in and translation to flashcards and a quiz
+      zh: Talk German 手機操作示範，從登入、翻譯到學習卡與測驗
+    ctaLabel:
+      en: Try it out
+      zh: 來試試看
+    ctaHref: 'https://hr1007.github.io/talk-german/'
   - type: researchFramework
     layout: split
     eyebrow:
@@ -158,31 +183,6 @@ sections:
           zh: 全站只用一套圖示：29 個 lucide 圖示，線寬 2，用在 22、18、14px 三種尺寸；顏色跟著文字走，兩種主題共用。
     direction: vertical
     layout: carousel
-  - type: experienceDemo
-    layout: split
-    eyebrow:
-      en: EXPERIENCE DEMO
-      zh: 體驗展示
-    heading:
-      en: See Talk German in Action
-      zh: 實際走一遍 Talk German
-    body:
-      en: >-
-        The demo follows the core flow: a secure but simple sign-in, audio
-        capture by live recording or file upload, and a side-by-side translation
-        where learners can check right away how much they understood. The design
-        keeps the pressure low so attention stays on understanding the sentence.
-      zh: >-
-        這段 demo
-        走過核心流程：先是安全但簡單的登入，接著擷取語音，可以現場錄音或上傳音檔，最後是左右對照的翻譯結果，學習者能馬上確認自己聽懂多少。這樣設計是為了降低壓力，讓注意力留在聽懂這句話上。
-    ratio: 390/844
-    alt:
-      en: Talk German demo on a phone, from sign-in and translation to flashcards and a quiz
-      zh: Talk German 手機操作示範，從登入、翻譯到學習卡與測驗
-    ctaLabel:
-      en: Try it out
-      zh: 來試試看
-    ctaHref: 'https://hr1007.github.io/talk-german/'
   - type: featureGrid
     eyebrow:
       en: INTUITIVE CAPABILITIES
