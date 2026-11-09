@@ -171,10 +171,10 @@ sections:
         上常看到這種照片：上面打滿星星、愛心和圓形的洞，看起來像用打洞機壓在沖洗出來的相片上，讓數位照片多了手作感。不過，市面上的修圖 app
         幾乎都沒有這個效果。想做出來，得在好幾個 app 之間切換、找合適的工具，還要使用不是為這個效果設計的控制項。Star Overlay
         把這些步驟整合成一個簡單的工具：選形狀、灑上去、輸出。
-    ratio: 16/10
+    ratio: 390/844
     alt:
-      en: Two phone mockups showing the Star Overlay app screens
-      zh: 兩台手機模擬畫面，展示 Star Overlay 的 app 介面
+      en: Star Overlay demo on a phone, from picking a photo to shuffling, styling and downloading the stars
+      zh: Star Overlay 手機操作示範，從選照片、隨機排列、調整樣式到下載
     layout: stacked
   - type: featureSplit
     heading:
