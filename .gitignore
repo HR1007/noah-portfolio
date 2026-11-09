@@ -44,3 +44,6 @@ raw-assets/
 
 # npm run test:ui 的測試結果，每次跑都會覆蓋
 .ui-test/
+
+# npm run demo:record 錄出來的示範影片與總覽圖，確認後才複製進 src/assets
+.demo-out/
