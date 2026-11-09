@@ -181,8 +181,9 @@ const cursorScript = (kind) => `(() => {
         { duration: 560, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' }
       ).onfinish = () => svg.remove();
     };
-    const down = (x, y) => {
-      burst(x, y);
+    // 放射線只給點擊；手機的滑動手勢也會觸發 touchstart，那時只顯示手指圓點
+    const down = (x, y, tap = true) => {
+      if (tap) burst(x, y);
       ${kind === 'phone' ? `mark.style.opacity = 1; mark.style.transform = 'scale(1)';` : `mark.style.transform = 'scale(.88)';`}
     };
     const up = () => {
@@ -191,7 +192,7 @@ const cursorScript = (kind) => `(() => {
     addEventListener('mousemove', (e) => { if (!gliding) place(e.clientX, e.clientY); }, true);
     addEventListener('mousedown', (e) => { place(e.clientX, e.clientY); down(e.clientX, e.clientY); }, true);
     addEventListener('mouseup', up, true);
-    addEventListener('touchstart', (e) => { const t = e.touches[0]; if (t) { place(t.clientX, t.clientY); down(t.clientX, t.clientY); } }, true);
+    addEventListener('touchstart', (e) => { const t = e.touches[0]; if (t) { place(t.clientX, t.clientY); down(t.clientX, t.clientY, false); } }, true);
     addEventListener('touchmove', (e) => { const t = e.touches[0]; if (t) place(t.clientX, t.clientY); }, true);
     addEventListener('touchend', up, true);
   };
