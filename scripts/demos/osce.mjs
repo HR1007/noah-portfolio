@@ -10,7 +10,7 @@
 
   流程照案例頁的敘事：登入 → 測驗資料夾 → 進階篩選在原地展開 → 狀態的語意色彩 →
   勾選後批次操作出現在旁邊 → 學生作答記錄。
-  放到 src/assets/projects/osce/11.mp4（See the OSCE Platform in Action 那一段）。
+  放到 src/assets/projects/osce/02.mp4（See the OSCE Platform in Action 那一段）。
 */
 export default {
   device: 'desktop',

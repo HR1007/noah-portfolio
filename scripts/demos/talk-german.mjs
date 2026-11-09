@@ -7,7 +7,7 @@
 
   流程照案例頁的敘事：登入 → 翻譯（錄音／上傳／文字）→ 左右對照的結果 →
   每日單字 → 學習卡 → 測驗 → 單字庫。
-  放到 src/assets/projects/talk-german/10.mp4（See Talk German in Action 那一段）。
+  放到 src/assets/projects/talk-german/02.mp4（See Talk German in Action 那一段）。
 */
 export default {
   device: 'phone',

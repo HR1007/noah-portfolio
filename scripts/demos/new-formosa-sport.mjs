@@ -8,7 +8,7 @@
   這樣就算表單哪天改送到別的地方，也一樣漏不出去。
 
   流程照案例頁的敘事：報價表單就在首頁第一個畫面 → 填需求並送出 → 五大服務 → 服務介紹頁。
-  放到 src/assets/projects/new-formosa-sport/08.mp4（The Quote Lives on the First Screen 那一段）。
+  放到 src/assets/projects/new-formosa-sport/02.mp4（The Quote Lives on the First Screen 那一段）。
 */
 export default {
   device: 'desktop',

@@ -8,7 +8,7 @@
   流程照案例頁的敘事：註冊 → 建立錢包 → 領第一個 NFT → 收藏頁 → 看卡片權益 →
   模擬在合作店家付款、解鎖新收藏 → 篩選。鏡頭在表單、領取卡片、卡片詳情、
   新解鎖的收藏這幾處放大，其餘時候看整個畫面。
-  放到 src/assets/projects/foodlet/04.mp4（See Foodlet in Action 那一段）。
+  放到 src/assets/projects/foodlet/02.mp4（See Foodlet in Action 那一段）。
 */
 export default {
   device: 'desktop',

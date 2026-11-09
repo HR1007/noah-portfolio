@@ -7,7 +7,7 @@
 
   流程照案例頁的敘事：選照片 → 左右對照的星形構圖出現 → 隨機生成星星 →
   調整數量與大小 → 換顏色 → 換比例 → 下載。
-  放到 src/assets/projects/star-overlay/10.mp4（See the Star Overlay Editor in Action 那一段）。
+  放到 src/assets/projects/star-overlay/02.mp4（See the Star Overlay Editor in Action 那一段）。
 */
 export default {
   device: 'phone',
