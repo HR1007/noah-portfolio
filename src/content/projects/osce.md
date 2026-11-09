@@ -174,6 +174,9 @@ sections:
           zh: 從登入到修正成績的操作動線：主線六個畫面，另有八條分支從中岔出
     direction: horizontal
   - type: featureSplit
+    eyebrow:
+      en: TASK SURFACE
+      zh: 操作介面
     heading:
       en: Unified Task Surface
       zh: 收攏成單一操作面
@@ -191,6 +194,9 @@ sections:
       en: Unified task surface dashboard screenshot
       zh: 收攏後的單一操作面後台畫面
   - type: featureSplit
+    eyebrow:
+      en: DARK MODE
+      zh: 深色模式
     heading:
       en: Dark Mode for Long Sessions
       zh: 為長時間作業而做的深色模式
