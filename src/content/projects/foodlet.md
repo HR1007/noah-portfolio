@@ -2,6 +2,9 @@
 title:
   en: Foodlet
   zh: 食錢包 Foodlet
+eyebrow:
+  en: WEB3 MOBILE PAYMENT
+  zh: Web3 行動支付
 order: 6
 summary:
   en: >-

@@ -2,6 +2,9 @@
 title:
   en: Signal & Action
   zh: 訊號與行動
+eyebrow:
+  en: B2B SALES DASHBOARD
+  zh: B2B 銷售戰情室
 order: 1
 summary:
   en: >-

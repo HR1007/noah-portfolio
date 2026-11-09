@@ -2,6 +2,9 @@
 title:
   en: A design language for the Star Overlay editor
   zh: Star Overlay
+eyebrow:
+  en: MOBILE PHOTO EDITOR
+  zh: 手機影像編輯器
 order: 2
 summary:
   en: >-

@@ -2,6 +2,9 @@
 title:
   en: New Formosa Sport — Sports Platform Website Design
   zh: 新寶島──運動用品平台網站設計
+eyebrow:
+  en: E-COMMERCE WEBSITE
+  zh: 電商網站
 order: 3
 summary:
   en: >-

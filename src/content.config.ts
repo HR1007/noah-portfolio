@@ -307,6 +307,8 @@ const projects = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/projects' }),
   schema: z.object({
     title: localized(),
+    /* 作品類型的短標，首頁作品輪播在作品名稱上方用灰色小字顯示（例如「B2B 銷售戰情室」） */
+    eyebrow: localized().optional(),
     order: z.number(),
     year: z.string().optional(), // [需確認] live 站未展示年份，待設計師提供
     summary: localized(),
@@ -408,6 +410,10 @@ const site = defineCollection({
       aboutIntro: z.string(),
       /* About 的第二段：研究主軸。跟 aboutIntro 分開存，版面上是獨立一段 */
       aboutResearch: z.string(),
+      /* About 下面的作品影片輪播：段落標題、左右箭頭給螢幕閱讀器唸的名稱 */
+      showreelHeading: z.string(),
+      showreelPrev: z.string(),
+      showreelNext: z.string(),
       beyondGridHeading: z.string(),
       beyondGridParagraphs: z.array(z.string()),
       experience: z.array(

@@ -2,6 +2,9 @@
 title:
   en: Talk German
   zh: Talk German
+eyebrow:
+  en: LANGUAGE LEARNING APP
+  zh: 語言學習 App
 order: 5
 summary:
   en: >-

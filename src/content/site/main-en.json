@@ -76,6 +76,9 @@
     "aboutSubheading": "Making complex systems feel simple",
     "aboutIntro": "I did my master's in Information Management at NKUST, and most of my work is in UI/UX design and human factors. As a data analysis intern at e-Excellence, I kept working on how to make the important numbers on a dashboard easy to spot. During an exchange year in Computer Science at THWS in Germany, I saw how differently people read the same button depending on where they grew up. My thesis was on Taiwan's OSCE medical assessment system, where I used user-centered design to rework the back-office workflows from scratch. Drawing the new flow was the easy part. Getting it adopted is harder, and I'm still working on it.",
     "aboutResearch": "My research keeps returning to one goal: bringing human factors into clinical settings. In 2023 I built an immersive ordering interface for AR glasses, controlled by hand gestures. Later I moved into hospitals, using eye tracking and usability testing to improve a medication recognition system. Across those projects the question has stayed the same: whether an interface can help someone make one fewer mistake when the pressure is high and there's little room for error.",
+    "showreelHeading": "Work in Motion",
+    "showreelPrev": "Previous project",
+    "showreelNext": "Next project",
     "beyondGridHeading": "Beyond the Grid",
     "beyondGridParagraphs": [
       "When I'm not adjusting pixels or working with data, I'm usually drawing. The two have always overlapped. Halfway through building a web page, a character comes to mind, I can't help drawing it, and it often ends up on that page.",

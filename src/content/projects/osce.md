@@ -2,6 +2,9 @@
 title:
   en: OSCE Medical Assessment Platform
   zh: OSCE 醫學考評平台
+eyebrow:
+  en: MEDICAL ASSESSMENT PLATFORM
+  zh: 醫學考評後台
 order: 4
 summary:
   en: >-
