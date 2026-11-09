@@ -55,6 +55,9 @@ const {
     但仍然可以自己手動播放，不會完全看不到這段內容。
     aspect-ratio 用內容裡的 ratio 欄位頂著版面——影片的 metadata 要等
     載入後才知道真正尺寸，沒有這個會在載入完成那一刻跳一下版。
+
+    preload 只抓 metadata（連帶第一格畫面）：示範影片是 30 秒以上、約 10MB，
+    用 auto 的話訪客一打開頁面就得整支下載，不管有沒有捲到這一段。
   */}
   <div class="experience-demo__media" data-reveal>
     {
@@ -67,7 +70,7 @@ const {
           loop
           playsinline
           controls
-          preload="auto"
+          preload="metadata"
           aria-label={alt}
         />
       ) : (
@@ -80,11 +83,23 @@ const {
 {
   video && (
     <script>
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.querySelectorAll<HTMLVideoElement>('.experience-demo__video').forEach((v) => {
-          v.play().catch(() => {});
-        });
-      }
+      /*
+        捲到影片（露出四分之一）才播放，離開畫面就暫停：沒看到的時候不必一直解碼、
+        也不會在背景把整支影片抓下來。減少動態時不自動播放，但離開畫面一樣會暫停
+        訪客自己按下的播放。
+      */
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            const video = entry.target as HTMLVideoElement;
+            if (!entry.isIntersecting) video.pause();
+            else if (!reduceMotion.matches) video.play().catch(() => {});
+          }
+        },
+        { threshold: 0.25 }
+      );
+      document.querySelectorAll<HTMLVideoElement>('.experience-demo__video').forEach((v) => observer.observe(v));
     </script>
   )
 }
