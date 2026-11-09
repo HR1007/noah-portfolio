@@ -12,6 +12,13 @@
   --color-muted: rgba(0, 0, 0, 0.55);
   /* [需確認] 沒有實測到明確的 hairline border 色，暫用 ink 的低透明度技術性替代，等設計師提供正式數值 */
   --color-border: rgba(51, 51, 51, 0.12);
+  /*
+    [需確認] 舞台聚光燈（ExperienceDemo 直式影片的背後）。設計稿沒有這個元件，非實測值。
+    stage-light 是從上方往下打的一束光；stage-floor 是手機腳下那一圈。
+    淺色底上白光幾乎看不出來，所以淺色主題的地面改用淡淡的影子撐出「站在台上」的感覺。
+  */
+  --color-stage-light: rgba(255, 255, 255, 0.9);
+  --color-stage-floor: rgba(51, 51, 51, 0.1);
 
   /*
     字體。字型的 fallback 是「逐字」生效的：Inter 沒有漢字，所以中文會自動往後找到
@@ -248,6 +255,8 @@
   --color-ink: #f2f2f2;
   --color-muted: rgba(242, 242, 242, 0.6);
   --color-border: rgba(242, 242, 242, 0.14);
+  --color-stage-light: rgba(242, 242, 242, 0.1);
+  --color-stage-floor: rgba(242, 242, 242, 0.08);
 
   /* 深色的順序型三階：一樣由「最顯眼」到「最安靜」，所以 step-1 是最亮的那一階 */
   --chart-step-1: #f2f2f2;

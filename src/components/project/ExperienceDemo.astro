@@ -30,6 +30,10 @@ const {
   ctaHref,
   layout = 'stacked',
 } = Astro.props;
+
+// 直式版位（寬小於高）就是手機畫面：置中、背後打一圈舞台聚光燈，見樣式裡的 [data-stage]
+const [ratioW, ratioH] = ratio.split('/').map(Number);
+const isPortrait = ratioW < ratioH;
 ---
 
 <section class="experience-demo" data-layout={layout}>
@@ -59,7 +63,7 @@ const {
     preload 只抓 metadata（連帶第一格畫面）：示範影片是 30 秒以上、約 10MB，
     用 auto 的話訪客一打開頁面就得整支下載，不管有沒有捲到這一段。
   */}
-  <div class="experience-demo__media" data-reveal>
+  <div class="experience-demo__media" data-reveal data-stage={isPortrait ? '' : undefined}>
     {
       video ? (
         <video
@@ -188,6 +192,22 @@ const {
     max-height: var(--hero-max-height);
     margin-inline: auto;
     border-radius: var(--radius);
+  }
+
+  /*
+    直式版位（手機畫面）的舞台。影片置中，左右直接露出網頁背景，深淺色自動跟著換——
+    MP4 沒有透明通道，「去背」靠的是只錄手機畫面本身，背景交給網頁。
+    兩層漸層組成舞台：上方往下打的一束光、手機腳下的一圈光（淺色主題是影子）。
+    最上層再疊一道「頁面底色 → 透明」：光源在版位最頂端最亮，少了這層，
+    方框上緣會切出一條明顯的水平線。尺寸全用百分比，跟著版位大小縮放。
+  */
+  .experience-demo__media[data-stage] {
+    padding-block: var(--sp-5);
+    border-radius: var(--radius);
+    background:
+      linear-gradient(var(--color-bg), transparent 20%),
+      radial-gradient(ellipse 24% 6% at 50% 95%, var(--color-stage-floor), transparent),
+      radial-gradient(ellipse 36% 100% at 50% 0%, var(--color-stage-light), transparent 75%);
   }
 
   /*
