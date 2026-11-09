@@ -64,7 +64,7 @@ sections:
       en: Try it out
       zh: 來試試看
     ctaHref: 'https://hr1007.github.io/foodlet/#/join'
-    layout: split
+    layout: stacked
   - type: persona
     eyebrow:
       en: PERSONA
