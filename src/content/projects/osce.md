@@ -248,27 +248,5 @@ sections:
       en: Try it out
       zh: 來試試看
     ctaHref: 'https://hr1007.github.io/vr-medication-admin/'
-  - type: featureSplit
-    eyebrow:
-      en: AUDIT LOG
-      zh: 操作日誌
-    heading:
-      en: Every Change Leaves a Trace
-      zh: 每一次更動都留得下痕跡
-    body:
-      en: >-
-        Logins, edits, deletions and exports each have their own colour tag and
-        can be searched by account and date. When a score is disputed, the log
-        shows what happened.
-      zh: 登入、編輯、刪除和匯出各有對應的顏色，也能依帳號和日期查詢。成績有爭議時，可以直接從紀錄查證。
-    imagePosition: left
-    ratio: 3/4
-    alt:
-      en: System audit log with colour-tagged event types
-      zh: 系統操作日誌，事件類型以顏色標記
-    ctaLabel:
-      en: Try it out
-      zh: 來試試看
-    ctaHref: 'https://hr1007.github.io/vr-medication-admin/'
 ---
 
