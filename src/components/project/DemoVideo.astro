@@ -16,16 +16,24 @@ interface Props {
   src: string;
   ratio: string;
   alt: string;
+  /** 舞台聚光燈。沒指定時只有直式（手機畫面）才打；首頁作品輪播要每一部都打，傳 true */
+  stage?: boolean;
+  /**
+   * 交給外層決定什麼時候播（首頁作品輪播：只有正中間那部播）。
+   * 這支元件自己的捲動偵測會略過它，preload 也先設 none，由外層在需要時才載入。
+   */
+  managed?: boolean;
 }
 
-const { src, ratio, alt } = Astro.props;
+const { src, ratio, alt, stage, managed = false } = Astro.props;
 
 // 直式版位（寬小於高）就是手機畫面：置中、背後打一圈舞台聚光燈，見樣式裡的 [data-stage]
 const [ratioW, ratioH] = ratio.split('/').map(Number);
 const isPortrait = ratioW < ratioH;
+const hasStage = stage ?? isPortrait;
 ---
 
-<div class="demo-video" data-stage={isPortrait ? '' : undefined}>
+<div class="demo-video" data-stage={hasStage ? '' : undefined}>
   <video
     class="demo-video__video"
     src={src}
@@ -34,8 +42,9 @@ const isPortrait = ratioW < ratioH;
     loop
     playsinline
     controls
-    preload="metadata"
+    preload={managed ? 'none' : 'metadata'}
     aria-label={alt}
+    data-demo-managed={managed ? '' : undefined}
   ></video>
 </div>
 
@@ -56,7 +65,7 @@ const isPortrait = ratioW < ratioH;
     },
     { threshold: 0.25 }
   );
-  document.querySelectorAll<HTMLVideoElement>('.demo-video__video').forEach((v) => observer.observe(v));
+  document.querySelectorAll<HTMLVideoElement>('.demo-video__video:not([data-demo-managed])').forEach((v) => observer.observe(v));
 </script>
 
 <style>
