@@ -140,8 +140,8 @@ sections:
       zh: 詢價表單直接放在首頁 hero 旁邊，訪客不必另外找聯絡頁面，填完需求就能送出，不用往下捲。
     ratio: 16/10
     alt:
-      en: New Formosa Sport homepage with the free-quote form beside the hero
-      zh: 新寶島首頁，免費報價表單就在 hero 旁邊
+      en: New Formosa Sport demo, from filling in the quote form on the homepage to a service page
+      zh: 新寶島操作示範，從首頁填寫報價表單到服務介紹頁
     ctaLabel:
       en: Try it out
       zh: 來試試看
