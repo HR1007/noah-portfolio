@@ -219,8 +219,8 @@ sections:
       zh: 這段展示走一遍改版後的後台：進階篩選在原地展開，狀態用語意化色彩標示，批次操作就在選取的資料旁邊。
     ratio: 16/10
     alt:
-      en: OSCE Medical Assessment Platform demo on laptop
-      zh: 筆電上的 OSCE 醫學考評平台展示
+      en: OSCE back office demo, from signing in to filtering, bulk-selecting and opening a student record
+      zh: OSCE 後台操作示範，從登入、篩選、批次勾選到開啟學生作答記錄
     layout: stacked
     ctaLabel:
       en: Try it out
