@@ -205,10 +205,10 @@ sections:
         now leaves something to collect.
       zh: 付款完成後，第一個收藏品就會出現：一塊像素餅乾，點一下就能領取。原本只有一聲「嗶」的結帳時刻，現在多了一樣可以收藏的東西。
     imagePosition: right
-    ratio: 3/4
+    ratio: 390/844
     alt:
-      en: Mobile screen awarding the first Foodlet NFT collectible
-      zh: 領取第一個 Foodlet NFT 收藏品的手機畫面
+      en: Foodlet phone demo, from signing up to claiming the first NFT and opening it in the wallet
+      zh: Foodlet 手機操作示範，從註冊、領取第一個 NFT 到在錢包裡打開它
     ctaLabel:
       en: Try it out
       zh: 來試試看
