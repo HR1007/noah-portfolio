@@ -90,8 +90,8 @@ sections:
         走過一條完整路線：從品牌故事進站，點一下就連好錢包，不用填表單，接著付一餐的錢，領到第一個收藏品。每個畫面都在回應同一件事：用餐者能帶走什麼。
     ratio: 16/10
     alt:
-      en: 'Foodlet collection page on a laptop, showing the NFTs a diner has earned'
-      zh: 筆電上的 Foodlet 收藏頁，列出用餐者領到的 NFT
+      en: Foodlet demo, from signing up to claiming the first NFT and browsing the collection
+      zh: Foodlet 操作示範，從註冊、領取第一個 NFT 到瀏覽收藏
     ctaLabel:
       en: Try it out
       zh: 來試試看
