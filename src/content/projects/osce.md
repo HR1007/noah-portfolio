@@ -13,7 +13,7 @@ hero:
   ctaLabel:
     en: Try it out
     zh: 實際試試
-  ctaHref: 'https://osce-medical-assessment-platform.figma.site'
+  ctaHref: 'https://hr1007.github.io/vr-medication-admin/'
 sections:
   - type: textSection
     eyebrow:
@@ -231,7 +231,7 @@ sections:
     ctaLabel:
       en: Try it out
       zh: 來試試看
-    ctaHref: 'https://osce-medical-assessment-platform.figma.site'
+    ctaHref: 'https://hr1007.github.io/vr-medication-admin/'
   - type: featureSplit
     eyebrow:
       en: AUDIT LOG
@@ -253,6 +253,6 @@ sections:
     ctaLabel:
       en: Try it out
       zh: 來試試看
-    ctaHref: 'https://osce-medical-assessment-platform.figma.site'
+    ctaHref: 'https://hr1007.github.io/vr-medication-admin/'
 ---
 
