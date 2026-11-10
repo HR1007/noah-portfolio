@@ -58,6 +58,7 @@ const navItems = [
   { id: 'about', label: home.aboutHeading },
   ...(reel.length > 0 ? [{ id: 'showreel', label: home.showreelHeading }] : []),
   { id: 'beyond-grid', label: home.beyondGridHeading },
+  { id: 'experience', label: home.experienceHeading },
   { id: 'activities', label: home.activitiesHeading },
   { id: 'connect', label: home.connectHeading },
 ];
@@ -204,10 +205,18 @@ const navItems = [
     }
   </section>
 
-  <section class="experience">
-    {home.experience.map((item) => (
-      <ExperienceItem title={item.title} period={item.period} description={item.description} />
-    ))}
+  {/*
+    工作經歷、研討會與服務預設收起，只露出最前面幾筆（最近的那幾筆），想看的人再展開——
+    兩個清單加起來十筆，全部攤開時要捲很久才到聯絡方式。收合方式跟 About 的「閱讀更多」
+    同一顆 ReadMore，只是改成依筆數收。
+  */}
+  <section class="experience" id="experience">
+    <h2 class="experience__heading">{home.experienceHeading}</h2>
+    <ReadMore items={1}>
+      {home.experience.map((item) => (
+        <ExperienceItem title={item.title} period={item.period} description={item.description} />
+      ))}
+    </ReadMore>
   </section>
 
   {/*
@@ -216,9 +225,11 @@ const navItems = [
   */}
   <section class="activities" id="activities">
     <h2 class="activities__heading">{home.activitiesHeading}</h2>
-    {home.activities.map((item) => (
-      <ExperienceItem title={item.title} period={item.period} description={item.description} />
-    ))}
+    <ReadMore items={2}>
+      {home.activities.map((item) => (
+        <ExperienceItem title={item.title} period={item.period} description={item.description} />
+      ))}
+    </ReadMore>
   </section>
 
   <section class="connect" id="connect">
@@ -492,6 +503,7 @@ const navItems = [
   .about,
   .showreel,
   .beyond-grid,
+  .experience,
   .activities,
   .connect {
     scroll-margin-top: var(--sp-7);
@@ -590,6 +602,7 @@ const navItems = [
     padding: 0 var(--content-gutter) var(--sp-7);
   }
 
+  .experience__heading,
   .activities__heading {
     font-size: var(--font-size-h2);
     margin-bottom: var(--sp-3);
