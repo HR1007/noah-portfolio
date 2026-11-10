@@ -84,6 +84,28 @@
       "When I'm not adjusting pixels or working with data, I'm usually drawing. The two have always overlapped. Halfway through building a web page, a character comes to mind, I can't help drawing it, and it often ends up on that page.",
       "I've been a student ambassador and an international volunteer, and I lived in Würzburg for a while. Living somewhere new meant relearning small things like buying bread or catching a tram, and things I used to take for granted started to need a second look. For a designer, that unfamiliarity is a pretty good deal."
     ],
+    "hobbyPhotos": [
+      {
+        "title": "Würzburg Residence",
+        "caption": "The statue in front of the Residence, on Residenzplatz",
+        "date": "2024"
+      },
+      {
+        "title": "Street Food",
+        "caption": "A really good kebap near the station",
+        "date": "2024"
+      },
+      {
+        "title": "Würzburg Old Town",
+        "caption": "Alte Mainbrücke, the old bridge over the Main",
+        "date": "2024"
+      },
+      {
+        "title": "The Residence in Spring",
+        "caption": "Cherry trees in the garden at Residenzplatz",
+        "date": "2024"
+      }
+    ],
     "beyondGridCta": "Visit the Gallery",
     "experienceHeading": "Experience",
     "experience": [

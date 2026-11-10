@@ -416,6 +416,15 @@ const site = defineCollection({
       showreelNext: z.string(),
       beyondGridHeading: z.string(),
       beyondGridParagraphs: z.array(z.string()),
+      /*
+        格線之外那排旅行照的說明，照順序對應 src/assets/home/hobby-01、02…。
+        標題在滑鼠移上去時浮出；點開全螢幕檢視後，底部顯示標題、描述與拍攝日期。
+        date 是顯示用的文字（目前只寫年份），不拿來排序。
+        筆數比照片少時，多出來的照片沒有說明，照樣顯示、照樣能點開。
+      */
+      hobbyPhotos: z.array(
+        z.object({ title: z.string(), caption: z.string(), date: z.string() })
+      ),
       /* 格線之外段落最下面的按鈕，連到藝廊 */
       beyondGridCta: z.string(),
       /* 工作經歷的段落大標題，跟研討會與服務的標題同一層級 */
