@@ -8,12 +8,20 @@
 
   文字完整留在 DOM 裡，只用 CSS 收合高度：SEO 與螢幕閱讀器讀到的都是全文，
   收起來的只是視覺上的高度。
+
+  兩種收法：
+  - lines：依行數，給一大段文字用（預設）。
+  - items：依筆數，給一筆一筆的清單用（首頁的工作經歷、研討會與服務）。
+    露出前 N 筆，第 N+1 筆只露出開頭一截、蓋著漸層，看得出下面還有。
+    行數算不準這種清單——每筆的標題、說明字級不同，說明長短也不一。
 */
 import { getEntry } from 'astro:content';
 
 interface Props {
   /** 超過幾行才收合。低於這個行數的段落不會出現按鈕 */
   lines?: number;
+  /** 改成依筆數收合：露出前幾筆（slot 裡的每個直屬子元素算一筆）。筆數不超過就不出現按鈕 */
+  items?: number;
 }
 
 /*
@@ -21,13 +29,13 @@ interface Props {
   5 行的門檻剛好讓長段落（osce 的 203 字中文約 6.3 行）被截到，
   短段落（star-overlay 的 88 字約 2.8 行）則不會冒出一顆沒有作用的按鈕。
 */
-const { lines = 5 } = Astro.props;
+const { lines = 5, items } = Astro.props;
 const locale = Astro.currentLocale ?? 'en';
 const site = await getEntry('site', `main-${locale}`);
 const { more, less } = site!.data.readMore;
 ---
 
-<div class="read-more" data-read-more style={`--lines: ${lines}`}>
+<div class="read-more" data-read-more data-items={items} style={`--lines: ${lines}`}>
   <div class="read-more__body" data-read-more-body>
     <slot />
   </div>
@@ -49,10 +57,25 @@ const { more, less } = site!.data.readMore;
       只有真的被截到才給按鈕。短段落也掛一顆「閱讀更多」，點下去什麼都沒發生，
       比沒有按鈕更糟。字型載入會改變行高，所以量測要等 fonts.ready。
     */
+    const items = Number(box.dataset.items) || 0;
+
+    /*
+      依筆數：收合高度＝第 N+1 筆的頂端，再往下多露一截（--read-more-peek）。
+      高度要等版面排好才量得到，寫進 --clamp 給 CSS 用；沒有 JS 時不收合。
+    */
+    const clampToItems = () => {
+      const rows = Array.from(body.children) as HTMLElement[];
+      if (rows.length <= items) return false;
+      const peek = parseFloat(getComputedStyle(box).getPropertyValue('--read-more-peek')) || 0;
+      const top = rows[items].getBoundingClientRect().top - body.getBoundingClientRect().top;
+      box.style.setProperty('--clamp', `${top + peek}px`);
+      return true;
+    };
+
     const measure = () => {
       // 展開狀態下量不出截斷（max-height 已解除），維持現狀不要把按鈕收掉
       if (box.classList.contains('is-open')) return;
-      const clipped = body.scrollHeight > body.clientHeight + 1;
+      const clipped = items ? clampToItems() : body.scrollHeight > body.clientHeight + 1;
       box.classList.toggle('is-clipped', clipped);
       btn.hidden = !clipped;
     };
@@ -64,6 +87,11 @@ const { more, less } = site!.data.readMore;
       const open = box.classList.toggle('is-open');
       btn.setAttribute('aria-expanded', String(open));
       label.textContent = open ? btn.dataset.less! : btn.dataset.more!;
+      if (!open) {
+        measure();
+        // 讀完長清單按「收合」，內容一下子變短，按鈕可能已經跑到畫面上方；把它帶回視線裡
+        if (btn.getBoundingClientRect().top < 0) btn.scrollIntoView({ block: 'center' });
+      }
     });
   });
 </script>
@@ -77,13 +105,26 @@ const { more, less } = site!.data.readMore;
     改成直接算高度：行高 × 行數。font-size 明寫在這裡，em 才有穩定的基準，
     不會因為外層某天換了字級而算錯。
   */
+  .read-more {
+    /* 依筆數收合時，第 N+1 筆露出的那一截 */
+    --read-more-peek: var(--sp-6);
+  }
+
   .read-more__body {
-    --line-height: 1.7;
     position: relative;
+    overflow: hidden;
+  }
+
+  .read-more:not([data-items]) .read-more__body {
+    --line-height: 1.7;
     font-size: var(--font-size-body);
     line-height: var(--line-height);
     max-height: calc(var(--lines) * var(--line-height) * 1em);
-    overflow: hidden;
+  }
+
+  /* 依筆數：高度由 JS 量好寫進 --clamp；字級行高交給清單自己，不在這裡改 */
+  .read-more[data-items] .read-more__body {
+    max-height: var(--clamp, none);
   }
 
   .read-more.is-open .read-more__body {
@@ -104,6 +145,10 @@ const { more, less } = site!.data.readMore;
     height: calc(var(--line-height) * 2em);
     background: linear-gradient(transparent, var(--color-bg));
     pointer-events: none;
+  }
+
+  .read-more[data-items].is-clipped:not(.is-open) .read-more__body::after {
+    height: var(--read-more-peek);
   }
 
   /* 按鈕靠右下角，跟著段落的右緣走 */
