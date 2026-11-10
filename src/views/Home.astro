@@ -8,6 +8,7 @@ import PullQuote from '../components/PullQuote.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
 import ConnectChannel from '../components/ConnectChannel.astro';
 import ReadMore from '../components/ReadMore.astro';
+import Button from '../components/Button.astro';
 import ScrollVideo from '../components/ScrollVideo.astro';
 import SectionNav from '../components/project/SectionNav.astro';
 import Showreel, { type ShowreelSlide } from '../components/Showreel.astro';
@@ -203,6 +204,9 @@ const navItems = [
         </div>
       )
     }
+    <div class="beyond-grid__cta">
+      <Button label={home.beyondGridCta} href={`/${locale}/gallery`} variant="secondary" />
+    </div>
   </section>
 
   {/*
@@ -594,6 +598,10 @@ const navItems = [
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--sp-2);
+  }
+
+  .beyond-grid__cta {
+    margin-top: var(--sp-4);
   }
 
   .activities {
