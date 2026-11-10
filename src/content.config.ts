@@ -416,6 +416,10 @@ const site = defineCollection({
       showreelNext: z.string(),
       beyondGridHeading: z.string(),
       beyondGridParagraphs: z.array(z.string()),
+      /* 格線之外段落最下面的按鈕，連到藝廊 */
+      beyondGridCta: z.string(),
+      /* 工作經歷的段落大標題，跟研討會與服務的標題同一層級 */
+      experienceHeading: z.string(),
       experience: z.array(
         z.object({ title: z.string(), period: z.string(), description: z.string() })
       ),
