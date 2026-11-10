@@ -13,6 +13,9 @@
 
   前提：dev server 要先開著（npx astro dev --background）。
 
+  每測一頁會印出「寬度 [第幾頁/共幾頁] 路徑」。任何一步等 Chrome 超過 30 秒、或連線斷掉
+  （Chrome 當掉、電腦睡眠），那一頁記成「測試本身出錯」，不會整支停在原地。
+
   參數（npm 要加 -- 才傳得進來，例如 npm run test:ui -- --width 768）：
     --width 768       只跑一個寬度，預設 375、768、1440 依序跑
     --only foodlet    只測路徑符合這個正規式的頁面
@@ -77,7 +80,20 @@ async function crawl() {
 let ws, id = 0;
 const pending = new Map();
 const listeners = [];
-const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending.set(i, r); ws.send(JSON.stringify({ id: i, method, params })); });
+/*
+  每個呼叫最多等 CALL_TIMEOUT。沒有這個上限時，只要頁面卡住（JS 跑不完、跳出對話框、
+  分頁當掉），這裡就永遠等不到回應，整支測試會無聲地停在那裡——曾經在 1440 停了 13 小時。
+  逾時會丟錯，由 testPage 外面的 try/catch 記成「測試本身出錯」，接著測下一頁。
+*/
+const CALL_TIMEOUT = 30000;
+const send = (method, params = {}) => new Promise((resolve, reject) => {
+  const i = ++id;
+  const fail = (why) => { clearTimeout(t); pending.delete(i); reject(new Error(`${method}：${why}`)); };
+  const t = setTimeout(() => fail(`等了 ${CALL_TIMEOUT / 1000} 秒沒有回應`), CALL_TIMEOUT);
+  pending.set(i, { done: (d) => { clearTimeout(t); resolve(d); }, fail });
+  if (ws.readyState !== WebSocket.OPEN) return fail('和 Chrome 的連線已經斷了');
+  ws.send(JSON.stringify({ id: i, method, params }));
+});
 const ev = async (expr) => {
   const r = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
   if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.exception?.description ?? 'eval error');
@@ -113,16 +129,29 @@ async function openBrowser(width, height) {
   ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((r) => ws.addEventListener('open', r));
   pending.clear();
+  /*
+    連線斷掉（Chrome 當掉，或電腦睡眠醒來後 socket 已經失效）時，等在半路的呼叫
+    永遠收不到回應：立刻讓它們全部失敗，不必各自等滿逾時。
+  */
+  ws.addEventListener('close', () => {
+    for (const p of [...pending.values()]) p.fail('和 Chrome 的連線斷了（Chrome 當掉，或電腦睡眠後連線中斷）');
+  });
   ws.addEventListener('message', (m) => {
     const d = JSON.parse(m.data);
-    if (d.id && pending.has(d.id)) { pending.get(d.id)(d); pending.delete(d.id); return; }
+    if (d.id && pending.has(d.id)) { pending.get(d.id).done(d); pending.delete(d.id); return; }
     if (d.method === 'Runtime.exceptionThrown') pageErrors.push('exception: ' + (d.params.exceptionDetails.exception?.description ?? d.params.exceptionDetails.text).split('\n')[0]);
     if (d.method === 'Runtime.consoleAPICalled' && d.params.type === 'error') pageErrors.push('console.error: ' + d.params.args.map((a) => a.value ?? a.description).join(' ').slice(0, 200));
     if (d.method === 'Network.responseReceived' && d.params.response.status >= 400) pageErrors.push(`HTTP ${d.params.response.status}: ${d.params.response.url}`);
     if (d.method === 'Network.loadingFailed' && !d.params.canceled && d.params.errorText !== 'net::ERR_ABORTED') pageErrors.push(`載入失敗 ${d.params.errorText}`);
+    // alert／confirm／離開頁面確認會擋住整個分頁，後面的指令全部等不到回應：記下來並直接關掉
+    if (d.method === 'Page.javascriptDialogOpening') {
+      pageErrors.push(`跳出對話框（${d.params.type}）：${d.params.message.slice(0, 120)}`);
+      ws.send(JSON.stringify({ id: ++id, method: 'Page.handleJavaScriptDialog', params: { accept: true } }));
+    }
+    if (d.method === 'Inspector.targetCrashed') pageErrors.push('分頁當掉（Inspector.targetCrashed）');
     listeners.slice().forEach((fn) => fn(d));
   });
-  await send('Page.enable'); await send('Runtime.enable'); await send('Network.enable');
+  await send('Page.enable'); await send('Runtime.enable'); await send('Network.enable'); await send('Inspector.enable');
   await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width < 768 });
 
   return async () => {
@@ -387,7 +416,9 @@ async function runWidth(width, pages) {
   const height = width < 768 ? 812 : width < 1200 ? 1024 : 900;
   const close = await openBrowser(width, height);
   try {
-    for (const p of pages) {
+    for (const [i, p] of pages.entries()) {
+      // 逐頁印進度：卡住時至少看得出是哪一頁
+      console.log(`  ${width}px [${i + 1}/${pages.length}] ${p}`);
       try { await testPage(p); } catch (e) { results.pages[p] ??= { checks: [], errors: [] }; results.pages[p].checks.push({ name: '測試本身出錯', pass: false, detail: String(e.message ?? e) }); }
     }
     for (const lp of pages.filter((p) => /\/portfolio\/?$/.test(p))) {
