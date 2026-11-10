@@ -32,13 +32,30 @@ const { close, prev, next, hint } = site!.data.viewer;
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6" /></svg>
   </button>
 
-  <p class="viewer__hint">{hint}</p>
+  <div class="viewer__footer" data-viewer-footer>
+    {/*
+      照片說明：只有來源圖片外層帶了 data-photo-title 才顯示（目前是首頁「格線之外」那排旅行照）。
+      藝廊與案例頁的圖都沒有，這塊維持隱藏，畫面跟以前一樣。
+    */}
+    <div class="viewer__caption" data-viewer-caption hidden>
+      <p class="viewer__title" data-viewer-caption-title></p>
+      <p class="viewer__text">
+        <span data-viewer-caption-text></span><time class="viewer__date" data-viewer-caption-date></time>
+      </p>
+    </div>
+    <p class="viewer__hint">{hint}</p>
+  </div>
 </div>
 
 <script>
   const root = document.querySelector<HTMLElement>('[data-viewer]');
   const img = document.querySelector<HTMLImageElement>('[data-viewer-image]');
   const spot = document.querySelector<HTMLElement>('[data-viewer-spot]');
+  const footer = document.querySelector<HTMLElement>('[data-viewer-footer]');
+  const caption = document.querySelector<HTMLElement>('[data-viewer-caption]');
+  const captionTitle = document.querySelector<HTMLElement>('[data-viewer-caption-title]');
+  const captionText = document.querySelector<HTMLElement>('[data-viewer-caption-text]');
+  const captionDate = document.querySelector<HTMLTimeElement>('[data-viewer-caption-date]');
 
   if (root && img && spot) {
     // 慣性滑行是 JS 逐幀算的，CSS 的 prefers-reduced-motion 管不到，要自己查一次
@@ -62,6 +79,31 @@ const { close, prev, next, hint } = site!.data.viewer;
 
     const targets = () =>
       Array.from(document.querySelectorAll<HTMLImageElement>(SOURCES)).filter(zoomable);
+
+    /*
+      分組：來源圖片外層有 data-viewer-group 時，左右切換只在同一組裡跑。
+      首頁「格線之外」那四張旅行照是一組——不分組的話，從旅行照按下一張會跳到
+      hero 的像素頭像、引言旁的大頭照，跟正在看的旅行照毫無關係。
+      沒有分組的圖彼此算同一組；藝廊與案例頁全都沒分組，切換範圍跟以前一樣。
+    */
+    const groupOf = (el: Element) =>
+      el.closest<HTMLElement>('[data-viewer-group]')?.dataset.viewerGroup ?? '';
+
+    // 把來源圖片外層的說明（標題、描述、拍攝日期）搬到底部；沒有說明就整塊收起來
+    const describe = (source: HTMLImageElement) => {
+      const info = source.closest<HTMLElement>('[data-photo-title]');
+      root.toggleAttribute('data-captioned', Boolean(info));
+      if (!caption) return;
+      caption.hidden = !info;
+      if (!info) return;
+      const date = info.dataset.photoDate ?? '';
+      if (captionTitle) captionTitle.textContent = info.dataset.photoTitle ?? '';
+      if (captionText) captionText.textContent = info.dataset.photoCaption ?? '';
+      if (captionDate) {
+        captionDate.textContent = date;
+        captionDate.dateTime = date;
+      }
+    };
 
     let list: HTMLImageElement[] = [];
     let at = 0;
@@ -139,11 +181,13 @@ const { close, prev, next, hint } = site!.data.viewer;
       const source = list[at];
       img.src = source.currentSrc || source.src;
       img.alt = source.alt;
+      describe(source);
       reset();
     };
 
     const open = (source: HTMLImageElement) => {
-      list = targets();
+      const group = groupOf(source);
+      list = targets().filter((el) => groupOf(el) === group);
       const i = list.indexOf(source);
       if (i < 0) return;
       opener = source;
@@ -174,9 +218,9 @@ const { close, prev, next, hint } = site!.data.viewer;
     root.querySelector('[data-viewer-prev]')?.addEventListener('click', () => load(at - 1));
     root.querySelector('[data-viewer-next]')?.addEventListener('click', () => load(at + 1));
 
-    // 點空白處關閉，但點在圖片或按鈕上不算
+    // 點空白處關閉，但點在圖片、按鈕或說明文字上不算（說明那一列的留白算空白處）
     root.addEventListener('click', (e) => {
-      if (e.target === root || e.target === spot) shut();
+      if (e.target === root || e.target === spot || e.target === footer) shut();
     });
 
     document.addEventListener('keydown', (e) => {
@@ -350,13 +394,18 @@ const { close, prev, next, hint } = site!.data.viewer;
     display: none;
   }
 
+  /*
+    上下兩列：上面放圖，下面放照片說明。沒有說明時下面那列是空的（提示文字是
+    絕對定位、不佔位），高度為 0，圖片跟以前一樣落在整個畫面正中間；有說明時
+    圖片讓出底部那一列，字才不會壓在照片上。
+  */
   .viewer {
     position: fixed;
     inset: 0;
     z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    place-items: center;
     background: var(--viewer-backdrop);
     color: var(--viewer-ink);
     overscroll-behavior: contain;
@@ -378,8 +427,10 @@ const { close, prev, next, hint } = site!.data.viewer;
   }
 
   .viewer__image {
+    grid-row: 1;
     max-width: 92vw;
-    max-height: 88vh;
+    /* 100% 是上面那一列的高度：有說明時比整個畫面矮，圖片跟著縮，不會蓋到說明 */
+    max-height: min(88vh, 100%);
     /* transform 由 JS 控制，這裡只負責原點與不被拉伸 */
     transform-origin: center;
     object-fit: contain;
@@ -436,6 +487,16 @@ const { close, prev, next, hint } = site!.data.viewer;
     right: var(--sp-3);
   }
 
+  /*
+    垂直置中要明寫。以前 .viewer 是 flex，絕對定位的按鈕沒設 top 也會被
+    align-items 置中；改成 grid 之後各瀏覽器對這種情況的處理不一致，不能再靠它。
+  */
+  .viewer__btn--prev,
+  .viewer__btn--next {
+    top: 50%;
+    translate: 0 -50%;
+  }
+
   .viewer__btn--prev {
     left: var(--sp-3);
   }
@@ -444,12 +505,61 @@ const { close, prev, next, hint } = site!.data.viewer;
     right: var(--sp-3);
   }
 
+  .viewer__footer {
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-1);
+    text-align: center;
+  }
+
+  .viewer[data-captioned] .viewer__footer {
+    padding: var(--sp-2) var(--sp-4) var(--sp-3);
+  }
+
+  .viewer__caption {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+  }
+
+  .viewer__caption[hidden] {
+    display: none;
+  }
+
+  .viewer__title,
+  .viewer__text {
+    margin: 0;
+    font-size: var(--font-size-label);
+  }
+
+  .viewer__title {
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .viewer__text {
+    opacity: 0.7;
+  }
+
+  /* 描述與日期之間的分隔點；沒有日期時不畫 */
+  .viewer__date:not(:empty)::before {
+    content: '·';
+    margin-inline: var(--sp-1);
+  }
+
   .viewer__hint {
-    position: absolute;
-    bottom: var(--sp-3);
     margin: 0;
     font-size: var(--font-size-meta);
     opacity: 0.55;
+  }
+
+  /* 沒有說明時提示文字照舊貼在畫面底部，不佔底下那一列的高度 */
+  .viewer:not([data-captioned]) .viewer__hint {
+    position: absolute;
+    bottom: var(--sp-3);
+    left: 0;
+    right: 0;
   }
 
   /* 觸控裝置沒有滾輪也沒有 hover，提示文字換掉沒意義的部分不如整段收起來 */
@@ -460,7 +570,14 @@ const { close, prev, next, hint } = site!.data.viewer;
 
     .viewer__btn--prev,
     .viewer__btn--next {
+      top: auto;
       bottom: var(--sp-3);
+      translate: none;
+    }
+
+    /* 手機的左右鍵移到底部，說明要墊在它們上面，不然會被按鈕擋住 */
+    .viewer[data-captioned] .viewer__footer {
+      padding-bottom: calc(var(--sp-3) + var(--control-size-lg) + var(--sp-2));
     }
   }
 </style>
