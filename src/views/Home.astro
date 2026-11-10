@@ -198,9 +198,26 @@ const navItems = [
     {
       hobbyPhotos.length > 0 && (
         <div class="beyond-grid__hobbies">
-          {hobbyPhotos.map((photo, index) => (
-            <Media image={photo} ratio="1/1" alt={`travel photo ${index + 1}`} />
-          ))}
+          {/*
+            說明照順序對應照片（hobby-01 對 hobbyPhotos[0]）。外層的 data-photo-* 給全螢幕
+            檢視器讀，點開後底部顯示標題、描述與日期；data-viewer-group 讓檢視器的
+            左右切換只在這幾張之間跑。
+          */}
+          {hobbyPhotos.map((photo, index) => {
+            const info = home.hobbyPhotos[index];
+            return (
+              <figure
+                class="hobby"
+                data-viewer-group="hobby"
+                data-photo-title={info?.title}
+                data-photo-caption={info?.caption}
+                data-photo-date={info?.date}
+              >
+                <Media image={photo} ratio="1/1" alt={info?.caption ?? home.beyondGridHeading} />
+                {info && <figcaption class="hobby__label">{info.title}</figcaption>}
+              </figure>
+            );
+          })}
         </div>
       )
     }
@@ -598,6 +615,67 @@ const navItems = [
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--sp-2);
+  }
+
+  /*
+    旅行照的 hover：照片在圓角框裡微微放大、底部浮出標題，提示「點得開」。
+    放大倍數與時長跟作品集卡片的圖片 hover 一樣，全站同一種手感。
+    只在有滑鼠的裝置上做——觸控裝置沒有 hover，點下去直接開全螢幕，標題在檢視器底部看。
+  */
+  .hobby {
+    position: relative;
+    margin: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: zoom-in;
+  }
+
+  .hobby :global(img) {
+    transition: transform calc(var(--motion-fast) * 3) var(--motion-ease);
+  }
+
+  .hobby__label {
+    position: absolute;
+    inset: auto 0 0;
+    padding: var(--sp-5) var(--sp-2) var(--sp-2);
+    background: linear-gradient(to top, var(--photo-scrim), transparent);
+    color: var(--photo-scrim-ink);
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.3;
+    opacity: 0;
+    translate: 0 var(--sp-1);
+    /* 標題疊在照片上，點擊要穿過它打到圖片，檢視器才認得出是哪一張 */
+    pointer-events: none;
+    transition:
+      opacity calc(var(--motion-fast) * 2) var(--motion-ease),
+      translate calc(var(--motion-fast) * 2) var(--motion-ease);
+  }
+
+  @media (hover: hover) {
+    .hobby:hover :global(img) {
+      transform: scale(1.04);
+    }
+
+    .hobby:hover .hobby__label {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  /* 減少動態：不放大、不位移，標題直接淡入就好 */
+  @media (prefers-reduced-motion: reduce) {
+    .hobby :global(img) {
+      transition: none;
+    }
+
+    .hobby:hover :global(img) {
+      transform: none;
+    }
+
+    .hobby__label {
+      translate: none;
+    }
   }
 
   .beyond-grid__cta {
