@@ -6,7 +6,7 @@
 
   流程照案例頁的動線：總覽的洞察卡 → 看中區明細 → 回到洞察卡指派跟進 →
   跟進任務頁多出一列 → 看這張洞察卡背後的規則 → 自己建立報表。
-  放到 src/assets/projects/sales-dashboard/03.mp4（裝置展示圖後面的「體驗展示」段落）。
+  放到 src/assets/projects/sales-dashboard/04.mp4（裝置展示圖後面的「體驗展示」段落）。
 */
 export default {
   device: 'desktop',
