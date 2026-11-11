@@ -61,6 +61,40 @@ sections:
             Persona — Chien-chung Lin, regional sales manager covering four
             counties in central Taiwan
           zh: 人物誌——林建中，負責中部四縣市的區域銷售主管
+  - type: featureSplit
+    eyebrow:
+      en: BEFORE & AFTER
+      zh: 導入前後
+    heading:
+      en: It used to be a chat message. Now it's a task.
+      zh: 以前是一則聊天訊息，現在是一項任務
+    body:
+      en: >-
+        Before, the manager only spotted the Central gap by digging through the
+        report ①, sent a screenshot to the chat ②, and the task ended with "keep
+        me posted" ③. The rep couldn't see the source data, the task had no due
+        date and no record, and when the manager followed up a week later, they
+        were each remembering a different task ④. Now the system checks its
+        rules every day. When Central stays below 85% for two months, an insight
+        card appears at the top of the overview. The manager clicks "Assign
+        follow-up", fills in an owner, a due date and a note, and the task
+        becomes a row on the follow-ups page, where the rep can open the related
+        data.
+      zh: >-
+        以前，主管要自己翻報表才發現中區有缺口①，把報表截圖傳到聊天室②，最後只留下一句「有消息再跟我說」③。業務看不到原始資料，任務沒有到期日，也沒有紀錄；一週後追問時，兩個人記得的已經不是同一件事④。現在，系統每天檢查規則，中區連續兩個月低於
+        85%，總覽最上方就會出現洞察卡。主管按下「指派跟進」，填好負責人、到期日和備註，任務就成為跟進任務頁上的一列，業務打開就能看到相關數據。
+    imagePosition: left
+    ratio: 395/834
+    alt:
+      en: >-
+        A phone chat from before the dashboard: the manager sends the rep the
+        Central attainment figure and a report screenshot, the rep says they will
+        check renewals with clients in Taichung this week, and a week later asks
+        which clients the manager meant. Red markers 1 to 4 match ① to ④ in the
+        text.
+      zh: >-
+        導入前的手機聊天畫面：主管傳中區達成率和報表截圖給業務，業務說這週去問台中客戶的續約；一週後主管追問，業務反問是哪幾家。紅色
+        1 到 4 號標註對應文字裡的 ① 到 ④。
   - type: deviceShowcase
     eyebrow:
       en: THE SCREEN
