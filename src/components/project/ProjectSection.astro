@@ -94,6 +94,22 @@ const trThemes = (themes: { title: LocalizedText; description?: LocalizedText }[
       alt={trReq(section.alt)}
       ctaLabel={tr(section.ctaLabel)}
       ctaHref={section.ctaHref}
+      chat={
+        section.chat && {
+          label: trReq(section.chat.label),
+          contact: trReq(section.chat.contact),
+          avatar: trReq(section.chat.avatar),
+          clock: section.chat.clock,
+          read: trReq(section.chat.read),
+          placeholder: trReq(section.chat.placeholder),
+          replay: trReq(section.chat.replay),
+          messages: section.chat.messages.map((message) => ({
+            ...message,
+            date: tr(message.date),
+            text: tr(message.text),
+          })),
+        }
+      }
     />
   ) : section.type === 'featureGrid' ? (
     <FeatureGrid

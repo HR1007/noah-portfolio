@@ -1,0 +1,814 @@
+---
+/*
+  對話重播：一支聊天 App 的手機，訊息一則一則跳出來，像真的在傳訊息。
+
+  用在「導入前後」這類段落——要講的是「一件事在聊天室裡怎麼交代、一週後怎麼失聯」，
+  時間感本身就是重點。靜態截圖只能把十則訊息同時攤開，看不出「過了一週」。
+
+  為什麼做成網頁元件、不是影片：
+    - 中英文各自顯示（影片的字是燒死的，英文頁會看到中文對話）
+    - 字是真的文字，清楚、螢幕閱讀器讀得到
+    - 捲到這裡才開始播，看完可以重播
+
+  畫面完全照 Figma「13 · 導入前 · 任務怎麼交代」重現。元件內所有尺寸都寫成
+  「N 個 Figma px」（N × var(--u)）：--u 由版面寬度換算，欄位比手機原寸窄時整支等比縮小，
+  跟縮放一張截圖的效果一樣。這些 N 是設計稿上的量測值，不是另外發明的間距，
+  所以沒有收進 tokens.css 的間距階梯；顏色與原寸寬度則都在 tokens.css 的 --chat-*。
+
+  動畫（照 animate skill 的順序決定）：
+    - 該不該動：案例頁一位訪客通常只看一次，屬於「少見」的檔位；目的是「說明」
+    - 工具：狀態用 class 切換 + CSS transition，震動是預先決定好的 keyframes，
+      排程用原生 JS——沒有手勢、不需要彈簧，不必引入任何函式庫
+    - 只動 opacity 與 transform。每則訊息從一開始就照設計稿排好、佔好位置，只是先隱藏，
+      出現時不會推動其他訊息，也不會讓整頁跳動
+    - 減少動態：不打字、不震動、不位移，整段對話一次淡入
+    - 沒有 JavaScript：直接看到完整對話（隱藏只在 script 掛上 data-armed 之後才生效）
+*/
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import Placeholder from '../Placeholder.astro';
+
+export interface ChatMessage {
+  date?: string;
+  from?: 'me' | 'them';
+  text?: string;
+  shot?: boolean;
+  time?: string;
+  read?: boolean;
+  marker?: number;
+}
+
+export interface ChatData {
+  label: string;
+  contact: string;
+  avatar: string;
+  clock: string;
+  read: string;
+  placeholder: string;
+  replay: string;
+  messages: ChatMessage[];
+}
+
+interface Props {
+  chat: ChatData;
+  /** 對話裡傳出去的那張截圖：段落自己依序取到的圖，沒有就顯示佔位框 */
+  shot: ImageMetadata | undefined;
+  shotAlt: string;
+  shotRatio: string;
+}
+
+const { chat, shot, shotAlt, shotRatio } = Astro.props;
+
+/*
+  一則訊息要讓人讀多久，用「閱讀量」算而不是字元數：中文一個字算一個，英文一個單字算 1.5 個。
+  同一句話英文的字元數是中文的兩三倍，照字元數算的話英文版會整整慢一倍。
+*/
+const readingWeight = (text = '') =>
+  Math.round(
+    (text.match(/[㐀-鿿]/g)?.length ?? 0) + (text.match(/[A-Za-z0-9]+/g)?.length ?? 0) * 1.5
+  );
+---
+
+<figure class="chat" data-chat aria-label={chat.label}>
+  <div class="chat__phone" data-chat-phone>
+    <div class="chat__screen">
+      <div class="chat__status" aria-hidden="true">
+        <span class="chat__clock">{chat.clock}</span>
+        <span class="chat__status-icons">
+          <svg class="chat__signal" viewBox="0 0 18 12">
+            <rect x="0" y="8" width="3" height="4" rx="0.5" />
+            <rect x="5" y="5" width="3" height="7" rx="0.5" />
+            <rect x="10" y="2" width="3" height="10" rx="0.5" />
+            <rect x="15" y="0" width="3" height="12" rx="0.5" />
+          </svg>
+          <svg class="chat__battery" viewBox="0 0 26 12">
+            <rect class="chat__battery-shell" x="0.5" y="0.5" width="22" height="11" rx="3" />
+            <rect x="3" y="2" width="16" height="8" rx="1.5" />
+            <rect x="24" y="4" width="2" height="4" rx="1" />
+          </svg>
+        </span>
+      </div>
+
+      <div class="chat__header" aria-hidden="true">
+        <svg class="chat__back" viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" /></svg>
+        <span class="chat__contact">{chat.contact}</span>
+        <svg class="chat__menu" viewBox="0 0 20 16">
+          <rect y="1" width="20" height="2" rx="1" />
+          <rect y="7" width="20" height="2" rx="1" />
+          <rect y="13" width="20" height="2" rx="1" />
+        </svg>
+      </div>
+
+      <ol class="chat__log" data-chat-log>
+        {
+          chat.messages.map((message) =>
+            message.date ? (
+              <li class="chat__date" data-chat-step="date">
+                <span class="chat__chip">{message.date}</span>
+              </li>
+            ) : (
+              <li
+                class:list={['chat__row', `chat__row--${message.from ?? 'me'}`]}
+                data-chat-step={message.from ?? 'me'}
+                data-chat-read={message.read ? '' : undefined}
+                data-chat-marker={message.marker ? '' : undefined}
+                data-chat-weight={readingWeight(message.text)}
+              >
+                {message.from === 'them' && (
+                  <span class="chat__avatar" aria-hidden="true">
+                    {chat.avatar}
+                  </span>
+                )}
+                <div class="chat__say">
+                  {message.shot ? (
+                    <div class="chat__bubble chat__bubble--shot">
+                      {shot ? (
+                        <Image src={shot} alt={shotAlt} width={shot.width} height={shot.height} />
+                      ) : (
+                        <Placeholder ratio={shotRatio} label="" />
+                      )}
+                    </div>
+                  ) : (
+                    <p class="chat__bubble">{message.text}</p>
+                  )}
+                  {message.from === 'them' && (
+                    <span class="chat__typing" aria-hidden="true">
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                  )}
+                </div>
+                <span class="chat__meta">
+                  {message.from !== 'them' && message.read && <span class="chat__read">{chat.read}</span>}
+                  {message.time && <time class="chat__time">{message.time}</time>}
+                </span>
+                {message.marker && <span class="chat__marker">{message.marker}</span>}
+              </li>
+            )
+          )
+        }
+      </ol>
+
+      <div class="chat__input" aria-hidden="true">
+        <svg class="chat__icon chat__icon--plus" viewBox="0 0 22 22"><path d="M11 3v16M3 11h16" /></svg>
+        <span class="chat__field">{chat.placeholder}</span>
+        <svg class="chat__icon chat__icon--send" viewBox="0 0 22 22"><path d="M3 10.5 19 3l-7.5 16-2-6.5z" /></svg>
+      </div>
+      <div class="chat__home" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
+
+  <button class="chat__replay" type="button" data-chat-replay hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7" /><path d="M4 4v4h4" /></svg>
+    {chat.replay}
+  </button>
+</figure>
+
+<script>
+  /*
+    播放排程。每一步的等待時間跟上一則訊息的長度走——字越多，留給人讀的時間越長；
+    對方的訊息前面先出現「輸入中」，長度越長打得越久。數字是照實際讀起來的節奏調的，
+    不是 UI 回饋那種一兩百毫秒的動畫時長，所以不收進 tokens。
+  */
+  const START_DELAY = 400; // 捲到之後先停一下，人的視線才剛落到手機上
+  const MARKER_DELAY = 350; // 訊息跳出來之後，紅色標記才補上去
+  const DAY_GAP = 1600; // 換日（一週後）前多停一下，讓「過了一段時間」被感覺到
+  const readTime = (chars: number) => Math.min(1800, Math.max(700, 600 + chars * 30));
+  const typeTime = (chars: number) => Math.min(1800, Math.max(900, 700 + chars * 30));
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-chat]').forEach((root) => {
+    const phone = root.querySelector<HTMLElement>('[data-chat-phone]');
+    const log = root.querySelector<HTMLElement>('[data-chat-log]');
+    const replay = root.querySelector<HTMLButtonElement>('[data-chat-replay]');
+    const steps = Array.from(root.querySelectorAll<HTMLElement>('[data-chat-step]'));
+    if (!phone || !log || steps.length === 0) return;
+
+    /*
+      對話比手機螢幕長時（英文版的字比中文長，十則訊息塞不下），跟真的聊天 App 一樣
+      把對話往上捲，讓最新那一則留在畫面裡。中文版放得下，這裡不會有動作。
+    */
+    const follow = (step: HTMLElement) => {
+      const padding = parseFloat(getComputedStyle(log).paddingBottom) || 0;
+      const target = step.offsetTop + step.offsetHeight + padding - log.clientHeight;
+      if (target > log.scrollTop) log.scrollTo({ top: target, behavior: reduceMotion ? 'auto' : 'smooth' });
+    };
+
+    // 掛上之後訊息才會被藏起來；script 沒跑到的話對話就是完整顯示的
+    root.dataset.armed = '';
+
+    let run = 0; // 每次播放遞增；舊的排程醒來發現號碼不對就自己收手（重播時用）
+    const timers = new Set<number>();
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        const id = window.setTimeout(() => {
+          timers.delete(id);
+          resolve();
+        }, ms);
+        timers.add(id);
+      });
+
+    const showAll = () => {
+      steps.forEach((step) => {
+        step.classList.add('is-in');
+        if (step.hasAttribute('data-chat-marker')) step.classList.add('is-marked');
+        if (step.hasAttribute('data-chat-read')) step.classList.add('is-read');
+      });
+      follow(steps[steps.length - 1]);
+    };
+
+    const reset = () => {
+      timers.forEach((id) => clearTimeout(id));
+      timers.clear();
+      // 收回的那一下不要有過渡，不然會看到整段對話慢慢淡出再重來
+      root.dataset.resetting = '';
+      steps.forEach((step) => step.classList.remove('is-in', 'is-typing', 'is-marked', 'is-read'));
+      log.scrollTop = 0;
+      void root.offsetWidth;
+      delete root.dataset.resetting;
+    };
+
+    // 手機震一下：收到對方訊息時。先拿掉再加回去，連續兩則也能各震一次
+    const buzz = () => {
+      phone.classList.remove('is-buzz');
+      void phone.offsetWidth;
+      phone.classList.add('is-buzz');
+    };
+    phone.addEventListener('animationend', () => phone.classList.remove('is-buzz'));
+
+    const play = async () => {
+      const id = ++run;
+      const alive = () => id === run;
+      reset();
+      if (replay) replay.setAttribute('aria-disabled', 'true');
+
+      await wait(START_DELAY);
+      let previous = 0; // 上一則訊息的字數，決定要停多久
+
+      for (const step of steps) {
+        if (!alive()) return;
+        const kind = step.dataset.chatStep;
+        const chars = Number(step.dataset.chatWeight) || 12; // 截圖沒有字，當成一則短訊息
+
+        if (kind === 'date') {
+          // 第一個日期不用等；之後的日期代表時間跳了一大段
+          if (step !== steps[0]) await wait(DAY_GAP);
+          if (!alive()) return;
+          step.classList.add('is-in');
+          follow(step);
+          previous = 0;
+          await wait(500);
+          continue;
+        }
+
+        await wait(readTime(previous));
+        if (!alive()) return;
+
+        if (kind === 'them') {
+          // 對方開始打字＝已經讀過我傳的訊息，「已讀」在這一刻浮出來
+          steps
+            .slice(0, steps.indexOf(step))
+            .forEach((s) => s.hasAttribute('data-chat-read') && s.classList.add('is-read'));
+          step.classList.add('is-typing');
+          follow(step);
+          await wait(typeTime(chars));
+          if (!alive()) return;
+          step.classList.remove('is-typing');
+          step.classList.add('is-in');
+          buzz();
+        } else {
+          step.classList.add('is-in');
+          follow(step);
+        }
+
+        if (step.hasAttribute('data-chat-marker')) {
+          await wait(MARKER_DELAY);
+          if (!alive()) return;
+          step.classList.add('is-marked');
+        }
+        previous = chars;
+      }
+
+      await wait(800);
+      if (!alive()) return;
+      root.dataset.done = '';
+      replay?.removeAttribute('aria-disabled');
+    };
+
+    if (reduceMotion) {
+      // 不演，一次淡入整段；也就不需要重播鍵
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            showAll();
+            io.disconnect();
+          }
+        },
+        { threshold: 0.3 }
+      );
+      io.observe(phone);
+      return;
+    }
+
+    if (replay) {
+      replay.hidden = false;
+      replay.addEventListener('click', () => {
+        if (replay.getAttribute('aria-disabled') === 'true') return;
+        play();
+      });
+    }
+
+    // 手機露出一半才開始，只自動播一次
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          play();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    io.observe(phone);
+  });
+</script>
+
+<style>
+  .chat {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+    width: 100%;
+    margin: 0;
+  }
+
+  /* ---------- 手機本體 ---------- */
+
+  .chat__phone {
+    /* 1 個 Figma px。欄位夠寬時就是 1px；比手機原寸窄時跟著等比縮小 */
+    --u: calc(min(100cqi, var(--chat-phone-width)) / var(--chat-design-width));
+    width: calc(var(--chat-design-width) * var(--u));
+    padding: calc(11 * var(--u));
+    border: 1px solid var(--chat-frame-edge);
+    border-radius: calc(53 * var(--u));
+    background: var(--chat-frame);
+    color: var(--chat-ink);
+    font-family: var(--font-sans);
+  }
+
+  .chat__screen {
+    display: flex;
+    flex-direction: column;
+    height: calc(812 * var(--u));
+    border-radius: calc(42 * var(--u));
+    overflow: hidden;
+    background: var(--chat-screen);
+  }
+
+  .chat__status {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: calc(44 * var(--u));
+    padding: 0 calc(24 * var(--u)) 0 calc(32 * var(--u));
+    background: var(--chat-bar);
+  }
+
+  .chat__clock {
+    font-size: calc(15 * var(--u));
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .chat__status-icons {
+    display: flex;
+    align-items: center;
+    gap: calc(6 * var(--u));
+  }
+
+  .chat__signal {
+    width: calc(18 * var(--u));
+    height: calc(12 * var(--u));
+    fill: var(--chat-ink);
+  }
+
+  .chat__battery {
+    width: calc(26 * var(--u));
+    height: calc(12 * var(--u));
+    fill: var(--chat-ink);
+  }
+
+  .chat__battery-shell {
+    fill: none;
+    stroke: var(--chat-ink);
+  }
+
+  .chat__header {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: calc(12 * var(--u));
+    height: calc(52 * var(--u));
+    padding: 0 calc(16 * var(--u));
+    background: var(--chat-bar);
+  }
+
+  .chat__back {
+    width: calc(12 * var(--u));
+    height: calc(20 * var(--u));
+    fill: none;
+    stroke: var(--chat-ink);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .chat__contact {
+    flex: 1;
+    font-size: calc(17 * var(--u));
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .chat__menu {
+    width: calc(20 * var(--u));
+    height: calc(16 * var(--u));
+    fill: var(--chat-ink);
+  }
+
+  /* ---------- 對話 ---------- */
+
+  .chat__log {
+    /* offsetTop 要以對話區為基準，script 才算得出要捲多少 */
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: calc(7 * var(--u));
+    margin: 0;
+    padding: calc(12 * var(--u)) calc(12 * var(--u)) calc(8 * var(--u));
+    list-style: none;
+    /* 播放時由 script 捲動，不讓訪客自己捲；沒有 JS 時才開放手動捲，看得到後面的訊息 */
+    overflow-y: auto;
+  }
+
+  .chat[data-armed] .chat__log {
+    overflow-y: hidden;
+  }
+
+  .chat__log > li {
+    flex: none;
+  }
+
+  .chat__date {
+    display: flex;
+    justify-content: center;
+    padding-bottom: calc(4 * var(--u));
+  }
+
+  .chat__chip {
+    padding: calc(3 * var(--u)) calc(10 * var(--u));
+    border-radius: calc(10 * var(--u));
+    background: var(--chat-chip);
+    color: var(--chat-surface);
+    font-size: calc(11 * var(--u));
+    line-height: calc(14 * var(--u));
+  }
+
+  .chat__row {
+    display: flex;
+    align-items: flex-end;
+    gap: calc(6 * var(--u));
+  }
+
+  /* 我方：泡泡貼右邊，往左依序是時間、紅色標記（DOM 順序是泡泡在前，螢幕閱讀器先讀內容） */
+  .chat__row--me {
+    flex-direction: row-reverse;
+  }
+
+  .chat__avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: calc(34 * var(--u));
+    height: calc(34 * var(--u));
+    border-radius: 50%;
+    background: var(--chat-avatar);
+    color: var(--chat-surface);
+    font-size: calc(14 * var(--u));
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .chat__say {
+    position: relative;
+    min-width: 0;
+  }
+
+  .chat__bubble {
+    max-width: calc(256 * var(--u));
+    margin: 0;
+    padding: calc(8 * var(--u)) calc(11 * var(--u));
+    font-size: calc(13 * var(--u));
+    line-height: calc(19 * var(--u));
+    /* 內容裡的換行要保留：「哪幾家？…」那則在設計稿上就是兩行 */
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  .chat__row--me .chat__bubble {
+    border-radius: calc(16 * var(--u));
+    background: var(--chat-mine);
+    /* 從泡泡尾巴那個角長出來 */
+    transform-origin: bottom right;
+  }
+
+  .chat__row--them .chat__bubble {
+    border-radius: calc(4 * var(--u));
+    background: var(--chat-theirs);
+    transform-origin: bottom left;
+  }
+
+  .chat__row--me .chat__bubble--shot,
+  .chat__bubble--shot {
+    width: calc(150 * var(--u));
+    padding: 0;
+    border-radius: calc(12 * var(--u));
+    overflow: hidden;
+    background: none;
+  }
+
+  .chat__bubble--shot :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .chat__meta {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    color: var(--chat-meta);
+    font-size: calc(10 * var(--u));
+    line-height: calc(13 * var(--u));
+  }
+
+  .chat__row--me .chat__meta {
+    align-items: flex-end;
+  }
+
+  .chat__marker {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: calc(24 * var(--u));
+    height: calc(24 * var(--u));
+    border-radius: 50%;
+    background: var(--chat-marker);
+    /* 設計稿的白色外框；用陰影畫，才不會把圓撐大 */
+    box-shadow: 0 0 0 calc(2 * var(--u)) var(--chat-marker-ink);
+    color: var(--chat-marker-ink);
+    font-size: calc(12 * var(--u));
+    font-weight: var(--font-weight-bold);
+  }
+
+  /* 對方「輸入中」：疊在之後那則泡泡的位置左下角，訊息一到就換掉 */
+  .chat__typing {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    display: none;
+    gap: calc(4 * var(--u));
+    padding: calc(13 * var(--u)) calc(12 * var(--u));
+    border-radius: calc(4 * var(--u));
+    background: var(--chat-theirs);
+  }
+
+  .chat__typing i {
+    width: calc(6 * var(--u));
+    height: calc(6 * var(--u));
+    border-radius: 50%;
+    background: var(--chat-meta);
+    animation: chat-dot calc(var(--motion-fast) * 6) ease-in-out infinite;
+  }
+
+  .chat__typing i:nth-child(2) {
+    animation-delay: calc(var(--motion-fast) * 1);
+  }
+
+  .chat__typing i:nth-child(3) {
+    animation-delay: calc(var(--motion-fast) * 2);
+  }
+
+  @keyframes chat-dot {
+    0%,
+    60%,
+    100% {
+      opacity: 0.4;
+      transform: translateY(0);
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(calc(-3 * var(--u)));
+    }
+  }
+
+  .chat__input {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: calc(12 * var(--u));
+    height: calc(56 * var(--u));
+    padding: 0 calc(14 * var(--u));
+    border-top: 1px solid var(--chat-divider);
+    background: var(--chat-surface);
+  }
+
+  .chat__icon {
+    flex: none;
+    width: calc(22 * var(--u));
+    height: calc(22 * var(--u));
+  }
+
+  .chat__icon--plus {
+    fill: none;
+    stroke: var(--chat-icon);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+
+  .chat__icon--send {
+    fill: var(--chat-icon);
+  }
+
+  .chat__field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    height: calc(36 * var(--u));
+    padding: 0 calc(14 * var(--u));
+    border-radius: calc(18 * var(--u));
+    background: var(--chat-field);
+    color: var(--chat-hint);
+    font-size: calc(14 * var(--u));
+  }
+
+  .chat__home {
+    flex: none;
+    display: grid;
+    place-items: center;
+    height: calc(34 * var(--u));
+    background: var(--chat-surface);
+  }
+
+  .chat__home span {
+    width: calc(134 * var(--u));
+    height: calc(5 * var(--u));
+    border-radius: calc(3 * var(--u));
+    background: var(--chat-ink);
+  }
+
+  /* ---------- 播放狀態 ---------- */
+
+  /*
+    「待出場」：script 掛上 data-armed 之後才藏，沒有 JS 時對話完整顯示。
+    只藏不拿掉——每則訊息的位置從頭到尾都在，出現時不會推動別的東西。
+  */
+  .chat[data-armed] :is(.chat__chip, .chat__bubble, .chat__avatar, .chat__time, .chat__read, .chat__marker) {
+    opacity: 0;
+  }
+
+  .chat[data-armed] :is(.chat__chip, .chat__bubble) {
+    transform: translateY(calc(8 * var(--u))) scale(0.96);
+  }
+
+  .chat[data-armed] .chat__marker {
+    transform: scale(0.9);
+  }
+
+  .chat__chip,
+  .chat__bubble,
+  .chat__marker {
+    transition:
+      opacity calc(var(--motion-fast) * 1.5) var(--motion-ease),
+      transform calc(var(--motion-fast) * 1.5) var(--motion-ease);
+  }
+
+  .chat__avatar,
+  .chat__time,
+  .chat__read {
+    transition: opacity var(--motion-fast) var(--motion-ease);
+  }
+
+  .chat[data-armed] .is-in :is(.chat__chip, .chat__bubble, .chat__avatar, .chat__time) {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* 打字中：頭像先出來，泡泡位置先放「…」 */
+  .chat[data-armed] .is-typing .chat__avatar {
+    opacity: 1;
+  }
+
+  .chat[data-armed] .is-typing .chat__typing {
+    display: flex;
+  }
+
+  .chat[data-armed] .is-read .chat__read,
+  .chat[data-armed] .is-marked .chat__marker {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* 重播時一口氣收回，不要過渡 */
+  .chat[data-resetting] :is(.chat__chip, .chat__bubble, .chat__avatar, .chat__time, .chat__read, .chat__marker) {
+    transition: none;
+  }
+
+  /*
+    收到訊息時手機震一下：左右小幅擺動、很快停下來，像通知的震動。
+    用 rotate 這個獨立屬性，不佔用 transform，跟其他效果不互相覆蓋。
+  */
+  .chat__phone.is-buzz {
+    animation: chat-buzz calc(var(--motion-fast) * 2.5) ease-in-out;
+  }
+
+  @keyframes chat-buzz {
+    0%,
+    100% {
+      rotate: 0deg;
+    }
+    20% {
+      rotate: -2deg;
+    }
+    40% {
+      rotate: 2deg;
+    }
+    60% {
+      rotate: -1.5deg;
+    }
+    80% {
+      rotate: 1deg;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chat[data-armed] :is(.chat__chip, .chat__bubble, .chat__marker) {
+      transform: none;
+    }
+
+    .chat__phone.is-buzz {
+      animation: none;
+    }
+  }
+
+  /* ---------- 重播 ---------- */
+
+  .chat__replay {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    padding: var(--sp-1) var(--sp-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--color-muted);
+    font: inherit;
+    font-size: var(--font-size-meta);
+    cursor: pointer;
+    transition: color var(--motion-fast) ease, border-color var(--motion-fast) ease;
+  }
+
+  .chat__replay[hidden] {
+    display: none;
+  }
+
+  /* 第一次播完之前先不出現，但位置留著，按鈕出現時下面的內容不會被推開 */
+  .chat:not([data-done]) .chat__replay {
+    visibility: hidden;
+  }
+
+  .chat__replay[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .chat__replay:not([aria-disabled='true']):hover {
+      color: var(--color-ink);
+      border-color: var(--color-ink);
+    }
+  }
+
+  .chat__replay svg {
+    width: var(--icon-md);
+    height: var(--icon-md);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>

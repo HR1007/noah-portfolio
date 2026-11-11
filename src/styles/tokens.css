@@ -202,6 +202,34 @@
   --photo-scrim-ink: var(--viewer-ink);
 
   /*
+    案例頁的對話重播（ChatReplay）：一支亮色聊天 App 的手機模型。數值全部取自 Figma
+    「作品集（面試用）／數據儀表板／13 · 導入前 · 任務怎麼交代」。這是一張「截圖」的
+    重現，跟網站本身的主題無關，所以不隨深淺色反轉。
+
+    --chat-phone-width 是 Figma 裡手機外框的原尺寸（含外框 397px）。版面比這窄時整支
+    手機等比縮小，元件內部所有尺寸都以「Figma 的 1px」為單位跟著縮，見 ChatReplay.astro。
+  */
+  --chat-phone-width: 397px;
+  --chat-design-width: 397; /* 同一個寬度的純數字，用來把版面寬度換算成「Figma 的 1px」；兩個要一起改 */
+  --chat-frame: #1f2023;
+  --chat-frame-edge: #3a3d42;
+  --chat-screen: #e7ebf0;
+  --chat-bar: #f7f8fa;
+  --chat-surface: #ffffff;
+  --chat-divider: #e1e5ea;
+  --chat-field: #f1f3f6;
+  --chat-ink: #1f2328;
+  --chat-meta: #8a9099;
+  --chat-hint: #9aa0a6;
+  --chat-icon: #5f6670;
+  --chat-chip: #c3cad3;
+  --chat-avatar: #b9c0c9;
+  --chat-mine: #c5ecb0;
+  --chat-theirs: #ffffff;
+  --chat-marker: #ff3b30;
+  --chat-marker-ink: #ffffff;
+
+  /*
     首頁的捲動驅動影片（ScrollVideo，About 前面那段伸手互動）。
 
     --scrub-distance：訪客要捲多長，影片才從第一幀走到最後一幀。影片 121 幀，

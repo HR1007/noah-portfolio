@@ -84,17 +84,97 @@ sections:
         以前，主管要自己翻報表才發現中區有缺口①，把報表截圖傳到聊天室②，最後只留下一句「有消息再跟我說」③。業務看不到原始資料，任務沒有到期日，也沒有紀錄；一週後追問時，兩個人記得的已經不是同一件事④。現在，系統每天檢查規則，中區連續兩個月低於
         85%，總覽最上方就會出現洞察卡。主管按下「指派跟進」，填好負責人、到期日和備註，任務就成為跟進任務頁上的一列，業務打開就能看到相關數據。
     imagePosition: left
-    ratio: 397/834
+    ratio: 25/16
     alt:
-      en: >-
-        A phone chat from before the dashboard: the manager sends the rep the
-        Central attainment figure and a report screenshot, the rep says they will
-        check renewals with clients in Taichung this week, and a week later asks
-        which clients the manager meant. Red markers 1 to 4 match ① to ④ in the
-        text.
-      zh: >-
-        導入前的手機聊天畫面：主管傳中區達成率和報表截圖給業務，業務說這週去問台中客戶的續約；一週後主管追問，業務反問是哪幾家。紅色
-        1 到 4 號標註對應文字裡的 ① 到 ④。
+      en: A screenshot of a bar chart from the sales report
+      zh: 業績報表的長條圖截圖
+    chat:
+      label:
+        en: >-
+          The chat between the manager and the rep before the dashboard. Red
+          markers 1 to 4 match ① to ④ in the text.
+        zh: 導入前主管和業務的聊天紀錄，紅色 1 到 4 號標註對應文字裡的 ① 到 ④
+      contact:
+        en: Cheng X-yu
+        zh: 鄭X妤
+      avatar:
+        en: C
+        zh: 鄭
+      clock: '18:32'
+      read:
+        en: Read
+        zh: 已讀
+      placeholder:
+        en: Message
+        zh: 輸入訊息
+      replay:
+        en: Replay
+        zh: 重播
+      messages:
+        - date:
+            en: Mon 10/2
+            zh: 10/2（一）
+        - from: me
+          time: '09:12'
+          read: true
+          marker: 1
+          text:
+            en: >-
+              Morning X-yu. Just checked the report: Central was only at 77.7% in
+              September, under 85% for two months in a row
+            zh: Ｘ妤早，我剛翻報表，中區 9 月達成率只有 77.7%，已經連兩個月低於 85%
+        - from: me
+          time: '09:12'
+          read: true
+          marker: 2
+          shot: true
+        - from: them
+          time: '09:40'
+          text:
+            en: Got it! Which part dropped the most?
+            zh: 收到！是哪一塊掉比較多？
+        - from: me
+          time: '09:41'
+          read: true
+          text:
+            en: Looks like CO-400. Taichung is down almost 180K
+            zh: 好像是 CO-400，台中那邊少了快 18 萬
+        - from: them
+          time: '09:43'
+          text:
+            en: Then I'll ask a few big clients in Taichung about renewals this week
+            zh: 那我這週先去問台中幾家大客戶的續約
+        - from: me
+          time: '09:43'
+          read: true
+          marker: 3
+          text:
+            en: OK, keep me posted
+            zh: 好，有消息再跟我說
+        - date:
+            en: Tue 10/10
+            zh: 10/10（二）
+        - from: me
+          time: '18:05'
+          read: true
+          text:
+            en: X-yu, how did those Taichung renewals go last week?
+            zh: Ｘ妤，上週台中那幾家續約後來怎樣？
+        - from: them
+          time: '18:30'
+          marker: 4
+          text:
+            en: |-
+              Which ones? The Chen-X Creative ones?
+              I thought that was on hold
+            zh: |-
+              哪幾家？是晨X文創那些嗎？
+              我以為那件先放著
+        - from: me
+          time: '18:32'
+          text:
+            en: Let me dig up last week's screenshot…
+            zh: 我再翻一下上週的截圖…
   - type: deviceShowcase
     eyebrow:
       en: THE SCREEN

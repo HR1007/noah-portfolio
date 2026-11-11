@@ -54,6 +54,34 @@ const experienceDemoBlock = z.object({
   layout: z.enum(['stacked', 'split', 'split-reverse']).default('stacked'),
 });
 
+/*
+  對話重播（ChatReplay.astro）的一則訊息。有 date 的是日期分隔，其餘欄位不看。
+  shot 為 true 的訊息是一張截圖，用的是這個段落自己依序取到的那張圖，
+  所以換截圖照樣是在後台換這個段落的圖，不必另外寫路徑。
+*/
+const chatMessage = z.object({
+  date: localized().optional(),
+  from: z.enum(['me', 'them']).optional(),
+  text: localized().optional(),
+  shot: z.boolean().optional(),
+  time: z.string().optional(),
+  /* 我方訊息是否顯示「已讀」；對方開始打字的那一刻才浮出來 */
+  read: z.boolean().optional(),
+  /* 對應段落內文 ①②③④ 的紅色標記編號 */
+  marker: z.number().int().positive().optional(),
+});
+
+const chatBlock = z.object({
+  label: localized(), // 整支手機給螢幕閱讀器的名稱
+  contact: localized(), // 標題列的聯絡人名稱
+  avatar: localized(), // 對方頭像上的字
+  clock: z.string(), // 狀態列時間
+  read: localized(), // 「已讀」
+  placeholder: localized(), // 輸入框的提示字
+  replay: localized(), // 播完後的重播按鈕
+  messages: z.array(chatMessage),
+});
+
 const featureSplitBlock = z.object({
   type: z.literal('featureSplit'),
   eyebrow: localized().optional(),
@@ -64,6 +92,8 @@ const featureSplitBlock = z.object({
   alt: localized(),
   ctaLabel: localized().optional(),
   ctaHref: z.string().optional(),
+  /* 有填就把圖片那一側換成一支手機，訊息一則一則跳出來 */
+  chat: chatBlock.optional(),
 });
 
 const featureGridBlock = z.object({
