@@ -254,7 +254,12 @@ const navItems = [
   </section>
 
   <section class="connect" id="connect">
-    <h2>{home.connectHeading}</h2>
+    <div class="connect__heading">
+      <div class="connect__avatar">
+        <Media image={avatarImage} ratio="1/1" alt={home.heroName} />
+      </div>
+      <h2>{home.connectHeading}</h2>
+    </div>
     <div class="connect__intro">
       {home.connectIntro.map((line) => <p>{line}</p>)}
     </div>
@@ -700,8 +705,27 @@ const navItems = [
     text-align: center;
   }
 
-  .connect h2 {
+  /*
+    標題左邊放半身頭像，兩者底部對齊、整組置中，像本人站在標題旁邊。
+    跟引言旁那顆同一張圖，但這裡不裁成圓形：圖是透明底，肩膀線本來就平，
+    直接貼齊標題底部比框在圓裡更像「人站在那裡」。
+  */
+  .connect__heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: var(--sp-2);
     margin-bottom: var(--sp-2);
+  }
+
+  .connect__avatar {
+    width: var(--avatar-size-lg);
+    flex: none;
+  }
+
+  /* Media 預設有圓角，會把肩膀兩端裁掉一角 */
+  .connect__avatar :global(.media) {
+    border-radius: 0;
   }
 
   .connect__intro {
