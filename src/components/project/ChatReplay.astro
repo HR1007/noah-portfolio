@@ -101,7 +101,7 @@ const readingWeight = (text = '') =>
 
       <ol class="chat__log" data-chat-log>
         {
-          chat.messages.map((message) =>
+          chat.messages.map((message, index) =>
             message.date ? (
               <li class="chat__date" data-chat-step="date">
                 <span class="chat__chip">{message.date}</span>
@@ -118,8 +118,15 @@ const readingWeight = (text = '') =>
                   /*
                     translate="no"：頭像只放得下一個字。用瀏覽器翻譯中文頁時，「鄭」會被換成
                     「Zheng」整個撐出圓圈；首字母本來就不該被翻，英文頁有自己的「Z」。
+
+                    同一個人連續傳好幾則時，跟真的聊天 App 一樣只有第一則掛頭像，
+                    後面幾則留著同樣寬的空位，泡泡才會對齊。
                   */
-                  <span class="chat__avatar" aria-hidden="true" translate="no">
+                  <span
+                    class:list={['chat__avatar', { 'chat__avatar--ghost': chat.messages[index - 1]?.from === 'them' }]}
+                    aria-hidden="true"
+                    translate="no"
+                  >
                     {chat.avatar}
                   </span>
                 )}
@@ -504,6 +511,11 @@ const readingWeight = (text = '') =>
     color: var(--chat-surface);
     font-size: calc(14 * var(--u));
     font-weight: var(--font-weight-semibold);
+  }
+
+  /* 連續訊息的頭像空位：佔寬度但不顯示，打字中也不會冒出來 */
+  .chat__avatar--ghost {
+    visibility: hidden;
   }
 
   .chat__say {
