@@ -115,7 +115,11 @@ const readingWeight = (text = '') =>
                 data-chat-weight={readingWeight(message.text)}
               >
                 {message.from === 'them' && (
-                  <span class="chat__avatar" aria-hidden="true">
+                  /*
+                    translate="no"：頭像只放得下一個字。用瀏覽器翻譯中文頁時，「鄭」會被換成
+                    「Zheng」整個撐出圓圈；首字母本來就不該被翻，英文頁有自己的「Z」。
+                  */
+                  <span class="chat__avatar" aria-hidden="true" translate="no">
                     {chat.avatar}
                   </span>
                 )}
