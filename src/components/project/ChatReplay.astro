@@ -17,11 +17,11 @@
 
   動畫（照 animate skill 的順序決定）：
     - 該不該動：案例頁一位訪客通常只看一次，屬於「少見」的檔位；目的是「說明」
-    - 工具：狀態用 class 切換 + CSS transition，震動是預先決定好的 keyframes，
+    - 工具：狀態用 class 切換 + CSS transition，訊息晃動是預先決定好的 keyframes，
       排程用原生 JS——沒有手勢、不需要彈簧，不必引入任何函式庫
     - 只動 opacity 與 transform。每則訊息從一開始就照設計稿排好、佔好位置，只是先隱藏，
       出現時不會推動其他訊息，也不會讓整頁跳動
-    - 減少動態：不打字、不震動、不位移，整段對話一次淡入
+    - 減少動態：不打字、不晃動、不位移，整段對話一次淡入
     - 沒有 JavaScript：直接看到完整對話（隱藏只在 script 掛上 data-armed 之後才生效）
 */
 import type { ImageMetadata } from 'astro';
@@ -113,6 +113,7 @@ const readingWeight = (text = '') =>
                 data-chat-read={message.read ? '' : undefined}
                 data-chat-marker={message.marker ? '' : undefined}
                 data-chat-weight={readingWeight(message.text)}
+                data-chat-shot={message.shot ? '' : undefined}
               >
                 {message.from === 'them' && (
                   /*
@@ -184,6 +185,12 @@ const readingWeight = (text = '') =>
   */
   const START_DELAY = 400; // 捲到之後先停一下，人的視線才剛落到手機上
   const MARKER_DELAY = 350; // 訊息跳出來之後，紅色標記才補上去
+  /*
+    照片跟上一則文字通常是同一分鐘接著傳的，傳照片也不會有「輸入中」。先前照文字的節奏
+    「等讀完上一則＋打字」，照片要晚兩秒多才出來，看起來像卡住。
+  */
+  const SHOT_DELAY = 600;
+  const SHOT_DECODE_LIMIT = 1500; // 圖片最多等這麼久；網路再慢也不讓整段對話停在這裡
   const DAY_GAP = 1600; // 換日（一週後）前多停一下，讓「過了一段時間」被感覺到
   const readTime = (chars: number) => Math.min(1800, Math.max(700, 600 + chars * 30));
   const typeTime = (chars: number) => Math.min(1800, Math.max(900, 700 + chars * 30));
@@ -235,19 +242,31 @@ const readingWeight = (text = '') =>
       timers.clear();
       // 收回的那一下不要有過渡，不然會看到整段對話慢慢淡出再重來
       root.dataset.resetting = '';
-      steps.forEach((step) => step.classList.remove('is-in', 'is-typing', 'is-marked', 'is-read'));
+      steps.forEach((step) => step.classList.remove('is-in', 'is-typing', 'is-marked', 'is-read', 'is-buzz'));
       log.scrollTop = 0;
       void root.offsetWidth;
       delete root.dataset.resetting;
     };
 
-    // 手機震一下：收到對方訊息時。先拿掉再加回去，連續兩則也能各震一次
-    const buzz = () => {
-      phone.classList.remove('is-buzz');
-      void phone.offsetWidth;
-      phone.classList.add('is-buzz');
+    // 收到對方訊息時，那一則泡泡晃一下（手機本體不動）。晃完拿掉，重播時才能再晃
+    const buzz = (step: HTMLElement) => step.classList.add('is-buzz');
+    log.addEventListener('animationend', (e) => {
+      const bubble = e.target as HTMLElement;
+      if (bubble.classList.contains('chat__bubble')) bubble.closest('[data-chat-step]')?.classList.remove('is-buzz');
+    });
+
+    // 照片要等圖真的解碼好才出現，不然會先跳出一個空框；但最多等 SHOT_DECODE_LIMIT
+    const shotReady = (step: HTMLElement) => {
+      const img = step.querySelector<HTMLImageElement>('.chat__bubble--shot img');
+      if (!img) return Promise.resolve();
+      return Promise.race([img.decode().catch(() => {}), wait(SHOT_DECODE_LIMIT)]);
     };
-    phone.addEventListener('animationend', () => phone.classList.remove('is-buzz'));
+
+    // 對方有動作（開始打字或傳照片）＝已經讀過我傳的訊息，「已讀」在這一刻浮出來
+    const markRead = (step: HTMLElement) =>
+      steps
+        .slice(0, steps.indexOf(step))
+        .forEach((s) => s.hasAttribute('data-chat-read') && s.classList.add('is-read'));
 
     const play = async () => {
       const id = ++run;
@@ -274,25 +293,25 @@ const readingWeight = (text = '') =>
           continue;
         }
 
-        await wait(readTime(previous));
+        const isShot = step.hasAttribute('data-chat-shot');
+        await wait(isShot ? SHOT_DELAY : readTime(previous));
+        if (isShot) await shotReady(step);
         if (!alive()) return;
 
         if (kind === 'them') {
-          // 對方開始打字＝已經讀過我傳的訊息，「已讀」在這一刻浮出來
-          steps
-            .slice(0, steps.indexOf(step))
-            .forEach((s) => s.hasAttribute('data-chat-read') && s.classList.add('is-read'));
-          step.classList.add('is-typing');
-          follow(step);
-          await wait(typeTime(chars));
-          if (!alive()) return;
-          step.classList.remove('is-typing');
-          step.classList.add('is-in');
-          buzz();
-        } else {
-          step.classList.add('is-in');
-          follow(step);
+          markRead(step);
+          if (!isShot) {
+            step.classList.add('is-typing');
+            follow(step);
+            await wait(typeTime(chars));
+            if (!alive()) return;
+            step.classList.remove('is-typing');
+          }
         }
+
+        step.classList.add('is-in');
+        follow(step);
+        if (kind === 'them') buzz(step);
 
         if (step.hasAttribute('data-chat-marker')) {
           await wait(MARKER_DELAY);
@@ -744,11 +763,12 @@ const readingWeight = (text = '') =>
   }
 
   /*
-    收到訊息時手機震一下：左右小幅擺動、很快停下來，像通知的震動。
-    用 rotate 這個獨立屬性，不佔用 transform，跟其他效果不互相覆蓋。
+    收到對方訊息時，那一則泡泡晃一下：以泡泡尾巴那個角為軸左右小幅擺動、很快停下，
+    像通知的震動。手機本體不動——整支手機晃會把注意力從訊息上拉走。
+    等跳出的動畫走完才開始晃；用 rotate 這個獨立屬性，不跟跳出用的 transform 互相覆蓋。
   */
-  .chat__phone.is-buzz {
-    animation: chat-buzz calc(var(--motion-fast) * 2.5) ease-in-out;
+  .chat__row.is-buzz .chat__bubble {
+    animation: chat-buzz calc(var(--motion-fast) * 2.5) ease-in-out calc(var(--motion-fast) * 1.5);
   }
 
   @keyframes chat-buzz {
@@ -775,7 +795,7 @@ const readingWeight = (text = '') =>
       transform: none;
     }
 
-    .chat__phone.is-buzz {
+    .chat__row.is-buzz .chat__bubble {
       animation: none;
     }
   }
