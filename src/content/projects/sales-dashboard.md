@@ -95,10 +95,10 @@ sections:
           markers 1 to 4 match ① to ④ in the text.
         zh: 導入前主管和業務的聊天紀錄，紅色 1 到 4 號標註對應文字裡的 ① 到 ④
       contact:
-        en: Cheng X-yu
+        en: Zheng X-yu
         zh: 鄭X妤
       avatar:
-        en: C
+        en: Z
         zh: 鄭
       clock: '18:32'
       read:
