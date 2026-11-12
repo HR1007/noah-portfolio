@@ -78,6 +78,117 @@ sections:
         alt:
           en: New Formosa Sport persona board
           zh: 新寶島人物誌看板
+  - type: featureSplit
+    eyebrow:
+      en: BEFORE & AFTER
+      zh: 導入前後
+    heading:
+      en: Orders used to scatter across chats. Now each one lands in one place.
+      zh: 以前訂單散在聊天室，現在每一筆都收在一起
+    body:
+      en: >-
+        Before, schools ordered team apparel over chat: the quantity, a photo of
+        the sizes and the colour arrived in separate messages ①, a change in
+        quantity was just one more line ②, and the shop's "noted it down" was
+        the whole order ③. Two weeks later, when it was time to prepare the
+        order, the messages were buried under other chats. Scrolling back turned
+        up nothing, so the shop had to ask the teacher again ④, which looked bad
+        to the customer and wasted the shop's time. Now the inquiry form turns
+        each request into one record, collected automatically and available at
+        any time, so nobody has to dig back through a chat.
+      zh: >-
+        以前，學校訂團體服都在通訊軟體裡談：件數、尺寸照片和顏色分好幾則傳①，中途改件數也只是一句話②，店裡回一句「記下來了」就算接單③。兩週後要備貨時，訊息早已被其他對話淹沒，往上滑半天找不到，只好再問一次老師④，客人觀感不好，店裡也白花時間。現在，詢價表單把每一筆需求收成一筆紀錄，自動收件、隨時查得到，不必再回頭翻聊天紀錄。
+    imagePosition: left
+    ratio: 25/16
+    alt:
+      en: A photo of the handwritten class shirt size list the teacher sent
+      zh: 老師傳來的手寫班服尺寸表照片
+    chat:
+      label:
+        en: >-
+          The chat between the shop and a school teacher before the website. Red
+          markers 1 to 4 match ① to ④ in the text.
+        zh: 導入前店家和學校老師的聊天紀錄，紅色 1 到 4 號標註對應文字裡的 ① 到 ④
+      contact:
+        en: Teacher Chen
+        zh: 陳X老師
+      avatar:
+        en: C
+        zh: 陳
+      clock: '11:21'
+      read:
+        en: Read
+        zh: 已讀
+      placeholder:
+        en: Message
+        zh: 輸入訊息
+      replay:
+        en: Replay
+        zh: 重播
+      messages:
+        - date:
+            en: Tue 9/3
+            zh: 9/3（二）
+        - from: them
+          time: '10:15'
+          marker: 1
+          text:
+            en: |-
+              Hi! We need class shirts for sports day
+              Class 3-2, 28 shirts
+            zh: |-
+              老闆好，運動會要訂班服
+              3 年 2 班 28 件
+        - from: them
+          time: '10:15'
+          shot: true
+        - from: them
+          time: '10:16'
+          text:
+            en: Sizes are in the photo. Same blue as last year
+            zh: 尺寸在照片裡，顏色要跟去年一樣的藍
+        - from: me
+          time: '10:32'
+          read: true
+          marker: 3
+          text:
+            en: No problem, I've noted it down!
+            zh: 好的沒問題，我記下來了！
+        - date:
+            en: Thu 9/5
+            zh: 9/5（四）
+        - from: them
+          time: '16:40'
+          marker: 2
+          text:
+            en: Two transfer students joined, so make it 30, with 2 more in S
+            zh: 有 2 個轉學生，改成 30 件，S 多 2 件
+        - from: me
+          time: '18:02'
+          read: true
+          text:
+            en: Got it
+            zh: 收到
+        - date:
+            en: Fri 9/20
+            zh: 9/20（五）
+        - from: me
+          time: '11:05'
+          read: true
+          text:
+            en: Hi, could I check the sizes and quantity for the class shirts again…
+            zh: 陳老師好，想再跟您確認一下班服的尺寸和件數…
+        - from: them
+          time: '11:20'
+          marker: 4
+          text:
+            en: Didn't I send all that last time? Scroll up, it should be there
+            zh: 上次不是都傳給你了嗎？往上滑應該有
+        - from: me
+          time: '11:21'
+          text:
+            en: Sorry, there are so many messages I can't find it…
+            zh: 抱歉，訊息太多一直找不到…
   - type: designThemes
     eyebrow:
       en: DESIGN THEMES
