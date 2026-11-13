@@ -1,6 +1,7 @@
 ---
 import { getEntry } from 'astro:content';
 import GalleryAlbum from '../../../views/GalleryAlbum.astro';
+import { isGalleryEnabled } from '../../../lib/gallery';
 
 export async function getStaticPaths() {
   const site = await getEntry('site', 'main-en');
@@ -10,6 +11,9 @@ export async function getStaticPaths() {
     props: { slug: album.slug, title: album.title },
   }));
 }
+
+// Gallery 關閉時相簿頁照樣產生，但內容是導回首頁——分享出去的相簿連結不會變成 404
+if (!(await isGalleryEnabled('en'))) return Astro.redirect('/en/', 307);
 
 const { slug, title } = Astro.props;
 ---

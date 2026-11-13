@@ -489,6 +489,13 @@ const site = defineCollection({
       tagline: z.string(),
     }),
     gallery: z.object({
+      /*
+        Gallery 整區的開關，後台「Gallery（相片集頁）」第一列的勾選框就是改這個值。
+        關掉時：導覽列與首頁「逛逛藝廊」按鈕不出現，Gallery 與相簿的網址導回首頁，
+        sitemap 也不列。相片與文案都留著，打開再發布就恢復。
+        沒填視為開啟——這個欄位是後來才加的，舊內容檔不該因此建置失敗。
+      */
+      enabled: z.boolean().default(true),
       eyebrow: z.string(),
       headline: z.string(),
       intro: z.string(),

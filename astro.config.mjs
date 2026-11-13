@@ -1,6 +1,19 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { readFileSync } from 'node:fs';
+
+/*
+  Gallery 關閉的語言（內容檔 gallery.enabled 為 false），sitemap 不列它的網址。
+  那幾頁關閉時只是導回首頁的轉址頁，列進去等於請搜尋引擎收錄一個空頁。
+  設定檔沒辦法用 astro:content，所以直接讀 JSON；兩個語言分開判斷，跟網站端一致。
+*/
+const galleryOff = ['en', 'zh'].filter((locale) => {
+  const site = JSON.parse(readFileSync(new URL(`./src/content/site/main-${locale}.json`, import.meta.url), 'utf-8'));
+  return site.gallery?.enabled === false;
+});
+const inClosedGallery = (/** @type {string} */ page) =>
+  galleryOff.some((locale) => new URL(page).pathname.startsWith(`/${locale}/gallery`));
 
 /*
   Vercel 的正式網址。@astrojs/sitemap 用它產生絕對 URL，也是 og:url／canonical
@@ -37,7 +50,7 @@ const devImageNoCache = {
 
 export default defineConfig({
   site: 'https://noah-portfolio-tawny.vercel.app',
-  integrations: [sitemap()],
+  integrations: [sitemap({ filter: (page) => !inClosedGallery(page) })],
   vite: { plugins: [devImageNoCache] },
   i18n: {
     defaultLocale: 'en',

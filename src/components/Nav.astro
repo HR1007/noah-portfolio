@@ -3,10 +3,15 @@ import { getEntry } from 'astro:content';
 import ThemeToggle from './ThemeToggle.astro';
 import LangToggle from './LangToggle.astro';
 import NavStatus from './NavStatus.astro';
+import { isGalleryHref } from '../lib/gallery';
 
 const locale = Astro.currentLocale ?? 'en';
 const site = await getEntry('site', `main-${locale}`);
-const { logo, links } = site!.data.nav;
+const { logo } = site!.data.nav;
+// Gallery 關閉時，選單裡指向它的那一項不出現（內容檔裡的項目本身保留，打開就回來）
+const links = site!.data.gallery.enabled
+  ? site!.data.nav.links
+  : site!.data.nav.links.filter((link) => !isGalleryHref(link.href));
 const currentPath = Astro.url.pathname;
 ---
 

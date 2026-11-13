@@ -1,5 +1,9 @@
 ---
 import Gallery from '../../views/Gallery.astro';
+import { isGalleryEnabled } from '../../lib/gallery';
+
+// Gallery 關閉時導回首頁。用 307：靜態輸出下 302 會讓 Astro 的轉址頁先停 2 秒才跳
+if (!(await isGalleryEnabled('en'))) return Astro.redirect('/en/', 307);
 ---
 
 <Gallery locale="en" />

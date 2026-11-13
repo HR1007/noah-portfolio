@@ -201,6 +201,7 @@
     "tagline": "Just a coffee guy"
   },
   "gallery": {
+    "enabled": false,
     "eyebrow": "Life, Framed",
     "headline": "Gallery",
     "intro": "I think a good photo has its story before the shutter clicks. I shoot both film and digital: film slows me down, digital lets me take the extra frame. Here you'll find ongoing projects, places I passed along the way, and some everyday shots I barely edited :)",

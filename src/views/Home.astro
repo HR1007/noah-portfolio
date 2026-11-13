@@ -21,7 +21,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const site = await getEntry('site', `main-${locale}`);
-const { home } = site!.data;
+const { home, gallery } = site!.data;
 
 const heroImage = getHomeImage('hero');
 const avatarImage = getHomeImage('avatar');
@@ -221,9 +221,14 @@ const navItems = [
         </div>
       )
     }
-    <div class="beyond-grid__cta">
-      <Button label={home.beyondGridCta} href={`/${locale}/gallery`} variant="secondary" />
-    </div>
+    {/* Gallery 關閉時連到那裡的按鈕也一起收掉，不然會點進一個導回首頁的網址 */}
+    {
+      gallery.enabled && (
+        <div class="beyond-grid__cta">
+          <Button label={home.beyondGridCta} href={`/${locale}/gallery`} variant="secondary" />
+        </div>
+      )
+    }
   </section>
 
   {/*
