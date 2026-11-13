@@ -509,6 +509,35 @@ svg {
   }
 }
 
+/* 是/否開關不分中英文，一個控制項橫跨 EN、ZH 兩欄 */
+@media (min-width: 901px) {
+  .content-row__wide {
+    grid-column: 2 / span 2;
+  }
+}
+
+.content-row__note {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* 分區標題旁的狀態（例如 Gallery「目前關閉」），沒有狀態時不佔位 */
+.content-section__status {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.content-section__status:empty {
+  display: none;
+}
+
 .content-savebar {
   position: fixed;
   left: 72px;

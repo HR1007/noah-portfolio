@@ -1385,9 +1385,74 @@ function renderContentRow(label, keyPath) {
   return row;
 }
 
+/*
+  內容檔裡的是/否欄位（目前只有 gallery.enabled）。這張表單原本只畫文字欄位，
+  布林值會被直接略過，所以開關只能進檔案手改。這裡給它一個勾選框，並寫明關掉後
+  網站上會發生什麼。
+  中英文兩份檔案寫同一個值：開關決定「這一區要不要上線」，不是文案，兩個語言
+  分開切只會讓中文版有、英文版沒有。
+*/
+const TOGGLE_FIELDS = {
+  'gallery.enabled': {
+    label: '顯示頁面',
+    text: '在網站上顯示 Gallery',
+    note:
+      '取消勾選後，導覽列的 Gallery 與首頁「逛逛藝廊」按鈕會隱藏，直接輸入 Gallery 或相簿的網址會導回首頁；' +
+      '相片與文案都會保留。按「儲存所有文案」後本機預覽就會套用，線上網站要按「發布」才會跟著改。',
+  },
+};
+
+/** 文案分區標題旁的狀態字（收合時也看得出 Gallery 是關著的）；沒有狀態回傳空字串 */
+function sectionStatusText(key) {
+  return key === 'gallery' && siteEn.gallery?.enabled === false ? '目前關閉' : '';
+}
+
+function renderToggleRow(keyPath) {
+  const meta = TOGGLE_FIELDS[keyPath.join('.')] ?? { label: humanize(keyPath[keyPath.length - 1]), text: '開啟' };
+
+  const row = document.createElement('div');
+  row.className = 'content-row';
+
+  const labelEl = document.createElement('div');
+  labelEl.className = 'content-row__label';
+  labelEl.textContent = meta.label;
+  row.appendChild(labelEl);
+
+  const control = document.createElement('div');
+  control.className = 'content-row__wide';
+  const toggle = document.createElement('label');
+  toggle.className = 'sec-cta-toggle';
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.checked = getPath(siteEn, keyPath) !== false;
+  toggle.append(input, document.createTextNode(` ${meta.text}`));
+  control.appendChild(toggle);
+  if (meta.note) {
+    const note = document.createElement('p');
+    note.className = 'content-row__note';
+    note.textContent = meta.note;
+    control.appendChild(note);
+  }
+  row.appendChild(control);
+
+  input.addEventListener('change', () => {
+    setPath(siteEn, keyPath, input.checked);
+    setPath(siteZh, keyPath, input.checked);
+    const status = row.closest('.content-section')?.querySelector('.content-section__status');
+    if (status) status.textContent = sectionStatusText(keyPath[0]);
+  });
+
+  return row;
+}
+
 function renderContentNode(enVal, keyPath, container) {
   if (typeof enVal === 'string') {
     container.appendChild(renderContentRow(humanize(keyPath[keyPath.length - 1]), keyPath));
+    return;
+  }
+
+  if (typeof enVal === 'boolean') {
+    container.appendChild(renderToggleRow(keyPath));
     return;
   }
 
@@ -1553,7 +1618,9 @@ function buildContentSection(key, label) {
 
   const header = document.createElement('div');
   header.className = 'content-section__header';
-  header.innerHTML = `<span>${escapeHtml(label)}</span><span class="chev">▾</span>`;
+  header.innerHTML =
+    `<span>${escapeHtml(label)}<span class="content-section__status">${escapeHtml(sectionStatusText(key))}</span></span>` +
+    '<span class="chev">▾</span>';
   bindSectionToggle(section, header);
 
   const body = document.createElement('div');
