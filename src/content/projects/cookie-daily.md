@@ -39,15 +39,29 @@ sections:
           primary pupils one-on-one online, and the subject I taught was
           primary-school English.
         zh: 大學時，我參與高科大執行的教育部數位學伴計畫，擔任「大學伴」，透過線上一對一的方式陪伴偏鄉的小學伴，教的是小學英文。
-      - en: >-
-          When I prepared lessons, the biggest headache was the weekly
-          vocabulary quiz. Learning words by rote holds little appeal for a new
-          generation of primary pupils. On top of that, the children had already
-          sat through a full day of school, so by the evening session they often
-          couldn't concentrate.
-        zh: 備課時最令人頭痛的，就是每個禮拜的單字小考。傳統死背單字的方式，對新一代的小學生並沒有太大的吸引力；再者，小學伴白天已經上完一整天的課，到了晚上的學伴課往往精神不集中。
-      - en: So I made Cookie Daily and set the vocabulary review in a bakery.
-        zh: 於是我做了日日餅乾，把單字複習搬進一間烘焙店。
+  - type: featureSplit
+    eyebrow:
+      en: PAIN POINT
+      zh: 痛點
+    heading:
+      en: The weekly vocabulary quiz
+      zh: 每個禮拜的單字小考
+    body:
+      en: >-
+        When I prepared lessons, the biggest headache was the weekly
+        vocabulary quiz. Learning words by rote holds little appeal for a new
+        generation of primary pupils. On top of that, the children had already
+        sat through a full day of school, and by the evening session they often
+        couldn't concentrate. So I made Cookie Daily and set the vocabulary
+        review in a bakery.
+      zh: 備課時最令人頭痛的，就是每個禮拜的單字小考。傳統死背單字的方式，對新一代的小學生並沒有太大的吸引力；再者，小學伴白天已經上完一整天的課，到了晚上的學伴課往往精神不集中。於是我做了日日餅乾，把單字複習搬進一間烘焙店。
+    imagePosition: right
+    ratio: 1014/537
+    alt:
+      en: >-
+        Handover email to a substitute tutor: lessons ran from 5:15 to 6:45 pm,
+        and it notes that the pupil was easily distracted in class
+      zh: 寫給代課大學伴的交接信：學伴課在傍晚 5:15 到 6:45，信裡也提醒小學伴上課比較容易分心
   - type: deviceShowcase
     ratio: 1200/1042
     alt:
