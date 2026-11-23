@@ -6,12 +6,14 @@ import Button from '../Button.astro';
 
 interface Props {
   title: string;
+  /** 標題下方的一行副標，選填；沒給就不渲染這一行 */
+  subtitle?: string;
   ctaLabel: string;
   ctaHref: string;
   image: ImageMetadata | undefined;
 }
 
-const { title, ctaLabel, ctaHref, image } = Astro.props;
+const { title, subtitle, ctaLabel, ctaHref, image } = Astro.props;
 
 // hero 圖不套固定比例：直接用圖片自己的原始尺寸，只有寬度超過容器（1040px）
 // 或高度超過 --project-hero-max-height 時才等比例縮小。這樣不同案例的 hero
@@ -27,6 +29,7 @@ const PLACEHOLDER_RATIO = '1040 / 480';
 <section class="project-hero">
   <div class="project-hero__inner">
     <h1 class="project-hero__title">{title}</h1>
+    {subtitle && <p class="project-hero__subtitle">{subtitle}</p>}
     <Button label={ctaLabel} href={ctaHref} variant="secondary" />
     <div class="project-hero__frame">
       {
@@ -42,7 +45,7 @@ const PLACEHOLDER_RATIO = '1040 / 480';
 
 <style>
   /*
-    版面由上到下：標題 → 按鈕 → 圖片，三者垂直排列在漸層底上，彼此不重疊。
+    版面由上到下：標題 →（選填的副標）→ 按鈕 → 圖片，垂直排列在漸層底上，彼此不重疊。
     標題刻意不疊在圖片上——照片深淺不可控，疊上去就得靠遮罩救對比，
     而遮罩會壓暗照片本身。分開排列則兩者都能保持乾淨。
     間距統一用同一個 gap，不個別微調。
@@ -80,6 +83,17 @@ const PLACEHOLDER_RATIO = '1040 / 480';
   .project-hero__title {
     font-size: var(--font-size-h1);
     color: var(--color-ink);
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  /*
+    副標是標題的補充說明，不跟標題搶：字級用內文大字、顏色用次要文字的灰。[需確認] 字級與顏色
+    跟標題、按鈕、圖片共用 __inner 的同一個 gap，不另外拉近，維持上面「間距統一」的規則。
+  */
+  .project-hero__subtitle {
+    font-size: var(--font-size-body-lg);
+    color: var(--color-muted);
     text-wrap: balance;
     margin: 0;
   }
@@ -133,6 +147,11 @@ const PLACEHOLDER_RATIO = '1040 / 480';
 
     .project-hero__title {
       font-size: var(--font-size-h2);
+    }
+
+    /* 標題在手機降一級，副標跟著降一級，兩者的大小差距維持一致 */
+    .project-hero__subtitle {
+      font-size: var(--font-size-body);
     }
   }
 </style>

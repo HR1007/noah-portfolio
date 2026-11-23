@@ -80,6 +80,7 @@ const { Content } = await render(project);
       <Fragment>
         <ProjectHero
           title={trReq(project.data.title)}
+          subtitle={tr(hero!.subtitle)}
           ctaLabel={trReq(hero!.ctaLabel)}
           ctaHref={hero!.ctaHref}
           image={heroImage}

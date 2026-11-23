@@ -348,6 +348,8 @@ const projects = defineCollection({
     // [slug].astro 會 fallback 回舊版簡易版型（標題＋摘要＋單張圖＋Markdown 內文），不讓 build 失敗。
     hero: z
       .object({
+        /* 標題下方的一行副標（選填），例如「為國小生量身設計的英語學習工具」。沒填就不顯示 */
+        subtitle: localized().optional(),
         ctaLabel: localized(),
         ctaHref: z.string().default('#'), // [需確認] 待設計師提供實際 demo／prototype 連結
       })
