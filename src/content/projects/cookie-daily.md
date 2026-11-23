@@ -10,10 +10,11 @@ summary:
   en: >-
     In university I tutored English online for primary pupils in rural areas,
     through a Ministry of Education programme that pairs university students
-    with children as learning partners. Cookie Daily grew out of that: in a
-    small bakery, the letters are the cookies and breads on the shelves, and
-    you help customers spell English words.
-  zh: 大學時我參與數位學伴計畫，線上教偏鄉小學生英文。日日餅乾從這段經驗出發：在一間烘焙店裡，字母就是架上的餅乾和麵包，玩家要幫顧客拼出英文單字。
+    with children as learning partners. The biggest headache was the weekly
+    vocabulary quiz, so I made Cookie Daily: in a small bakery, the letters are
+    the cookies and breads on the shelves, and you help customers spell English
+    words.
+  zh: 大學時我參與數位學伴計畫，線上教偏鄉小學生英文，而最頭痛的就是每週的單字小考。於是我做了日日餅乾：在一間烘焙店裡，字母就是架上的餅乾和麵包，玩家要幫顧客拼出英文單字。
 hero:
   subtitle:
     en: An English learning tool made for primary school pupils
@@ -39,12 +40,14 @@ sections:
           primary-school English.
         zh: 大學時，我參與高科大執行的教育部數位學伴計畫，擔任「大學伴」，透過線上一對一的方式陪伴偏鄉的小學伴，教的是小學英文。
       - en: >-
-          Cookie Daily is a fill-in-the-blank word game that grew out of that
-          work. You walk into a bakery where a to m are letter cookies on the
-          display cases and n to z are letter breads on the rack. A customer
-          asks for an English word, you find the missing letters, and Xiaoli
-          the hedgehog clerk fetches each cookie or bread to fill the gaps.
-        zh: 日日餅乾是從這段經驗延伸出來的單字填空遊戲。玩家走進一間烘焙店，a 到 m 是展示櫃上的字母餅乾，n 到 z 是麵包架上的字母麵包。顧客上門點一個英文單字，玩家找出缺的字母，刺蝟店員小栗就會把那塊餅乾或麵包拿回來補上。
+          When I prepared lessons, the biggest headache was the weekly
+          vocabulary quiz. Learning words by rote holds little appeal for a new
+          generation of primary pupils. On top of that, the children had already
+          sat through a full day of school, so by the evening session they often
+          couldn't concentrate.
+        zh: 備課時最令人頭痛的，就是每個禮拜的單字小考。傳統死背單字的方式，對新一代的小學生並沒有太大的吸引力；再者，小學伴白天已經上完一整天的課，到了晚上的學伴課往往精神不集中。
+      - en: So I made Cookie Daily and set the vocabulary review in a bakery.
+        zh: 於是我做了日日餅乾，把單字複習搬進一間烘焙店。
   - type: deviceShowcase
     ratio: 1200/1042
     alt:
@@ -61,12 +64,9 @@ sections:
       zh: 實際走一遍日日餅乾
     body:
       en: >-
-        The demo starts at the shop door: step inside, follow the short tour of
-        where the letters are, flip through the guide, and open for business.
-        Customers come to the counter with a word; you turn to the cookie case
-        or the bread rack and pick the missing letters. A wrong pick shakes and
-        costs a few seconds.
-      zh: 這段展示從店門口開始：推門進店、跟著導覽認識字母放在哪、翻過說明書，接著開始營業。顧客走到櫃台前出題，玩家轉向餅乾櫃或麵包架，點出缺的字母；點錯的商品會搖一搖，還會被扣掉幾秒。
+        The video starts at the shop door, goes through the first-visit tour
+        and guide, and plays on until two customers have been served.
+      zh: 這段影片從推門進店開始，走完第一次的導覽和說明書，一路玩到服務完兩位顧客。
     ratio: 16/10
     alt:
       en: >-
@@ -84,15 +84,11 @@ sections:
     layout: split
     paragraphs:
       - en: >-
-          Traditional ways of teaching English only go so far. The question
-          behind this project is how to bring play into lessons so they hold a
-          child's attention, with the goal of doubling what the lessons
-          achieve.
-        zh: 傳統的英文教學方式成效有限。這個專案想回答的是：如何結合趣味的方式提升教學的吸引力，目標是達到兩倍的成效。
-      - en: >-
-          The first tester is a ten-year-old boy in fourth grade. His interest
-          in English is average, and he already goes to cram school.
-        zh: 目前的受測者是一位 10 歲、國小四年級的男生，對英文的興趣普通，平常有在補習。
+          Traditional ways of teaching English only go so far. If the weekly
+          vocabulary review were lighter and more fun, the children would
+          remember the words better as they learned them. The goal of this
+          project is to double what the lessons achieve.
+        zh: 傳統的英文教學方式成效有限。如果能用較為輕鬆有趣的方式進行每週的單字複習，小學伴在背單字的同時也會更有印象。這個專案的目標，是達到兩倍的成效。
     ratio: 16/10
     alt:
       en: After a correct answer, the rabbit customer leaves happily with a paper bag
@@ -108,9 +104,10 @@ sections:
       en: >-
         The 26 letters are split between two places: a to m are letter cookies
         on top of the display cases, n to z are letter breads on the rack, both
-        in alphabetical order. A customer orders a word, and you gather its
-        missing letters from around the shop.
-      zh: 26 個字母分成兩區：a 到 m 是展示櫃頂上的字母餅乾，n 到 z 是麵包架上的字母麵包，都照字母順序排。顧客點一個單字，玩家就在店裡把缺的那幾個字母找齊。
+        in alphabetical order. A customer orders a word, you gather its missing
+        letters from around the shop, and Xiaoli the hedgehog clerk carries
+        each one back to the counter.
+      zh: 26 個字母分成兩區：a 到 m 是展示櫃頂上的字母餅乾，n 到 z 是麵包架上的字母麵包，都照字母順序排。顧客點一個單字，玩家就在店裡把缺的那幾個字母找齊，再由刺蝟店員小栗拿回櫃台。
     imagePosition: left
     ratio: 16/10
     alt:
@@ -182,10 +179,9 @@ sections:
       en: >-
         A first-time player pushes the door open, takes a three-stop tour of
         where the letters are, and reads the guide before the shop opens; the
-        tour and the guide can both be skipped. Fifteen customers then come in
-        one by one, and the round ends with a star rating and a review of the
-        fifteen words.
-      zh: 第一次玩的人先推門進店，跟著三站導覽認識字母放在哪，翻完說明書才開始營業；導覽和說明書都可以略過。營業時 15 位顧客輪流上門，結束後看拿到幾顆星，並複習這一輪的 15 個單字。
+        tour and the guide can both be skipped. Once the shop is open, fifteen
+        customers come in one by one.
+      zh: 第一次玩的人先推門進店，跟著三站導覽認識字母放在哪，翻完說明書才開始營業；導覽和說明書都可以略過。營業時 15 位顧客輪流上門。
     steps:
       - label: Storefront
         ratio: 16/10
@@ -246,10 +242,10 @@ sections:
           zh: 點錯會搖一搖
         body:
           en: >-
-            A wrong pick shakes, the customer frowns and a few seconds come
+            A wrong pick shakes, the customer frowns and three seconds come
             off the clock. When time is nearly up, the clock turns red and
             wobbles.
-          zh: 點錯的商品會搖一搖，顧客皺眉，時鐘也會被扣掉幾秒。時間快到時，時鐘會變紅晃動。
+          zh: 點錯的商品會搖一搖，顧客皺眉，還會扣 3 秒。時間快到時，時鐘會變紅晃動。
         ratio: 16/10
         alt:
           en: After a wrong pick, the letter cookie shakes and the fox customer looks worried
@@ -285,13 +281,14 @@ sections:
       zh: 不靠 3D 函式庫的烘焙店
     body:
       en: >-
-        The whole shop is built with plain CSS 3D, and the depth and rotation
-        set with Figma's beta 3D Transform map directly onto CSS transforms. The floor, ceiling, each
-        wall, the fixtures and the customers sit on separate layers stacked in
-        a fixed order, which stops Chrome from leaving holes in the walls at
-        certain widths. The background music is synthesised live in the
-        browser, so there are no audio files either.
-      zh: 整間店用原生 CSS 3D 搭起來，用 Figma 的 Beta 功能 3D Transform 設定的深度與旋轉，直接對應到 CSS 的 transform。地板、天花板、每一面牆、擺設和顧客各自一層，依固定順序疊起來，避免 Chrome 在某些寬度下把牆漏畫一塊。背景音樂也是瀏覽器即時合成的，沒有用到任何音檔。
+        The whole shop is built with plain CSS 3D. The depth and rotation are
+        set first in Figma's beta 3D Transform, then carried straight over to
+        CSS transforms. The floor, ceiling, each wall, the fixtures and the
+        customers sit on separate layers stacked in a fixed order, which stops
+        Chrome from leaving holes in the walls at certain widths. The background
+        music is synthesised live in the browser, so there are no audio files
+        either.
+      zh: 整間店用原生 CSS 3D 搭起來，深度和旋轉角度先在 Figma 的 Beta 功能 3D Transform 裡設定好，再直接對應到 CSS 的 transform。地板、天花板、每一面牆、擺設和顧客各自一層，依固定順序疊起來，避免 Chrome 在某些寬度下把牆漏畫一塊。背景音樂也是瀏覽器即時合成的，沒有用到任何音檔。
     imagePosition: left
     ratio: 16/10
     alt:
@@ -313,7 +310,7 @@ sections:
         fondness for animals. Each has a normal, a happy and a worried face. In
         the game every character is split into layered paper-puppet parts, and
         CSS handles the walking, carrying and changes of expression.
-      zh: 刺蝟店員小栗，和兔子、小熊、狐狸三位顧客為遊戲中的主要角色，針對兒童對動物的喜好設計而成，每個角色都有平常、開心和著急的表情。到了遊戲裡，角色拆成分層的紙偶，走路、拿東西和表情變化都交給 CSS 動起來。
+      zh: 刺蝟店員小栗，和兔子、小熊、狐狸三位顧客為遊戲中的主要角色，針對兒童對動物的喜好設計而成，每個角色都有平常、開心和著急的表情。到了遊戲裡，角色拆成分層的紙偶，走路、拿東西和表情變化都交付給 CSS 處理。
     imagePosition: right
     ratio: 16/9
     alt:
@@ -331,9 +328,9 @@ sections:
         The 1,249 words live in a Supabase table. Editing a word, changing its
         Chinese hint or switching it off takes effect the next time the game
         opens. If the database can't be reached, a built-in copy takes over and
-        the game still works. At the end of a round, all fifteen words are
-        listed, each with its pronunciation.
-      zh: 1,249 個單字放在 Supabase 的資料表裡，改字、改中文提示或停用某個字，下次打開遊戲就生效。連不上資料庫時改用內建的備份題庫，遊戲照樣能玩。一輪結束後會列出這 15 個單字，每個都能再聽一次發音。
+        the game still works. At the end of a round you see your star rating
+        and all fifteen words, each with its pronunciation.
+      zh: 1,249 個單字放在 Supabase 的資料表裡，改字、改中文提示或停用某個字，下次打開遊戲就生效。連不上資料庫時改用內建的備份題庫，遊戲照樣能玩。一輪結束後會看到拿了幾顆星，並列出這 15 個單字，每個都能再聽一次發音。
     imagePosition: left
     ratio: 16/10
     alt:
