@@ -83,7 +83,7 @@ sections:
       en: BEFORE & AFTER
       zh: 導入前後
     heading:
-      en: Orders used to scatter across chats. Now each one lands in one place.
+      en: Orders used to scatter across chats, now each one lands in one place
       zh: 以前訂單散在聊天室，現在每一筆都收在一起
     body:
       en: >-
@@ -196,8 +196,8 @@ sections:
     heading:
       en: >-
         Five business lines share one design language, so the site reads as a
-        single shop.
-      zh: 五條業務線共用一套設計語言，讓網站看起來是同一家店。
+        single shop
+      zh: 五條業務線共用一套設計語言，讓網站看起來是同一家店
     themes:
       - title:
           en: Colour

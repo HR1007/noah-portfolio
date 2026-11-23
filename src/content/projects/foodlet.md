@@ -22,8 +22,8 @@ sections:
       en: ORIGIN & INSPIRATION
       zh: 起點與靈感
     heading:
-      en: 食錢包 Foodlet — Where a meal becomes something you get to keep.
-      zh: 食錢包 Foodlet──讓一頓飯留下可以帶走的東西。
+      en: 食錢包 Foodlet — Where a meal becomes something you get to keep
+      zh: 食錢包 Foodlet──讓一頓飯留下可以帶走的東西
     paragraphs:
       - en: >-
           Foodlet is the first interface I ever built. It's about a third as

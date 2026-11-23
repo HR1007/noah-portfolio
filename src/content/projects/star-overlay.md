@@ -110,8 +110,8 @@ sections:
     heading:
       en: >-
         Colour, type and components follow one set of rules, keeping the
-        interface consistent and clear while leaving room to experiment.
-      zh: 色彩、字體和元件遵循同一套規則，介面一致、清楚，也保留發揮空間。
+        interface consistent and clear while leaving room to experiment
+      zh: 色彩、字體和元件遵循同一套規則，介面一致、清楚，也保留發揮空間
     themes:
       - title:
           en: Display

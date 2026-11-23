@@ -162,8 +162,8 @@ sections:
     heading:
       en: >-
         Designed for long shifts in dim rooms: colour shows status, and the dark
-        theme was planned from the start.
-      zh: 為昏暗房間裡的長時間輪班設計：用顏色表示狀態，深色模式從一開始就一起規劃。
+        theme was planned from the start
+      zh: 為昏暗房間裡的長時間輪班設計：用顏色表示狀態，深色模式從一開始就一起規劃
     themes:
       - title:
           en: Semantic colour

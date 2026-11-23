@@ -120,8 +120,8 @@ sections:
     heading:
       en: >-
         The scene, characters and game components were all built in Figma
-        first, using the beta 3D Transform feature to turn flat parts into 3D.
-      zh: 場景、角色和遊戲元件都先在 Figma 裡做好，用 Beta 功能 3D Transform 把平面零件轉成立體。
+        first, using the beta 3D Transform feature to turn flat parts into 3D
+      zh: 場景、角色和遊戲元件都先在 Figma 裡做好，用 Beta 功能 3D Transform 把平面零件轉成立體
     themes:
       - title:
           en: 3D Transform

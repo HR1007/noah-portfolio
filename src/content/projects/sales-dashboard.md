@@ -66,7 +66,7 @@ sections:
       en: BEFORE & AFTER
       zh: 導入前後
     heading:
-      en: It used to be a chat message. Now it's a task.
+      en: It used to be a chat message, now it's a task
       zh: 以前是一則聊天訊息，現在是一項任務
     body:
       en: >-

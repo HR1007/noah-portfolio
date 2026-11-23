@@ -130,8 +130,8 @@ sections:
       en: >-
         A small but complete design system: colour, type, spacing, redlines,
         components and icons that keep every screen consistent across both
-        themes.
-      zh: 一套小而完整的設計系統：色彩、字體、間距、標註、元件和圖示都有規範，每個畫面在兩種主題下都一致。
+        themes
+      zh: 一套小而完整的設計系統：色彩、字體、間距、標註、元件和圖示都有規範，每個畫面在兩種主題下都一致
     themes:
       - title:
           en: Colour
