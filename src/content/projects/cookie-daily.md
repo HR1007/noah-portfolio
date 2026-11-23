@@ -15,6 +15,9 @@ summary:
     you help customers spell English words.
   zh: 大學時我參與數位學伴計畫，線上教偏鄉小學生英文。日日餅乾從這段經驗出發：在一間烘焙店裡，字母就是架上的餅乾和麵包，玩家要幫顧客拼出英文單字。
 hero:
+  subtitle:
+    en: An English learning tool made for primary school pupils
+    zh: 為國小生量身設計的英語學習工具
   ctaLabel:
     en: Try it out
     zh: 實際試試
