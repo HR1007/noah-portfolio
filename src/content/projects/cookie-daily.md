@@ -43,12 +43,12 @@ sections:
           the hedgehog clerk fetches each cookie or bread to fill the gaps.
         zh: 日日餅乾是從這段經驗延伸出來的單字填空遊戲。玩家走進一間烘焙店，a 到 m 是展示櫃上的字母餅乾，n 到 z 是麵包架上的字母麵包。顧客上門點一個英文單字，玩家找出缺的字母，刺蝟店員小栗就會把那塊餅乾或麵包拿回來補上。
   - type: deviceShowcase
-    ratio: 16/10
+    ratio: 1200/1042
     alt:
       en: >-
-        Cookie Daily on desktop: a customer waits at the counter while the
+        Cookie Daily on an iMac: a customer waits at the counter while the
         question card shows a word with blanks
-      zh: 日日餅乾桌面版：顧客站在櫃台前，題目卡上是挖了空格的英文單字
+      zh: 日日餅乾在 iMac 上的畫面：顧客站在櫃台前，題目卡上是挖了空格的英文單字
   - type: experienceDemo
     eyebrow:
       en: EXPERIENCE DEMO
@@ -113,6 +113,61 @@ sections:
     alt:
       en: Letter cookies a to m standing on top of the display cases
       zh: 展示櫃頂上立著 a 到 m 的字母餅乾
+  - type: designThemes
+    eyebrow:
+      en: FIGMA COMPONENTS
+      zh: Figma 元件
+    heading:
+      en: >-
+        The scene, characters and game components were all built in Figma
+        first, using the beta 3D Transform feature to turn flat parts into 3D.
+      zh: 場景、角色和遊戲元件都先在 Figma 裡做好，用 Beta 功能 3D Transform 把平面零件轉成立體。
+    themes:
+      - title:
+          en: 3D Transform
+          zh: 3D Transform
+        description:
+          en: >-
+            A paper-box test of Figma's 3D Transform in five steps: the flat
+            net, each face rotated into place, a tilt, then Depth and
+            Perspective.
+          zh: 用紙盒測試 Figma 的 3D Transform，一共五步：展開圖、各面轉到定位、傾斜，再加上 Depth 和 Perspective。
+      - title:
+          en: Bakery display case
+          zh: 烘焙展示櫃
+        description:
+          en: >-
+            The glass, shelves, base and light strip are all flat panels
+            rotated into place. The cookies are top views turned 90° on X to
+            lie flat, 18 across three shelves.
+          zh: 玻璃、層板、底座和燈帶都是一片片平面，用 3D Transform 轉到定位；餅乾是俯視圖，整片轉 X 90° 平躺在層板上，三層共 18 片。
+      - title:
+          en: Hedgehog baker
+          zh: 刺蝟麵包師
+        description:
+          en: >-
+            Xiaoli is a paper puppet of six flat layers spaced apart with
+            Depth, so the layers separate as soon as the character turns.
+          zh: 小栗是 6 層平面疊成的紙偶，用 Depth 前後錯開，轉個角度就看得出層次。
+      - title:
+          en: Bakery scene
+          zh: 烘焙店場景
+        description:
+          en: >-
+            The floor, ceiling and three walls enclose the room: display cases
+            on the left, the bread rack on the right and the counter at the
+            back, seen from just inside the door.
+          zh: 地板、天花板和三面牆圍成房間，左牆是餅乾展示櫃、右牆是麵包層架、後面是櫃台，從門口往裡看。
+      - title:
+          en: Game components
+          zh: 遊戲元件
+        description:
+          en: >-
+            Cookies, breads, every character expression, shop props, question
+            cards and the guide book, kept in sync with the web version.
+          zh: 餅乾、麵包、每個角色的表情、店內道具、題目卡和遊戲說明書，跟網頁版同步。
+    direction: vertical
+    layout: carousel
   - type: flow
     eyebrow:
       en: FLOW
@@ -228,12 +283,12 @@ sections:
     body:
       en: >-
         The whole shop is built with plain CSS 3D, and the depth and rotation
-        set in Figma map directly onto CSS transforms. The floor, ceiling, each
+        set with Figma's beta 3D Transform map directly onto CSS transforms. The floor, ceiling, each
         wall, the fixtures and the customers sit on separate layers stacked in
         a fixed order, which stops Chrome from leaving holes in the walls at
         certain widths. The background music is synthesised live in the
         browser, so there are no audio files either.
-      zh: 整間店用原生 CSS 3D 搭起來，在 Figma 裡設定的深度與旋轉直接對應到 CSS 的 transform。地板、天花板、每一面牆、擺設和顧客各自一層，依固定順序疊起來，避免 Chrome 在某些寬度下把牆漏畫一塊。背景音樂也是瀏覽器即時合成的，沒有用到任何音檔。
+      zh: 整間店用原生 CSS 3D 搭起來，用 Figma 的 Beta 功能 3D Transform 設定的深度與旋轉，直接對應到 CSS 的 transform。地板、天花板、每一面牆、擺設和顧客各自一層，依固定順序疊起來，避免 Chrome 在某些寬度下把牆漏畫一塊。背景音樂也是瀏覽器即時合成的，沒有用到任何音檔。
     imagePosition: left
     ratio: 16/10
     alt:
