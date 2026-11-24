@@ -5,7 +5,7 @@ title:
 eyebrow:
   en: ENGLISH SPELLING GAME
   zh: 英文單字遊戲
-order: 7
+order: 6
 summary:
   en: >-
     In university I tutored English online for primary pupils in rural areas,

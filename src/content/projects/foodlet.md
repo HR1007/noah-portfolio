@@ -5,7 +5,7 @@ title:
 eyebrow:
   en: WEB3 MOBILE PAYMENT
   zh: Web3 行動支付
-order: 6
+order: 7
 summary:
   en: >-
     Foodlet combines mobile payment, Web3 rewards and digital collectibles into
