@@ -129,8 +129,8 @@ sections:
       zh: 展示櫃頂上立著 a 到 m 的字母餅乾
   - type: designThemes
     eyebrow:
-      en: FIGMA COMPONENTS
-      zh: Figma 元件
+      en: FIGMA FEATURES
+      zh: Figma 功能
     heading:
       en: >-
         The scene, characters and game components were all built in Figma
@@ -147,39 +147,44 @@ sections:
             Perspective.
           zh: 用紙盒測試 Figma 的 3D Transform，一共五步：展開圖、各面轉到定位、傾斜，再加上 Depth 和 Perspective。
       - title:
-          en: Bakery display case
-          zh: 烘焙展示櫃
+          en: X/Y rotation
+          zh: X／Y 旋轉
         description:
           en: >-
-            The glass, shelves, base and light strip are all flat panels
-            rotated into place. The cookies are top views turned 90° on X to
-            lie flat, 18 across three shelves.
-          zh: 玻璃、層板、底座和燈帶都是一片片平面，用 3D Transform 轉到定位；餅乾是俯視圖，整片轉 X 90° 平躺在層板上，三層共 18 片。
+            The display case's glass, shelves, base and light strip are all
+            flat panels turned into place with X and Y rotation. The cookies
+            are top views turned 90° on X to lie flat, 18 across three shelves.
+          zh: 展示櫃的玻璃、層板、底座和燈帶都是一片片平面，用 X、Y 旋轉擺到定位；餅乾是俯視圖，整片轉 X 90° 平躺在層板上，三層共 18 片。
       - title:
-          en: Hedgehog baker
-          zh: 刺蝟麵包師
+          en: Depth
+          zh: Depth
         description:
           en: >-
-            Xiaoli is a paper puppet of six flat layers spaced apart with
-            Depth, so the layers separate as soon as the character turns.
-          zh: 小栗是 6 層平面疊成的紙偶，用 Depth 前後錯開，轉個角度就看得出層次。
+            Xiaoli the hedgehog baker is a paper puppet of six flat layers
+            spaced apart with Depth, so the layers separate as soon as the
+            character turns.
+          zh: 刺蝟麵包師小栗是 6 層平面疊成的紙偶，用 Depth 前後錯開，轉個角度就看得出層次。
       - title:
-          en: Bakery scene
-          zh: 烘焙店場景
+          en: Perspective
+          zh: Perspective
         description:
           en: >-
-            The floor, ceiling and three walls enclose the room: display cases
-            on the left, the bread rack on the right and the counter at the
-            back, seen from just inside the door.
-          zh: 地板、天花板和三面牆圍成房間，左牆是餅乾展示櫃、右牆是麵包層架、後面是櫃台，從門口往裡看。
+            The floor, ceiling and three walls enclose the room, and the
+            viewport is set to Perspective 700. Seen from just inside the door:
+            display cases on the left, the bread rack on the right and the
+            counter at the back.
+          zh: 地板、天花板和三面牆圍成房間，取景框設 Perspective 700，從門口往裡看：左牆是餅乾展示櫃、右牆是麵包層架、後面是櫃台。
       - title:
-          en: Game components
-          zh: 遊戲元件
+          en: Components and instances
+          zh: 元件與實例
         description:
           en: >-
-            Cookies, breads, every character expression, shop props, question
-            cards and the guide book, kept in sync with the web version.
-          zh: 餅乾、麵包、每個角色的表情、店內道具、題目卡和遊戲說明書，跟網頁版同步。
+            Cookies, breads, character expressions and shop props are all
+            components, and the question cards and guide book sit in the same
+            section, all kept in sync with the web version. The storefront is
+            assembled from part components for the wall, windows, door and
+            awning, so changing one part updates the whole front.
+          zh: 餅乾、麵包、角色表情和店內道具都做成元件，題目卡和遊戲說明書也收在同一區，全部跟網頁版同步。店面由牆面、櫥窗、店門和遮雨棚的零件元件組成，改一個零件，整面店面跟著更新。
     direction: vertical
     layout: carousel
   - type: flow
@@ -295,14 +300,16 @@ sections:
       zh: 不靠 3D 函式庫的烘焙店
     body:
       en: >-
-        The whole shop is built with plain CSS 3D. The depth and rotation are
-        set first in Figma's beta 3D Transform, then carried straight over to
-        CSS transforms. The floor, ceiling, each wall, the fixtures and the
-        customers sit on separate layers stacked in a fixed order, which stops
-        Chrome from leaving holes in the walls at certain widths. The background
-        music is synthesised live in the browser, so there are no audio files
-        either.
-      zh: 整間店用原生 CSS 3D 搭起來，深度和旋轉角度先在 Figma 的 Beta 功能 3D Transform 裡設定好，再直接對應到 CSS 的 transform。地板、天花板、每一面牆、擺設和顧客各自一層，依固定順序疊起來，避免 Chrome 在某些寬度下把牆漏畫一塊。背景音樂也是瀏覽器即時合成的，沒有用到任何音檔。
+        The whole shop is built with plain CSS 3D. Each panel is placed first
+        in Figma's beta 3D Transform. Its position and size carry over as they
+        are, and its Depth and X/Y rotation become translateZ, rotateX and
+        rotateY, in the same order Figma applies them. Every number is in Figma
+        pixels, so the whole shop scales with the screen width. The floor,
+        ceiling, each wall, the fixtures and the customers sit on separate
+        layers stacked in a fixed order, which stops Chrome from leaving holes
+        in the walls at certain widths. The background music is synthesised
+        live in the browser, so there are no audio files either.
+      zh: 整間店用原生 CSS 3D 搭起來。每一片平面先在 Figma 的 Beta 功能 3D Transform 裡擺好，位置和寬高直接沿用，Depth 和 X／Y 旋轉照 Figma 的順序換成 CSS 的 translateZ、rotateX、rotateY；數字都以 Figma 的 1px 為單位，整間店跟著畫面寬度等比縮放。地板、天花板、每一面牆、擺設和顧客各自一層，依固定順序疊起來，避免 Chrome 在某些寬度下把牆漏畫一塊。背景音樂也是瀏覽器即時合成的，沒有用到任何音檔。
     imagePosition: left
     ratio: 16/10
     alt:
