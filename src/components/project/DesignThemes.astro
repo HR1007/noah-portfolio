@@ -3,6 +3,7 @@ import type { ImageMetadata } from 'astro';
 import Media from '../Media.astro';
 import SectionCta from './SectionCta.astro';
 import Carousel from '../Carousel.astro';
+import SourceList from './SourceList.astro';
 import { getEntry } from 'astro:content';
 
 interface Theme {
@@ -10,6 +11,8 @@ interface Theme {
   // schema 是 z.string().optional()，這裡跟著選填。
   // 元件也已經處理沒填的情況：沒有 description 就只出標題。
   description?: string;
+  /** 說明文字引用外部說明時的出處，選填；見 SourceList.astro */
+  sources?: { label: string; href: string }[];
 }
 
 interface Props {
@@ -75,6 +78,7 @@ const { prev, next } = site!.data.viewer;
             <div class="design-themes__caption">
               <h3 class="design-themes__title">{theme.title}</h3>
               {theme.description && <p class="design-themes__text">{theme.description}</p>}
+              <SourceList sources={theme.sources} />
             </div>
           </article>
         ))}
@@ -106,6 +110,7 @@ const { prev, next } = site!.data.viewer;
             <div class="design-themes__caption">
               <h3 class="design-themes__title">{theme.title}</h3>
               {theme.description && <p class="design-themes__text">{theme.description}</p>}
+              <SourceList sources={theme.sources} />
             </div>
           </article>
         ))

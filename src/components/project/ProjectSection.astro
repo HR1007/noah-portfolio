@@ -45,8 +45,18 @@ const trAlt = <T extends { alt: LocalizedText }>(items: T[]) =>
 const trColumns = (
   cols: { heading: LocalizedText; body: LocalizedText; ratio: string; alt: LocalizedText }[]
 ) => cols.map((c) => ({ ...c, heading: trReq(c.heading), body: trReq(c.body), alt: trReq(c.alt) }));
-const trThemes = (themes: { title: LocalizedText; description?: LocalizedText }[]) =>
-  themes.map((x) => ({ ...x, title: trReq(x.title), description: tr(x.description) }));
+// 出處的連結文字也要依 locale 取值；網址原樣帶過
+const trSources = (sources?: { label: LocalizedText; href: string }[]) =>
+  sources?.map((s) => ({ ...s, label: trReq(s.label) }));
+const trThemes = (
+  themes: { title: LocalizedText; description?: LocalizedText; sources?: { label: LocalizedText; href: string }[] }[]
+) =>
+  themes.map((x) => ({
+    ...x,
+    title: trReq(x.title),
+    description: tr(x.description),
+    sources: trSources(x.sources),
+  }));
 ---
 
 {
@@ -94,6 +104,7 @@ const trThemes = (themes: { title: LocalizedText; description?: LocalizedText }[
       alt={trReq(section.alt)}
       ctaLabel={tr(section.ctaLabel)}
       ctaHref={section.ctaHref}
+      sources={trSources(section.sources)}
       chat={
         section.chat && {
           label: trReq(section.chat.label),

@@ -46,6 +46,10 @@
     "next": "Next image",
     "hint": "Scroll to zoom · Drag to pan · Esc to close"
   },
+  "sources": {
+    "label": "Source",
+    "separator": " · "
+  },
   "dataViz": {
     "prev": "Previous chart",
     "next": "Next chart",

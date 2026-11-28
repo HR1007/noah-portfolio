@@ -4,6 +4,7 @@ import Media from '../Media.astro';
 import DemoVideo from './DemoVideo.astro';
 import ChatReplay, { type ChatData } from './ChatReplay.astro';
 import Button from '../Button.astro';
+import SourceList from './SourceList.astro';
 
 interface Props {
   heading: string;
@@ -19,9 +20,11 @@ interface Props {
   eyebrow?: string;
   /** 對話重播，選填。有的話圖片那一側換成一支手機，段落的圖變成對話裡傳出去的截圖 */
   chat?: ChatData;
+  /** 內文引用外部說明時的出處，選填；見 SourceList.astro */
+  sources?: { label: string; href: string }[];
 }
 
-const { heading, body, imagePosition, image, video, ratio, alt, ctaLabel, ctaHref, eyebrow, chat } = Astro.props;
+const { heading, body, imagePosition, image, video, ratio, alt, ctaLabel, ctaHref, eyebrow, chat, sources } = Astro.props;
 ---
 
 <section class:list={['feature-split', `feature-split--${imagePosition}`]}>
@@ -40,6 +43,7 @@ const { heading, body, imagePosition, image, video, ratio, alt, ctaLabel, ctaHre
     {eyebrow && <p class="feature-split__eyebrow">{eyebrow}</p>}
       <h2 class="feature-split__heading">{heading}</h2>
     <p class="feature-split__text">{body}</p>
+    <SourceList sources={sources} />
     {ctaLabel && ctaHref && <Button label={ctaLabel} href={ctaHref} variant="primary" />}
   </div>
 </section>

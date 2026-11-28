@@ -15,6 +15,12 @@ import { glob } from 'astro/loaders';
 const localized = () =>
   z.union([z.string(), z.object({ en: z.string(), zh: z.string().optional() })]);
 
+/*
+  引用外部說明時附上的出處（選填）：連結文字＋網址，顯示在段落文字下方（見 SourceList.astro）。
+  一段可能引用不只一個地方，所以用陣列。連結文字照對方頁面的原始標題寫，中文版用〈〉框住篇名。
+*/
+const sourceRef = z.object({ label: localized(), href: z.url() });
+
 // 案例頁區塊：每個專案依自己的 wireframe 排列不同組合與順序的區塊。
 // 區塊一律不帶圖片路徑／檔名，頁面依 sections 出現順序，依序從該專案的圖片資料夾取下一張圖（沒有圖就顯示佔位框）。
 const textSectionBlock = z.object({
@@ -94,6 +100,8 @@ const featureSplitBlock = z.object({
   ctaHref: z.string().optional(),
   /* 有填就把圖片那一側換成一支手機，訊息一則一則跳出來 */
   chat: chatBlock.optional(),
+  /* 內文引用了外部說明時的出處（選填），顯示在內文下方 */
+  sources: z.array(sourceRef).optional(),
 });
 
 const featureGridBlock = z.object({
@@ -205,6 +213,8 @@ const designThemesBlock = z.object({
       title: localized(),
       // 不在頁面上呈現，只作為後台版位標籤與 alt 文字，因此選填
       description: localized().optional(),
+      /* 說明文字引用了外部說明時的出處（選填），顯示在說明下方 */
+      sources: z.array(sourceRef).optional(),
     })
   ),
   // 選填 CTA 按鈕：兩個都填才會渲染（見 SectionCta.astro）。
@@ -417,6 +427,8 @@ const site = defineCollection({
       next: z.string(),
       hint: z.string(),
     }),
+    /* 案例頁段落下方的「出處」：前面的標籤，以及多個出處之間的分隔（見 SourceList.astro） */
+    sources: z.object({ label: z.string(), separator: z.string() }),
     /* 案例頁資料視覺化輪播的操作文案 */
     dataViz: z.object({
       prev: z.string(),

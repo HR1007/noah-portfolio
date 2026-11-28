@@ -1,0 +1,71 @@
+---
+/*
+  段落文字下方的「出處」：內文引用外部說明（例如 Figma 官方文件）時，列出原始頁面的連結，
+  讓想查證的人點得到。沒有出處就整個不渲染，所以沒填的段落版面完全不變。
+
+  標籤與多個出處之間的分隔都走 site 內容（main-*.json 的 sources），元件不寫死文案：
+  中文用頓號，英文用跟站上其他提示一樣的「 · 」。
+  排成一行文字而不是清單，是為了直接繼承外層的對齊方式——輪播的圖說置中，
+  左右圖文的內文靠左，出處跟著所在的段落走，不用另外判斷。
+
+  連結都是站外的，跟 Button.astro 的站外連結一樣開新分頁。
+*/
+import { getEntry } from 'astro:content';
+
+interface Props {
+  sources?: { label: string; href: string }[];
+}
+
+const { sources = [] } = Astro.props;
+
+const locale = Astro.currentLocale ?? 'en';
+const site = await getEntry('site', `main-${locale}`);
+const { label, separator } = site!.data.sources;
+---
+
+{
+  sources.length > 0 && (
+    <p class="source-list">
+      <span class="source-list__label">{label}</span>
+      {sources.map((source, i) => (
+        <Fragment>
+          {i > 0 && separator}
+          <a class="source-list__link" href={source.href} target="_blank" rel="noopener noreferrer">
+            {source.label}
+          </a>
+        </Fragment>
+      ))}
+    </p>
+  )
+}
+
+<style>
+  /*
+    出處是附註，不跟內文搶：用最小的 meta 字級、次要文字的灰。[需確認] 字級與顏色
+    標籤沿用 eyebrow 的字距與大寫，跟後面的連結用間距隔開，不另外加冒號。
+    寬度上限跟內文一樣是 --prose-width，長標題才不會比上面的段落還寬。
+  */
+  .source-list {
+    max-width: var(--prose-width);
+    font-size: var(--font-size-meta);
+    line-height: 1.6;
+    color: var(--color-muted);
+  }
+
+  .source-list__label {
+    margin-inline-end: var(--sp-1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* reset.css 把連結的底線全拿掉了；出處要看得出能點，這裡補回來 */
+  .source-list__link {
+    text-decoration: underline;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .source-list__link:hover {
+      color: var(--color-ink);
+    }
+  }
+</style>
