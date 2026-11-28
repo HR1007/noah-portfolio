@@ -134,57 +134,96 @@ sections:
     heading:
       en: >-
         The scene, characters and game components were all built in Figma
-        first, using the beta 3D Transform feature to turn flat parts into 3D
-      zh: 場景、角色和遊戲元件都先在 Figma 裡做好，用 Beta 功能 3D Transform 把平面零件轉成立體
+        first, using the beta 3D transform feature to turn flat parts into 3D
+      zh: 場景、角色和遊戲元件都先在 Figma 裡做好，用 Beta 功能 3D transform 把平面零件轉成立體
     themes:
       - title:
-          en: 3D Transform
-          zh: 3D Transform
+          en: 3D transform
+          zh: 3D transform
         description:
           en: >-
-            A paper-box test of Figma's 3D Transform in five steps: the flat
-            net, each face rotated into place, a tilt, then Depth and
-            Perspective.
-          zh: 用紙盒測試 Figma 的 3D Transform，一共五步：展開圖、各面轉到定位、傾斜，再加上 Depth 和 Perspective。
+            3D transform is a Figma effect that tilts, rotates and arranges
+            text, images, vectors and frames in space. It is non-destructive,
+            so the original artwork stays editable. The first test was a paper
+            box, in five steps: the flat net, each face rotated into place, a
+            tilt, then Depth and Perspective.
+          zh: 3D transform 是 Figma 的一種效果，能讓文字、圖片、向量和 frame 在空間裡傾斜、旋轉和排列；效果不會破壞原圖，套用後圖層一樣能編輯。第一個測試是紙盒，一共五步：展開圖、各面轉到定位、傾斜，再加上 Depth 和 Perspective。
+        sources:
+          - label:
+              en: 'Figma Blog: How 3D transforms and Figma’s agent brought a launch video to life'
+              zh: Figma 部落格〈How 3D transforms and Figma’s agent brought a launch video to life〉
+            href: 'https://www.figma.com/blog/how-3d-transforms-and-figmas-agent-brought-a-launch-video-to-life/'
       - title:
           en: X/Y rotation
           zh: X／Y 旋轉
         description:
           en: >-
-            The display case's glass, shelves, base and light strip are all
-            flat panels turned into place with X and Y rotation. The cookies
-            are top views turned 90° on X to lie flat, 18 across three shelves.
-          zh: 展示櫃的玻璃、層板、底座和燈帶都是一片片平面，用 X、Y 旋轉擺到定位；餅乾是俯視圖，整片轉 X 90° 平躺在層板上，三層共 18 片。
+            3D transform rotates a layer on three axes: X tilts it forward or
+            backward, Y tilts it left or right, and Z spins it clockwise or
+            counterclockwise in the plane of the canvas. The display case's
+            glass, shelves, base and light strip are all flat panels turned into
+            place with X and Y rotation. The cookies are top views turned 90° on
+            X to lie flat, 18 across three shelves.
+          zh: 3D transform 能沿三個軸旋轉圖層：X 軸讓圖層前後傾斜，Y 軸左右傾斜，Z 軸在畫布平面上順時針或逆時針旋轉。展示櫃的玻璃、層板、底座和燈帶都是一片片平面，用 X、Y 旋轉擺到定位；餅乾是俯視圖，整片轉 X 90° 平躺在層板上，三層共 18 片。
+        sources:
+          - label:
+              en: 'Figma Help Center: Use 3D transform and perspective effects in Figma Design'
+              zh: Figma 說明中心〈Use 3D transform and perspective effects in Figma Design〉
+            href: 'https://help.figma.com/hc/en-us/articles/44568893374999-Create-3D-effects-in-Figma-Design'
       - title:
           en: Depth
           zh: Depth
         description:
           en: >-
+            Depth moves a layer along the Z axis, closer to or farther from the
+            viewer. For the depth to show, the parent frame needs Keep nested
+            layers 3D turned on, plus Perspective or a 3D rotation of its own.
             Xiaoli the hedgehog baker is a paper puppet of six flat layers
             spaced apart with Depth, so the layers separate as soon as the
             character turns.
-          zh: 刺蝟麵包師小栗是 6 層平面疊成的紙偶，用 Depth 前後錯開，轉個角度就看得出層次。
+          zh: Depth 讓圖層沿 Z 軸靠近或遠離觀看者。深度要看得出來，父層 frame 得開啟 Keep nested layers 3D，再加上 Perspective 或把父層轉個角度。刺蝟麵包師小栗是 6 層平面疊成的紙偶，用 Depth 前後錯開，轉個角度就看得出層次。
+        sources:
+          - label:
+              en: 'Figma Help Center: Use 3D transform and perspective effects in Figma Design'
+              zh: Figma 說明中心〈Use 3D transform and perspective effects in Figma Design〉
+            href: 'https://help.figma.com/hc/en-us/articles/44568893374999-Create-3D-effects-in-Figma-Design'
       - title:
           en: Perspective
           zh: Perspective
         description:
           en: >-
-            The floor, ceiling and three walls enclose the room, and the
-            viewport is set to Perspective 700. Seen from just inside the door:
-            display cases on the left, the bread rack on the right and the
-            counter at the back.
-          zh: 地板、天花板和三面牆圍成房間，取景框設 Perspective 700，從門口往裡看：左牆是餅乾展示櫃、右牆是麵包層架、後面是櫃台。
+            Perspective goes on a parent frame and controls the sense of
+            distance inside it. Figma compares perspective to moving a camera
+            closer to or farther from a scene, and depth to moving an object
+            within that scene. The bakery's floor, ceiling and three walls
+            enclose the room, and the viewport is set to Perspective 700 px.
+            Seen from just inside the door: display cases on the left, the
+            bread rack on the right and the counter at the back.
+          zh: Perspective 加在父層 frame 上，控制畫面裡的距離感。照 Figma 官方的比喻，Perspective 像把攝影機推近或拉遠，Depth 則是在場景裡移動物件。烘焙店的地板、天花板和三面牆圍成房間，取景框設 Perspective 700 px，從門口往裡看：左牆是餅乾展示櫃、右牆是麵包層架、後面是櫃台。
+        sources:
+          - label:
+              en: 'Figma Help Center: Use 3D transform and perspective effects in Figma Design'
+              zh: Figma 說明中心〈Use 3D transform and perspective effects in Figma Design〉
+            href: 'https://help.figma.com/hc/en-us/articles/44568893374999-Create-3D-effects-in-Figma-Design'
       - title:
           en: Components and instances
           zh: 元件與實例
         description:
           en: >-
-            Cookies, breads, character expressions and shop props are all
-            components, and the question cards and guide book sit in the same
-            section, all kept in sync with the web version. The storefront is
-            assembled from part components for the wall, windows, door and
-            awning, so changing one part updates the whole front.
-          zh: 餅乾、麵包、角色表情和店內道具都做成元件，題目卡和遊戲說明書也收在同一區，全部跟網頁版同步。店面由牆面、櫥窗、店門和遮雨棚的零件元件組成，改一個零件，整面店面跟著更新。
+            A main component defines a component's properties, and an instance
+            is a reusable copy that stays linked to it and receives every update
+            made to the main component. Cookies, breads, character expressions
+            and shop props are all components, and the question cards and guide
+            book sit in the same section, all kept in sync with the web version.
+            The storefront is assembled from part components for the wall,
+            windows, door and awning, so changing one part updates the whole
+            front.
+          zh: 主元件（main component）定義元件的屬性，實例（instance）是可以重複使用的複本，跟主元件連動，主元件一改，實例都會更新。餅乾、麵包、角色表情和店內道具都做成元件，題目卡和遊戲說明書也收在同一區，全部跟網頁版同步。店面由牆面、櫥窗、店門和遮雨棚的零件元件組成，改一個零件，整面店面跟著更新。
+        sources:
+          - label:
+              en: 'Figma Help Center: Guide to components in Figma'
+              zh: Figma 說明中心〈Guide to components in Figma〉
+            href: 'https://help.figma.com/hc/en-us/articles/360038662654-Guide-to-components-in-Figma'
     direction: vertical
     layout: carousel
   - type: flow
@@ -300,16 +339,27 @@ sections:
       zh: 不靠 3D 函式庫的烘焙店
     body:
       en: >-
-        The whole shop is built with plain CSS 3D. Each panel is placed first
-        in Figma's beta 3D Transform. Its position and size carry over as they
-        are, and its Depth and X/Y rotation become translateZ, rotateX and
+        The whole shop is built with plain CSS 3D. Figma's 3D transform maps
+        directly to CSS: Depth is translateZ, Keep nested layers 3D is
+        transform-style: preserve-3d, and Perspective is perspective. So each
+        panel is placed first in Figma. Its position and size carry over as
+        they are, and its Depth and X/Y rotation become translateZ, rotateX and
         rotateY, in the same order Figma applies them. Every number is in Figma
         pixels, so the whole shop scales with the screen width. The floor,
         ceiling, each wall, the fixtures and the customers sit on separate
         layers stacked in a fixed order, which stops Chrome from leaving holes
         in the walls at certain widths. The background music is synthesised
         live in the browser, so there are no audio files either.
-      zh: 整間店用原生 CSS 3D 搭起來。每一片平面先在 Figma 的 Beta 功能 3D Transform 裡擺好，位置和寬高直接沿用，Depth 和 X／Y 旋轉照 Figma 的順序換成 CSS 的 translateZ、rotateX、rotateY；數字都以 Figma 的 1px 為單位，整間店跟著畫面寬度等比縮放。地板、天花板、每一面牆、擺設和顧客各自一層，依固定順序疊起來，避免 Chrome 在某些寬度下把牆漏畫一塊。背景音樂也是瀏覽器即時合成的，沒有用到任何音檔。
+      zh: '整間店用原生 CSS 3D 搭起來。Figma 的 3D transform 本來就對應得到 CSS：Depth 是 translateZ，Keep nested layers 3D 是 transform-style: preserve-3d，Perspective 是 perspective。於是每一片平面先在 Figma 裡擺好，位置和寬高直接沿用，Depth 和 X／Y 旋轉照 Figma 的順序換成 translateZ、rotateX、rotateY；數字都以 Figma 的 1px 為單位，整間店跟著畫面寬度等比縮放。地板、天花板、每一面牆、擺設和顧客各自一層，依固定順序疊起來，避免 Chrome 在某些寬度下把牆漏畫一塊。背景音樂也是瀏覽器即時合成的，沒有用到任何音檔。'
+    sources:
+      - label:
+          en: 'Figma Help Center: Use 3D transform and perspective effects in Figma Design'
+          zh: Figma 說明中心〈Use 3D transform and perspective effects in Figma Design〉
+        href: 'https://help.figma.com/hc/en-us/articles/44568893374999-Create-3D-effects-in-Figma-Design'
+      - label:
+          en: 'Figma Plugin API: Transform3d'
+          zh: Figma Plugin API〈Transform3d〉
+        href: 'https://developers.figma.com/docs/plugins/api/Transform3d/'
     imagePosition: left
     ratio: 16/10
     alt:
